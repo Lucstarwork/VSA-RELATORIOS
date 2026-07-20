@@ -270,7 +270,7 @@
         <div class='kpi-card'>
           <div class='icone-badge'><i class='fa-solid fa-bed'></i></div>
           <div class='valor' id='valPernoites'></div>
-          <div class='rotulo'>Pernoites</div>
+          <div class='rotulo' id='rotuloPernoites'>Pernoites</div>
           <div class='extra'>
             <div class='contexto'><b id='valPessoasPernoite'></b> pessoas · <b id='tagMediaPernoite'></b>/pess.</div>
           </div>
@@ -303,7 +303,7 @@
       
       <div class='insight' style='margin-top:8px;'>
         <i class='fa-solid fa-bed'></i>
-        <span>Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.</span>
+        <span id='textoPernoitesFrequencia'>Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.</span>
       </div>
 
     </section>
@@ -324,12 +324,12 @@
         <div class='kpi-card success'>
           <div class='icone-badge'><i class='fa-solid fa-user-plus'></i></div>
           <div class='valor' id='valNovasPessoas'></div>
-          <div class='rotulo'>Público Inédito</div>
+          <div class='rotulo'>Público Inédito <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que não participaram em nenhum dia da operação inverno do ano anterior (2025).'></i></div>
         </div>
         <div class='kpi-card info'>
           <div class='icone-badge'><i class='fa-solid fa-user-clock'></i></div>
           <div class='valor' id='valPessoasAntigas'></div>
-          <div class='rotulo'>Público Recorrente</div>
+          <div class='rotulo'>Público Recorrente <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que já participaram em algum dia da operação inverno do ano anterior (2025).'></i></div>
         </div>
         <div class='kpi-card'>
           <div class='icone-badge'><i class='fa-solid fa-bed'></i></div>
@@ -387,24 +387,24 @@
 <script>
 const dados = {
   "identificacao": {
-    "numero": "03/2026"
+    "numero": "04/2026"
   },
   "semanaAtual": {
-    "inicio": "06/07/2026",
-    "fim": "12/07/2026",
+    "inicio": "13/07/2026",
+    "fim": "19/07/2026",
     "porDia": {
-      "Seg": 36,
-      "Ter": 46,
-      "Qua": 47,
-      "Qui": 38,
-      "Sex": 38,
-      "Sáb": 28,
-      "Dom": 25
+      "Seg": 44,
+      "Ter": 48,
+      "Qua": 49,
+      "Qui": 48,
+      "Sex": 39,
+      "Sáb": 29,
+      "Dom": 33
     },
     "porDiaPernoites": {
       "Seg": 0,
       "Ter": 0,
-      "Qua": 0,
+      "Qua": 45,
       "Qui": 0,
       "Sex": 0,
       "Sáb": 0,
@@ -480,7 +480,7 @@ const dados = {
       "porDia": {
         "Seg": 36,
         "Ter": 46,
-        "Qua": 47,
+        "Qua": 48,
         "Qui": 38,
         "Sex": 38,
         "Sáb": 28,
@@ -504,6 +504,37 @@ const dados = {
         "umaNoite": 0,
         "maisDeDuasNoites": 0
       }
+    },
+    "4": {
+      "inicio": "13/07/2026",
+      "fim": "19/07/2026",
+      "porDia": {
+        "Seg": 44,
+        "Ter": 48,
+        "Qua": 49,
+        "Qui": 48,
+        "Sex": 39,
+        "Sáb": 29,
+        "Dom": 33
+      },
+      "porDiaPernoites": {
+        "Seg": 0,
+        "Ter": 0,
+        "Qua": 45,
+        "Qui": 0,
+        "Sex": 0,
+        "Sáb": 0,
+        "Dom": 0
+      },
+      "pernoites": {
+        "total": 45,
+        "pessoasComPernoite": 44,
+        "mediaPorPessoa": 1.02
+      },
+      "pernoitesFrequencia": {
+        "umaNoite": 43,
+        "maisDeDuasNoites": 0
+      }
     }
   },
   "ultimasSemanas": [
@@ -517,41 +548,45 @@ const dados = {
     },
     {
       "label": "S3",
-      "total": 258
+      "total": 259
+    },
+    {
+      "label": "S4",
+      "total": 290
     }
   ],
   "pernoites": {
-    "total": 0,
-    "pessoasComPernoite": 0,
-    "mediaPorPessoa": 0.0
+    "total": 45,
+    "pessoasComPernoite": 44,
+    "mediaPorPessoa": 1.02
   },
   "periodoOperacao": {
     "inicio": "22/06/2026",
-    "fimReferencia": "12/07/2026",
-    "diasCorridos": 21
+    "fimReferencia": "19/07/2026",
+    "diasCorridos": 28
   },
-  "totalAcumulado": 587,
-  "pessoasUnicasAcumulado": 97,
-  "pessoasComPernoiteAcumulado": 63,
+  "totalAcumulado": 878,
+  "pessoasUnicasAcumulado": 121,
+  "pessoasComPernoiteAcumulado": 91,
   "faixaEtaria": {
     "0–17": 0,
-    "18–29": 23,
-    "30–44": 61,
-    "45–59": 12,
+    "18–29": 31,
+    "30–44": 72,
+    "45–59": 17,
     "60+": 1
   },
   "sexo": {
-    "Masculino": 85,
-    "Feminino": 12
+    "Masculino": 106,
+    "Feminino": 15
   },
-  "idadeMedia": 36.0,
-  "novasPessoas": 73,
-  "pessoasAntigas": 24,
+  "idadeMedia": 35.77,
+  "novasPessoas": 95,
+  "pessoasAntigas": 26,
   "pernoitesFrequencia": {
-    "semana1Noite": 0,
+    "semana1Noite": 43,
     "semanaMais2Noites": 0,
-    "total1Noite": 8,
-    "totalMais2Noites": 45
+    "total1Noite": 35,
+    "totalMais2Noites": 47
   }
 };
 
@@ -681,19 +716,52 @@ function renderizarSemana(n){
   const totalSemana = soma(s.porDia);
   const mediaDiaria = totalSemana/(Object.keys(s.porDia).length || 1);
 
+  let pernoitesTotal = s.pernoites.total;
+  let pessoasComPernoite = s.pernoites.pessoasComPernoite;
+  let mediaPorPessoa = s.pernoites.mediaPorPessoa;
+  let porDiaPernoites = s.porDiaPernoites || {};
+  let umaNoite = (s.pernoitesFrequencia && s.pernoitesFrequencia.umaNoite) || 0;
+  let maisDeDuasNoites = (s.pernoitesFrequencia && s.pernoitesFrequencia.maisDeDuasNoites) || 0;
+  
+  const rotuloPernoites = document.getElementById("rotuloPernoites");
+  const textoPernoitesFrequencia = document.getElementById("textoPernoitesFrequencia");
+
+  if (n >= 3) {
+    pernoitesTotal = totalSemana;
+    pessoasComPernoite = totalSemana;
+    mediaPorPessoa = 1.0;
+    porDiaPernoites = s.porDia;
+    umaNoite = totalSemana;
+    maisDeDuasNoites = 0;
+    
+    if (rotuloPernoites) {
+      rotuloPernoites.innerHTML = "Pernoites <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='Devido a uma falha de comunicação, os registros de pernoites a partir da semana 3 estão incorretos. A quantidade exibida é baseada no total de atendimentos.'></i>";
+    }
+    if (textoPernoitesFrequencia) {
+      textoPernoitesFrequencia.innerHTML = "Dados sobre frequência de noites por pessoa indisponíveis devido à falha de registro nesta semana.";
+    }
+  } else {
+    if (rotuloPernoites) {
+      rotuloPernoites.innerHTML = "Pernoites";
+    }
+    if (textoPernoitesFrequencia) {
+      textoPernoitesFrequencia.innerHTML = "Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.";
+    }
+  }
+
   animarNumero(document.getElementById("valTotalSemana"), totalSemana, fmt);
   animarNumero(document.getElementById("valMediaSemana"), mediaDiaria, v=>dec(v,1));
-  animarNumero(document.getElementById("valPernoites"), s.pernoites.total, fmt);
-  document.getElementById("valPessoasPernoite").textContent = fmt(s.pernoites.pessoasComPernoite);
-  document.getElementById("tagMediaPernoite").textContent = dec(s.pernoites.mediaPorPessoa,1);
+  animarNumero(document.getElementById("valPernoites"), pernoitesTotal, fmt);
+  document.getElementById("valPessoasPernoite").textContent = fmt(pessoasComPernoite);
+  document.getElementById("tagMediaPernoite").textContent = dec(mediaPorPessoa,1);
 
-  document.getElementById("semana1Noite").textContent = (s.pernoitesFrequencia && s.pernoitesFrequencia.umaNoite) || 0;
-  document.getElementById("semanaMais2Noites").textContent = (s.pernoitesFrequencia && s.pernoitesFrequencia.maisDeDuasNoites) || 0;
+  if (document.getElementById("semana1Noite")) document.getElementById("semana1Noite").textContent = umaNoite;
+  if (document.getElementById("semanaMais2Noites")) document.getElementById("semanaMais2Noites").textContent = maisDeDuasNoites;
 
   if(chartTendencia){
     chartTendencia.data.labels = Object.keys(s.porDia);
     chartTendencia.data.datasets[0].data = Object.values(s.porDia);
-    chartTendencia.data.datasets[1].data = Object.values(s.porDiaPernoites || {});
+    chartTendencia.data.datasets[1].data = Object.values(porDiaPernoites);
     chartTendencia.update();
   }
   if(chartComparativo){
