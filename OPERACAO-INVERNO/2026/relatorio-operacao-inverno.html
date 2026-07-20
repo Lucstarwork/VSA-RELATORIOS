@@ -62,7 +62,7 @@
     background:var(--gray-2);
     font-size:var(--fs-base);
   }
-  .pagina{ display:flex; justify-content:center; padding: 1.5vh 2.5vw; height: 100vh; overflow-y: auto; overflow-x: hidden; }
+  .pagina{ display:flex; justify-content:center; padding: 0.5vh 1vw; height: 100vh; overflow-y: auto; overflow-x: hidden; }
   .folha{
     width: 100%;
     max-width: none;
@@ -174,6 +174,7 @@
 
   /* ===== Gráficos ===== */
   .grafico-linha{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; flex:1; min-height:0; }
+  .grafico-linha--3{ grid-template-columns:repeat(3, 1fr); }
   .grafico{
     background:var(--pure-0); border:1px solid var(--gray-10); border-radius:var(--rounder-sm);
     padding:12px; box-shadow:var(--shadow-sm);
@@ -343,7 +344,7 @@
         </div>
       </div>
 
-      <div class='grafico-linha'>
+      <div class='grafico-linha grafico-linha--3'>
         <div class='grafico'>
           <div class='titulo-row'>
             <span class='mini-icon'><i class='fa-solid fa-chart-bar'></i></span>
@@ -360,6 +361,14 @@
           <div class='nota'>Total Acumulado</div>
           <div class='corpo'><canvas id='chartSexo'></canvas></div>
         </div>
+        <div class='grafico'>
+          <div class='titulo-row'>
+            <span class='mini-icon'><i class='fa-solid fa-users'></i></span>
+            <h3>Raça/Cor</h3>
+          </div>
+          <div class='nota'>Total Acumulado</div>
+          <div class='corpo'><canvas id='chartRaca'></canvas></div>
+        </div>
       </div>
 
       <div class='insight'>
@@ -374,10 +383,6 @@
 
     </section>
     </main>
-
-    <div class='rodape'>
-      <div class='fecho' id='fechoData'></div>
-    </div>
 
   </div>
 </div>
@@ -579,6 +584,12 @@ const dados = {
     "Masculino": 106,
     "Feminino": 15
   },
+  "raca": {
+    "Branca": 58,
+    "Parda": 47,
+    "Preta": 15,
+    "Não Informado": 1
+  },
   "idadeMedia": 35.77,
   "novasPessoas": 95,
   "pessoasAntigas": 26,
@@ -587,7 +598,1219 @@ const dados = {
     "semanaMais2Noites": 0,
     "total1Noite": 35,
     "totalMais2Noites": 47
-  }
+  },
+  "dadosBrutosAcumulados": [
+    {
+      "id": "1066",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 34,
+      "pernoites": 3,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "11607",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 12,
+      "inedito": true,
+      "totalAtendimentos": 21
+    },
+    {
+      "id": "13597",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "15771",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 41,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 7
+    },
+    {
+      "id": "20921",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 28,
+      "pernoites": 9,
+      "inedito": true,
+      "totalAtendimentos": 24
+    },
+    {
+      "id": "27512",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 30,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 11
+    },
+    {
+      "id": "28555",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 45,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "62295",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 11,
+      "inedito": true,
+      "totalAtendimentos": 20
+    },
+    {
+      "id": "76633",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 25,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "79646",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 4,
+      "inedito": false,
+      "totalAtendimentos": 13
+    },
+    {
+      "id": "83620",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 54,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "100791",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 23,
+      "pernoites": 3,
+      "inedito": false,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "105745",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 39,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "109324",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 16
+    },
+    {
+      "id": "118976",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 30,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 8
+    },
+    {
+      "id": "119780",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 26,
+      "pernoites": 3,
+      "inedito": false,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "121168",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 26,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "122837",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 39,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 7
+    },
+    {
+      "id": "125589",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 14,
+      "inedito": true,
+      "totalAtendimentos": 28
+    },
+    {
+      "id": "128819",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 21,
+      "pernoites": 3,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "130687",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 45,
+      "pernoites": 3,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "141624",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 40,
+      "pernoites": 8,
+      "inedito": false,
+      "totalAtendimentos": 11
+    },
+    {
+      "id": "147155",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 40,
+      "pernoites": 3,
+      "inedito": true,
+      "totalAtendimentos": 8
+    },
+    {
+      "id": "167490",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 34,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "168999",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 27,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "181561",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 47,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "189775",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 25,
+      "pernoites": 3,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "194832",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 54,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "209304",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 42,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "231974",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "60+",
+      "idade": 62,
+      "pernoites": 4,
+      "inedito": true,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "250378",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 8
+    },
+    {
+      "id": "259522",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 4,
+      "inedito": false,
+      "totalAtendimentos": 9
+    },
+    {
+      "id": "265680",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "45–59",
+      "idade": 46,
+      "pernoites": 1,
+      "inedito": false,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "276257",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 41,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "279680",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 41,
+      "pernoites": 3,
+      "inedito": true,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "287550",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 39,
+      "pernoites": 3,
+      "inedito": true,
+      "totalAtendimentos": 8
+    },
+    {
+      "id": "303191",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 44,
+      "pernoites": 13,
+      "inedito": true,
+      "totalAtendimentos": 21
+    },
+    {
+      "id": "318519",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 33,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "326094",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 3,
+      "inedito": false,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "333006",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 24,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "341357",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 1,
+      "inedito": false,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "366770",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 27,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "415034",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "45–59",
+      "idade": 49,
+      "pernoites": 4,
+      "inedito": false,
+      "totalAtendimentos": 7
+    },
+    {
+      "id": "419477",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 22,
+      "pernoites": 6,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "421738",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 13,
+      "inedito": true,
+      "totalAtendimentos": 29
+    },
+    {
+      "id": "434712",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "443574",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 15
+    },
+    {
+      "id": "443615",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 24,
+      "pernoites": 1,
+      "inedito": false,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "458751",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 30,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "465608",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 3,
+      "inedito": false,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "467657",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 26,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "467900",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 23,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "468075",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 36,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "477571",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 40,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "479455",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 9
+    },
+    {
+      "id": "489199",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "45–59",
+      "idade": 50,
+      "pernoites": 5,
+      "inedito": false,
+      "totalAtendimentos": 8
+    },
+    {
+      "id": "490483",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 5,
+      "inedito": false,
+      "totalAtendimentos": 7
+    },
+    {
+      "id": "491166",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 44,
+      "pernoites": 9,
+      "inedito": false,
+      "totalAtendimentos": 13
+    },
+    {
+      "id": "496585",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 40,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "498360",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 34,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "499156",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 50,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "499157",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 53,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "500735",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 5,
+      "inedito": true,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "503778",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 43,
+      "pernoites": 1,
+      "inedito": false,
+      "totalAtendimentos": 12
+    },
+    {
+      "id": "504837",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 39,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "505854",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 22,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "506331",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 43,
+      "pernoites": 5,
+      "inedito": true,
+      "totalAtendimentos": 7
+    },
+    {
+      "id": "507300",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 30,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "507924",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "508670",
+      "sexo": "Feminino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 36,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "512508",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 33,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "513344",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 38,
+      "pernoites": 3,
+      "inedito": false,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "514644",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "45–59",
+      "idade": 46,
+      "pernoites": 1,
+      "inedito": false,
+      "totalAtendimentos": 16
+    },
+    {
+      "id": "515250",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 3,
+      "inedito": false,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "516158",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 4,
+      "inedito": true,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "517643",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 43,
+      "pernoites": 3,
+      "inedito": false,
+      "totalAtendimentos": 11
+    },
+    {
+      "id": "519111",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 41,
+      "pernoites": 1,
+      "inedito": false,
+      "totalAtendimentos": 14
+    },
+    {
+      "id": "522331",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "522733",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 43,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "525441",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 22,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "525671",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "526225",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 6,
+      "inedito": false,
+      "totalAtendimentos": 12
+    },
+    {
+      "id": "526835",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 36,
+      "pernoites": 4,
+      "inedito": false,
+      "totalAtendimentos": 8
+    },
+    {
+      "id": "527628",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 27,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "529212",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 23,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "531866",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 27,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "531867",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 27,
+      "pernoites": 8,
+      "inedito": true,
+      "totalAtendimentos": 9
+    },
+    {
+      "id": "532222",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 4,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "532964",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 44,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "533507",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 22,
+      "pernoites": 8,
+      "inedito": true,
+      "totalAtendimentos": 16
+    },
+    {
+      "id": "534937",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 5,
+      "inedito": true,
+      "totalAtendimentos": 10
+    },
+    {
+      "id": "534939",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 8
+    },
+    {
+      "id": "535674",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 24,
+      "pernoites": 7,
+      "inedito": true,
+      "totalAtendimentos": 17
+    },
+    {
+      "id": "535841",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 42,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "536514",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "538273",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 12,
+      "inedito": true,
+      "totalAtendimentos": 24
+    },
+    {
+      "id": "539141",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 40,
+      "pernoites": 13,
+      "inedito": true,
+      "totalAtendimentos": 21
+    },
+    {
+      "id": "539462",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 44,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "540033",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 43,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "540278",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "45–59",
+      "idade": 48,
+      "pernoites": 13,
+      "inedito": true,
+      "totalAtendimentos": 27
+    },
+    {
+      "id": "540497",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 19,
+      "pernoites": 9,
+      "inedito": true,
+      "totalAtendimentos": 12
+    },
+    {
+      "id": "540511",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 39,
+      "pernoites": 4,
+      "inedito": true,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "540711",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 42,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "540840",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "45–59",
+      "idade": 46,
+      "pernoites": 5,
+      "inedito": true,
+      "totalAtendimentos": 11
+    },
+    {
+      "id": "540856",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "45–59",
+      "idade": 45,
+      "pernoites": 7,
+      "inedito": true,
+      "totalAtendimentos": 15
+    },
+    {
+      "id": "541031",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 34,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 12
+    },
+    {
+      "id": "541037",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 25,
+      "pernoites": 4,
+      "inedito": true,
+      "totalAtendimentos": 11
+    },
+    {
+      "id": "541159",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 38,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 12
+    },
+    {
+      "id": "541161",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 54,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 13
+    },
+    {
+      "id": "541222",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "541303",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 38,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "541342",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 39,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "541370",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 10
+    },
+    {
+      "id": "541381",
+      "sexo": "Feminino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "541399",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 4
+    },
+    {
+      "id": "541416",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 51,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 8
+    },
+    {
+      "id": "541459",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 5
+    },
+    {
+      "id": "541516",
+      "sexo": "Feminino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "541576",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 41,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "541628",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "541670",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "45–59",
+      "idade": 51,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 3
+    }
+  ]
 };
 
 const paleta = ["#007044", "#005484", "#FDB92E", "#ED3237", "#34B778", "#0098DA", "#757575"];
@@ -618,8 +1841,6 @@ const hoje = new Date();
 document.getElementById("dataEmissao").textContent = hoje.toLocaleDateString("pt-BR");
 document.getElementById("tituloAcumulado").textContent = `${dados.periodoOperacao.inicio} – ${dados.periodoOperacao.fimReferencia}`;
 
-const meses = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
-document.getElementById("fechoData").textContent = `Araucária, ${hoje.getDate()} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
 
 const mediaUltimasSemanas = dados.ultimasSemanas.length > 0 ? (soma(Object.fromEntries(dados.ultimasSemanas.map((s,i)=>[i,s.total]))) / dados.ultimasSemanas.length) : 0;
 
@@ -640,6 +1861,23 @@ if(document.getElementById("chartComparativoSemanas")) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      onClick: (e, activeElements) => {
+        if (activeElements.length > 0) {
+          const index = activeElements[0].index;
+          const label = dados.ultimasSemanas[index].label; // Ex: "S3"
+          const numeroSemana = parseInt(label.replace(/\D/g, ''));
+          const seletor = document.getElementById("seletorSemana");
+          if (numeroSemana && seletor) {
+            if (Array.from(seletor.options).some(opt => opt.value == numeroSemana)) {
+              seletor.value = numeroSemana;
+              renderizarSemana(numeroSemana);
+            }
+          }
+        }
+      },
+      onHover: (e, activeElements) => {
+        e.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+      },
       plugins: {
         legend: { display: false },
         datalabels: {
@@ -789,24 +2027,116 @@ seletorSemana.value = semanaInicial;
 seletorSemana.addEventListener("change", () => renderizarSemana(Number(seletorSemana.value)));
 renderizarSemana(semanaInicial);
 
-const diasOperacao = dados.periodoOperacao.diasCorridos;
-const mediaDiariaTotal = dados.totalAcumulado/diasOperacao;
+let filtroSexo = null;
+let filtroFaixa = null;
+let filtroRaca = null;
+let chartFaixaEtaria = null;
+let chartSexo = null;
+let chartRaca = null;
 
-animarNumero(document.getElementById("valTotalAcumulado"), dados.totalAcumulado, fmt);
-animarNumero(document.getElementById("valPessoasComPernoiteTotal"), dados.pessoasComPernoiteAcumulado, fmt);
-animarNumero(document.getElementById("valMediaGeral"), mediaDiariaTotal, n=>dec(n,1));
+function renderizarAcumulado() {
+  if (!dados.dadosBrutosAcumulados) {
+    // Fallback original
+    const diasOperacao = dados.periodoOperacao.diasCorridos;
+    const mediaDiariaTotal = dados.totalAcumulado/diasOperacao;
+    animarNumero(document.getElementById("valTotalAcumulado"), dados.totalAcumulado, fmt);
+    animarNumero(document.getElementById("valPessoasComPernoiteTotal"), dados.pessoasComPernoiteAcumulado, fmt);
+    animarNumero(document.getElementById("valMediaGeral"), mediaDiariaTotal, n=>dec(n,1));
+    animarNumero(document.getElementById("valNovasPessoas"), dados.novasPessoas, fmt);
+    animarNumero(document.getElementById("valPessoasAntigas"), dados.pessoasAntigas, fmt);
+    if(dados.pernoitesFrequencia) {
+        document.getElementById("total1Noite").textContent = dados.pernoitesFrequencia.total1Noite || 0;
+        document.getElementById("totalMais2Noites").textContent = dados.pernoitesFrequencia.totalMais2Noites || 0;
+    }
+    return;
+  }
 
-animarNumero(document.getElementById("valNovasPessoas"), dados.novasPessoas, fmt);
-animarNumero(document.getElementById("valPessoasAntigas"), dados.pessoasAntigas, fmt);
+  let base = dados.dadosBrutosAcumulados;
+  
+  if (filtroSexo) base = base.filter(p => p.sexo === filtroSexo);
+  if (filtroFaixa) base = base.filter(p => p.faixaEtaria === filtroFaixa);
+  if (filtroRaca) base = base.filter(p => p.raca === filtroRaca);
+  
+  let totalAtend = 0;
+  let pessPernoite = 0;
+  let novas = 0;
+  let antigas = 0;
+  let umaNoite = 0;
+  let maisDuas = 0;
+  
+  let aggFaixa = {};
+  let aggSexo = {};
+  let aggRaca = {};
+  
+  const faixasOriginais = Object.keys(dados.faixaEtaria || {});
+  const racasOriginais = Object.keys(dados.raca || {});
+  
+  faixasOriginais.forEach(f => aggFaixa[f] = 0);
+  Object.keys(dados.sexo || {}).forEach(s => aggSexo[s] = 0);
+  racasOriginais.forEach(r => aggRaca[r] = 0);
+  
+  base.forEach(p => {
+    totalAtend += p.totalAtendimentos;
+    if (p.pernoites > 0) pessPernoite++;
+    if (p.inedito) novas++; else antigas++;
+    
+    if (p.pernoites === 1) umaNoite++;
+    if (p.pernoites > 2) maisDuas++;
+    
+    if (aggFaixa[p.faixaEtaria] !== undefined) aggFaixa[p.faixaEtaria]++;
+    if (aggSexo[p.sexo] !== undefined) aggSexo[p.sexo]++;
+    if (aggRaca[p.raca] !== undefined) aggRaca[p.raca]++;
+  });
+  
+  const diasOperacao = dados.periodoOperacao.diasCorridos;
+  const mediaDiariaTotal = totalAtend/diasOperacao;
 
-if(dados.pernoitesFrequencia) {
-    document.getElementById("total1Noite").textContent = dados.pernoitesFrequencia.total1Noite || 0;
-    document.getElementById("totalMais2Noites").textContent = dados.pernoitesFrequencia.totalMais2Noites || 0;
+  animarNumero(document.getElementById("valTotalAcumulado"), totalAtend, fmt);
+  animarNumero(document.getElementById("valPessoasComPernoiteTotal"), pessPernoite, fmt);
+  animarNumero(document.getElementById("valMediaGeral"), mediaDiariaTotal, n=>dec(n,1));
+  animarNumero(document.getElementById("valNovasPessoas"), novas, fmt);
+  animarNumero(document.getElementById("valPessoasAntigas"), antigas, fmt);
+
+  if (document.getElementById("total1Noite")) document.getElementById("total1Noite").textContent = umaNoite;
+  if (document.getElementById("totalMais2Noites")) document.getElementById("totalMais2Noites").textContent = maisDuas;
+  
+  if (chartFaixaEtaria) {
+    chartFaixaEtaria.data.datasets[0].data = faixasOriginais.map(f => aggFaixa[f]);
+    chartFaixaEtaria.data.datasets[0].backgroundColor = faixasOriginais.map(f => 
+       filtroFaixa && filtroFaixa !== f ? "#e6e6e6" : paleta[0]
+    );
+    chartFaixaEtaria.update();
+  }
+  
+  if (chartSexo) {
+    chartSexo.data.datasets[0].data = Object.keys(aggSexo).map(s => aggSexo[s]);
+    chartSexo.data.datasets[0].backgroundColor = Object.keys(aggSexo).map((s, i) => 
+       filtroSexo && filtroSexo !== s ? "#e6e6e6" : paleta[i]
+    );
+    chartSexo.update();
+  }
+  
+  if (chartRaca) {
+    chartRaca.data.datasets[0].data = racasOriginais.map(r => aggRaca[r]);
+    chartRaca.data.datasets[0].backgroundColor = racasOriginais.map((r, i) => 
+       filtroRaca && filtroRaca !== r ? "#e6e6e6" : paleta[i % paleta.length]
+    );
+    chartRaca.update();
+  }
+  
+  const topFaixa = Object.entries(aggFaixa).sort((a,b)=>b[1]-a[1])[0] || ["",0];
+  const topSexo = Object.entries(aggSexo).sort((a,b)=>b[1]-a[1])[0] || ["",0];
+  const topRaca = Object.entries(aggRaca).sort((a,b)=>b[1]-a[1])[0] || ["",0];
+  const tFaixa = soma(aggFaixa) || 1;
+  const tSexo = soma(aggSexo) || 1;
+  const tRaca = soma(aggRaca) || 1;
+  document.getElementById("textoInsightTotal").innerHTML =
+    `Perfil predominante na seleção: faixa etária <b>${topFaixa[0]}</b> (${dec((topFaixa[1]/tFaixa)*100,1)}%), sexo <b>${(topSexo[0]||"").toLowerCase()}</b> (${dec((topSexo[1]/tSexo)*100,1)}%) e raça/cor <b>${(topRaca[0]||"").toLowerCase()}</b> (${dec((topRaca[1]/tRaca)*100,1)}%).`;
 }
 
 // Chart: Faixa Etaria
 if(document.getElementById("chartFaixaEtaria")) {
-  new Chart(document.getElementById("chartFaixaEtaria"), {
+  chartFaixaEtaria = new Chart(document.getElementById("chartFaixaEtaria"), {
     type: "bar",
     data: {
       labels: Object.keys(dados.faixaEtaria),
@@ -820,6 +2150,17 @@ if(document.getElementById("chartFaixaEtaria")) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      onClick: (e, activeElements) => {
+        if (activeElements.length > 0) {
+          const index = activeElements[0].index;
+          const lbl = chartFaixaEtaria.data.labels[index];
+          filtroFaixa = (filtroFaixa === lbl) ? null : lbl;
+          renderizarAcumulado();
+        }
+      },
+      onHover: (e, activeElements) => {
+        e.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+      },
       plugins: {
         legend: { display: false },
         datalabels: {
@@ -838,7 +2179,7 @@ if(document.getElementById("chartFaixaEtaria")) {
 
 // Chart: Sexo
 if(document.getElementById("chartSexo")) {
-  new Chart(document.getElementById("chartSexo"), {
+  chartSexo = new Chart(document.getElementById("chartSexo"), {
     type: "doughnut",
     data: {
       labels: Object.keys(dados.sexo),
@@ -854,6 +2195,17 @@ if(document.getElementById("chartSexo")) {
       responsive: true,
       maintainAspectRatio: false,
       cutout: "70%",
+      onClick: (e, activeElements) => {
+        if (activeElements.length > 0) {
+          const index = activeElements[0].index;
+          const lbl = chartSexo.data.labels[index];
+          filtroSexo = (filtroSexo === lbl) ? null : lbl;
+          renderizarAcumulado();
+        }
+      },
+      onHover: (e, activeElements) => {
+        e.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+      },
       plugins: {
         legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 6, font: { size: 10 } } },
         datalabels: {
@@ -870,14 +2222,50 @@ if(document.getElementById("chartSexo")) {
   });
 }
 
-const faixaTopEntry = Object.entries(dados.faixaEtaria).sort((a,b)=>b[1]-a[1])[0];
-const totalPessoasFaixa = soma(dados.faixaEtaria);
-const faixaTopPct = dec((faixaTopEntry[1]/(totalPessoasFaixa||1))*100,1);
-const generoTopEntry = Object.entries(dados.sexo).sort((a,b)=>b[1]-a[1])[0];
-const totalPessoasGenero = soma(dados.sexo);
-const generoTopPct = dec((generoTopEntry[1]/(totalPessoasGenero||1))*100,1);
-document.getElementById("textoInsightTotal").innerHTML =
-  `Perfil predominante: faixa etária <b>${faixaTopEntry[0]}</b> (${faixaTopPct}%) e sexo <b>${generoTopEntry[0].toLowerCase()}</b> (${generoTopPct}%).`;
+// Chart: Raca/Cor
+if(document.getElementById("chartRaca")) {
+  chartRaca = new Chart(document.getElementById("chartRaca"), {
+    type: "bar",
+    data: {
+      labels: Object.keys(dados.raca || {}),
+      datasets: [{
+        data: Object.values(dados.raca || {}),
+        backgroundColor: Object.keys(dados.raca || {}).map((r, i) => paleta[i % paleta.length]),
+        borderRadius: 4,
+        maxBarThickness: 34
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onClick: (e, activeElements) => {
+        if (activeElements.length > 0) {
+          const index = activeElements[0].index;
+          const lbl = chartRaca.data.labels[index];
+          filtroRaca = (filtroRaca === lbl) ? null : lbl;
+          renderizarAcumulado();
+        }
+      },
+      onHover: (e, activeElements) => {
+        e.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+      },
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          anchor: "end", align: "end",
+          font: { size: 10, weight: "bold" },
+          formatter: Math.round
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, border: { display: false } },
+        y: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "15%" }
+      }
+    }
+  });
+}
+
+renderizarAcumulado();
 </script>
 </body>
 </html>
