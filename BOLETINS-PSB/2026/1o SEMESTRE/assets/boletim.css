@@ -203,6 +203,13 @@ table.gov-table th.sort-desc::after { content: '↓'; opacity: 1 !important; col
 .alerta-box ul { margin: var(--spacing-scale-base) 0 0 0; padding-left: var(--spacing-scale-3x); }
 
 .narrativa { background-color: var(--pure-0); border: 1px solid var(--gray-10); border-radius: var(--surface-rounder-md); box-shadow: var(--surface-shadow-sm); padding: var(--spacing-scale-3x); margin-bottom: var(--spacing-scale-4x); }
+.narrativa-secao { margin-bottom: var(--spacing-scale-3x); }
+.narrativa-secao:last-child { margin-bottom: 0; }
+.narrativa-secao h4 {
+    font-size: var(--font-size-scale-up-01); font-weight: 700; color: var(--brand-primary);
+    margin: 0 0 var(--spacing-scale-base) 0;
+}
+.narrativa-secao p { margin: 0; color: var(--gray-80); }
 
 .gov-table-wrapper { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 .gov-table-wrapper::-webkit-scrollbar { display: none; }
@@ -223,6 +230,17 @@ table.gov-table th.sort-desc::after { content: '↓'; opacity: 1 !important; col
 .chart-card.categoria-scfv { border-top: 4px solid var(--brand-secondary); }
 .chart-card.categoria-beneficios { border-top: 4px solid var(--brand-accent); }
 .chart-card.categoria-pessoal { border-top: 4px solid var(--gray-60); }
+.chart-card.categoria-demografia { border-top: 4px solid var(--feedback-info); }
+.chart-card.categoria-motivos { border-top: 4px solid var(--feedback-success); }
+
+.chart-grid-2 {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-scale-3x);
+    margin-bottom: var(--spacing-scale-4x);
+}
+.chart-grid-2 .chart-card { margin-bottom: 0; }
+@media (max-width: 768px) {
+    .chart-grid-2 { grid-template-columns: 1fr; }
+}
 
 .chart-filter {
     display: flex;
@@ -245,9 +263,9 @@ table.gov-table th.sort-desc::after { content: '↓'; opacity: 1 !important; col
 .dropdown-trigger i { transition: transform var(--duration-fast, 0.3s); color: var(--brand-primary); flex-shrink: 0; margin-left: 8px; }
 .dropdown-trigger.active i { transform: rotate(180deg); }
 .dropdown-trigger .placeholder { color: var(--gray-50); font-weight: var(--font-weight-regular, 400); }
-.dropdown-surface { text-align: left; position: absolute; top: calc(100% + 4px); left: 0; width: 100%; max-height: 260px; overflow-y: auto; background: var(--pure-0); border: 1px solid var(--gray-20); border-radius: var(--surface-rounder-sm, 4px); box-shadow: var(--surface-shadow-md, 0 3px 6px rgba(0,0,0,0.16)); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all var(--duration-fast, 0.3s) var(--animation-ease, cubic-bezier(.25, .1, .25, 1)); z-index: 2100; }
+.dropdown-surface { text-align: left; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; width: max-content; max-height: 260px; overflow-y: auto; background: var(--pure-0); border: 1px solid var(--gray-20); border-radius: var(--surface-rounder-sm, 4px); box-shadow: var(--surface-shadow-md, 0 3px 6px rgba(0,0,0,0.16)); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all var(--duration-fast, 0.3s) var(--animation-ease, cubic-bezier(.25, .1, .25, 1)); z-index: 2100; }
 .dropdown-trigger.active+.dropdown-surface { opacity: 1; visibility: visible; transform: translateY(0); }
-.dropdown-item { padding: 10px 14px; cursor: pointer; color: var(--gray-80); font-size: 14px; transition: background var(--duration-fast, 0.3s), color var(--duration-fast, 0.3s); }
+.dropdown-item { padding: 10px 14px; cursor: pointer; color: var(--gray-80); font-size: 14px; white-space: nowrap; transition: background var(--duration-fast, 0.3s), color var(--duration-fast, 0.3s); }
 .dropdown-item:hover, .dropdown-item.active { background: var(--feedback-info-bg, #edf5ff); color: var(--brand-primary); font-weight: var(--font-weight-bold, 700); }
 .chart-filter:has(.dropdown-trigger.active) { position: relative; z-index: 2100; }
 .dropdown-demo-container.dropdown-compacto { width: auto; min-width: 180px; }
