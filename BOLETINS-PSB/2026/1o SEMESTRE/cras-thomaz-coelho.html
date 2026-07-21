@@ -188,8 +188,45 @@
     <h3>Perfil de Vulnerabilidade Territorial</h3>
     <div class="chart-area"><canvas id="grafico-vulnerabilidade"></canvas></div>
     <div class="chart-footer">Fonte: Observatório CadÚnico. Indicadores percentuais de vulnerabilidade das famílias referenciadas por este CRAS.</div>
+    
+    <div class="kpi-grid" style="margin-top: var(--spacing-scale-3x);">
+        
+        <div class="kpi-tile"><span class="valor">250</span><span class="rotulo">Famílias no Bolsa Família</span></div>
+        
+        <div class="kpi-tile"><span class="valor">220</span><span class="rotulo">Renda per capita — Extrema pobreza (≤ R$ 218)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">256</span><span class="rotulo">Famílias com pessoa com deficiência</span></div>
+        
+        <div class="kpi-tile"><span class="valor">68</span><span class="rotulo">Pessoas com BPC deficiência (fonte: INSS)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">49</span><span class="rotulo">Pessoas com BPC idoso (fonte: INSS)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">18</span><span class="rotulo">Famílias acompanhadas pelo PAIF</span></div>
+        
+    </div>
+    
 </div>
 
+
+<h2>Perfil dos Atendidos</h2>
+<div class="chart-grid-2">
+    <div class="chart-card categoria-demografia">
+        <h3>Raça/Cor dos Atendidos</h3>
+        <div class="chart-area"><canvas id="grafico-raca-cor"></canvas></div>
+        <div class="chart-footer">
+            Fonte: <strong>BASE - PESSOAS</strong> cruzada com atendimentos PAIF e SCFV.
+            Pessoas únicas atendidas por esta unidade no período, por Raça/Cor autodeclarada.
+        </div>
+    </div>
+    <div class="chart-card categoria-demografia">
+        <h3>Sexo dos Atendidos</h3>
+        <div class="chart-area"><canvas id="grafico-sexo"></canvas></div>
+        <div class="chart-footer">
+            Fonte: <strong>BASE - PESSOAS</strong> cruzada com atendimentos PAIF e SCFV.
+            Pessoas únicas atendidas por esta unidade no período, por Sexo.
+        </div>
+    </div>
+</div>
 
 <h2>Atendimento Individual (PAIF)</h2>
 <div class="kpi-grid">
@@ -197,6 +234,25 @@
     <div class="kpi-tile"><span class="valor">493</span><span class="rotulo">Pessoas únicas atendidas</span></div>
     <div class="kpi-tile"><span class="valor">405</span><span class="rotulo">Famílias únicas atendidas</span></div>
     <div class="kpi-tile"><span class="valor">108</span><span class="rotulo">Visitas domiciliares</span></div>
+</div>
+
+<div class="chart-card categoria-motivos">
+    <h3>Motivos de atendimento mais frequentes</h3>
+    <div class="chart-area"><canvas id="grafico-motivos"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>. Top 10 motivos de atendimento PAIF mais registrados
+        nesta unidade no período, com o restante agrupado em "Outros Motivos". Uma mesma consulta
+        pode registrar mais de um motivo.
+    </div>
+</div>
+
+<div class="chart-card categoria-paif">
+    <h3>Atendimentos PAIF por mês</h3>
+    <div class="chart-area"><canvas id="grafico-atendimentos-mes"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>. Total de atendimentos individuais (PAIF) registrados
+        nesta unidade, por mês.
+    </div>
 </div>
 
 <h2>Atendimento Coletivo (SCFV)</h2>
@@ -215,6 +271,28 @@
     <div class="chart-area"><canvas id="grafico-beneficios"></canvas></div>
     <div class="chart-footer">Fonte: Dispensações de Benefícios — 1º Semestre de 2026. Total de 243 benefícios concedidos nesta unidade.</div>
 </div>
+
+<div class="chart-card categoria-beneficios">
+    <h3>Benefícios dispensados por mês</h3>
+    <div class="chart-filter">
+        <label for="filtro-beneficio-mes">Benefício</label>
+        <select id="filtro-beneficio-mes" class="gov-select">
+            <option value="__todos__">Todos</option>
+            
+            <option value="Prato Cheio">Prato Cheio</option>
+            
+            <option value="Triar">Triar</option>
+            
+        </select>
+    </div>
+    <div class="chart-area"><canvas id="grafico-beneficios-mes"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>. Quantidade de benefícios eventuais dispensados nesta
+        unidade, por mês. O filtro lista os benefícios com mais de 20 dispensações nesta unidade
+        no período; "Todos" soma todos os tipos.
+    </div>
+</div>
+
 <div class="kpi-grid">
     <div class="kpi-tile"><span class="valor">49</span><span class="rotulo">BPC Idoso ativos</span></div>
     <div class="kpi-tile"><span class="valor">68</span><span class="rotulo">BPC Pessoa com Deficiência ativos</span></div>
@@ -246,29 +324,146 @@
 </table>
 </div>
 
+<h2>Produção por Profissional</h2>
+<div class="gov-table-wrapper">
+<table class="gov-table striped">
+    <thead>
+        <tr>
+            <th class="sortable" data-type="string" title="Clique para ordenar">Nome</th>
+            <th class="sortable" data-type="string" title="Clique para ordenar">Cargo</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. PAIF</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. SCFV</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Benefícios Dispensados</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr>
+            <td>Allyandra Cordova Souza</td>
+            <td>AS</td>
+            <td>197</td>
+            <td>8</td>
+            <td>37</td>
+        </tr>
+        
+        <tr>
+            <td>Andreia Fernandes do Rosario</td>
+            <td>Educador Social</td>
+            <td>132</td>
+            <td>272</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>Eliane Cristina da Silva</td>
+            <td>Psicólogo</td>
+            <td>171</td>
+            <td>88</td>
+            <td>40</td>
+        </tr>
+        
+        <tr>
+            <td>Karina da Silva Leite Morales</td>
+            <td>AS</td>
+            <td>214</td>
+            <td>13</td>
+            <td>41</td>
+        </tr>
+        
+        <tr>
+            <td>Levi Oliveira de Souza Junior</td>
+            <td>Educador Social</td>
+            <td>258</td>
+            <td>0</td>
+            <td>66</td>
+        </tr>
+        
+        <tr>
+            <td>Luiz Gustavo Camilo</td>
+            <td>Psicólogo</td>
+            <td>243</td>
+            <td>253</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>Marilene Teixeira Motter</td>
+            <td>AS</td>
+            <td>214</td>
+            <td>15</td>
+            <td>5</td>
+        </tr>
+        
+        <tr>
+            <td>Não identificado</td>
+            <td>-</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+        
+    </tbody>
+</table>
+</div>
+
 <h2>Contexto da Unidade</h2>
-<div class="narrativa"><p>No período, o CRAS Thomaz Coelho realizou 1124 atendimentos individuais (PAIF) e 585 atendimentos em grupo (SCFV), referenciando 974 famílias no território. Com 3 Assistente(s) Social(is) ativo(s), a carga média é de 207 atendimentos por profissional. Carga de 207 atendimentos por Psicólogo (2 ativo(s)).</p></div>
+<div class="narrativa">
+    
+    <div class="narrativa-secao">
+        <h4>Atendimento</h4>
+        <p>No período, o CRAS Thomaz Coelho realizou 1.124 atendimentos individuais (PAIF) — 69% abaixo da média municipal de 3.638 — e 585 atendimentos em grupo (SCFV), ocupando a 8ª posição em volume de atendimentos PAIF entre os 8 CRAS. Foram 974 famílias referenciadas e 108 visitas domiciliares no período.</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Equipe</h4>
+        <p>AS: carga de 207,0 atendimentos por profissional (35% abaixo da média municipal de 318), 6ª colocação em carga entre as 8 unidades. Psicólogo: carga de 207,0 atendimentos por profissional (10% abaixo da média municipal de 229), 5ª colocação em carga entre as 8 unidades. Educador Social: carga de 331,0 atendimentos por profissional (64% abaixo da média municipal de 920), 8ª colocação em carga entre as 8 unidades. Considerando a carga combinada dos 3 cargos núcleo (AS, Psicólogo, Educador Social), a unidade ocupa a 7ª posição em intensidade de demanda por profissional entre as 8 CRAS.</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Território e Vulnerabilidade</h4>
+        <p>A renda média familiar referenciada é de R$ 1.049,3 (17% acima da média municipal de R$ 899,1). 26% das famílias referenciadas estão no Bolsa Família (19% abaixo da média municipal de 32%). O indicador de maior incidência entre as famílias referenciadas é &#34;Famílias com crianças/adolescentes 0–17 (%)&#34;, em 51% (5% abaixo da média municipal de 53%).</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Benefícios</h4>
+        <p>Foram 243 benefícios eventuais dispensados no período — 50% abaixo da média municipal de 489 — colocando a unidade na 8ª posição em volume de benefícios entre as 8 CRAS. O benefício mais dispensado na unidade foi &#34;Prato Cheio&#34;, com 160 dispensações.</p>
+    </div>
+    
+</div>
 
 <script>
 
-new Chart(document.getElementById('grafico-vulnerabilidade'), {
-    type: 'bar',
-    data: {
-        labels: ["Famílias com crianças/adolescentes 0–17 (%)", "Monoparentais chefiadas por mulher (%)", "Famílias com membro não alfabetizado (%)"],
-        datasets: [{
-            label: '% das famílias referenciadas',
-            data: [50.6, 91.5, 40.7],
-            backgroundColor: '#005484'
-        }]
-    },
-    options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { x: { beginAtZero: true, max: 100 } }
-    }
-});
+(function () {
+    const estimativasVulnerabilidade = [493, 396, 292];
+    new Chart(document.getElementById('grafico-vulnerabilidade'), {
+        type: 'bar',
+        data: {
+            labels: ["Famílias com crianças/adolescentes 0–17 (%)", "Famílias com membro não alfabetizado (%)", "Monoparentais chefiadas por mulher (%)"],
+            datasets: [{
+                label: '% das famílias referenciadas',
+                data: [50.6, 40.7, 30.0],
+                backgroundColor: '#005484'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const estimativa = estimativasVulnerabilidade[context.dataIndex];
+                            return context.parsed.x + '% (~' + estimativa.toLocaleString('pt-BR') + ' famílias)';
+                        }
+                    }
+                }
+            },
+            scales: { x: { beginAtZero: true, max: 100 } }
+        }
+    });
+})();
 
 
 (function () {
@@ -289,6 +484,271 @@ new Chart(document.getElementById('grafico-vulnerabilidade'), {
         },
         options: { responsive: true, maintainAspectRatio: false }
     });
+
+    var labelsRacaCor = ["Branca", "Parda", "Preta", "Amarela", "Não informado"];
+    new Chart(document.getElementById('grafico-raca-cor'), {
+        type: 'doughnut',
+        data: {
+            labels: labelsRacaCor,
+            datasets: [{
+                data: [412, 82, 20, 1, 22],
+                backgroundColor: labelsRacaCor.map(function (_, i) { return paletaBeneficios[i % paletaBeneficios.length]; })
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    var labelsSexo = ["Feminino", "Masculino", "Não informado"];
+    new Chart(document.getElementById('grafico-sexo'), {
+        type: 'doughnut',
+        data: {
+            labels: labelsSexo,
+            datasets: [{
+                data: [367, 148, 22],
+                backgroundColor: labelsSexo.map(function (_, i) { return paletaBeneficios[i % paletaBeneficios.length]; })
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+})();
+
+new Chart(document.getElementById('grafico-motivos'), {
+    type: 'bar',
+    data: {
+        labels: ["Recepção / Procura Espontânea / Orientações", "Escuta", "Contato Telefônico", "Acompanhamento Familiar", "Avaliação Benefício Eventual Alimentação", "Orientação Sociofamiliar", "Acesso a Documentação Pessoal", "Visita Domiciliar", "Orientação Social", "Atendimento Psicossocial", "Outros Motivos"],
+        datasets: [{
+            label: 'Ocorrências',
+            data: [350, 311, 178, 170, 156, 156, 152, 102, 98, 90, 580],
+            backgroundColor: '#168821'
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true } }
+    }
+});
+
+(function () {
+    // Gráfico de atendimentos PAIF por mês (barra + linha de média)
+    const labelsAtendimentosMes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"];
+    const valoresAtendimentosMes = [194, 199, 183, 162, 140, 246];
+    const mediaAtendimentosMes = valoresAtendimentosMes.length > 0
+        ? valoresAtendimentosMes.reduce((a, b) => a + b, 0) / valoresAtendimentosMes.length
+        : 0;
+
+    new Chart(document.getElementById('grafico-atendimentos-mes'), {
+        data: {
+            labels: labelsAtendimentosMes,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média do Período',
+                    data: valoresAtendimentosMes.map(() => mediaAtendimentosMes),
+                    borderColor: 'rgba(229, 34, 7, 0.4)',
+                    backgroundColor: 'rgba(229, 34, 7, 0.4)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === valoresAtendimentosMes.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#e52207',
+                        font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Atendimentos PAIF',
+                    data: valoresAtendimentosMes,
+                    backgroundColor: 'rgba(0, 112, 68, 0.65)',
+                    hoverBackgroundColor: 'rgba(0, 112, 68, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                    bodyFont: { size: 13, family: 'Rawline, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' atendimentos';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Rawline, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
+            }
+        }
+    });
+
+    // Gráfico de benefícios dispensados por mês, com filtro por tipo
+    const dadosBeneficiosMes = {"labels": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"], "todos": [43, 36, 48, 39, 37, 40], "por_tipo": {"Prato Cheio": [19, 26, 32, 26, 25, 32], "Triar": [3, 5, 2, 4, 5, 2]}};
+
+    function valoresParaFiltroBeneficioMes(tipo) {
+        return tipo === '__todos__' ? dadosBeneficiosMes.todos : dadosBeneficiosMes.por_tipo[tipo];
+    }
+
+    function mediaDeMes(valores) {
+        return valores.length > 0 ? valores.reduce((a, b) => a + b, 0) / valores.length : 0;
+    }
+
+    const mediaInicialBeneficiosMes = mediaDeMes(dadosBeneficiosMes.todos);
+
+    const chartBeneficiosMes = new Chart(document.getElementById('grafico-beneficios-mes'), {
+        data: {
+            labels: dadosBeneficiosMes.labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média do Período',
+                    data: dadosBeneficiosMes.todos.map(() => mediaInicialBeneficiosMes),
+                    borderColor: 'rgba(229, 34, 7, 0.4)',
+                    backgroundColor: 'rgba(229, 34, 7, 0.4)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === dadosBeneficiosMes.labels.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#e52207',
+                        font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Benefícios Dispensados',
+                    data: dadosBeneficiosMes.todos,
+                    backgroundColor: 'rgba(253, 185, 46, 0.65)',
+                    hoverBackgroundColor: 'rgba(253, 185, 46, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                    bodyFont: { size: 13, family: 'Rawline, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' benefícios';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Rawline, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
+            }
+        }
+    });
+
+    document.getElementById('filtro-beneficio-mes').addEventListener('change', (e) => {
+        const valores = valoresParaFiltroBeneficioMes(e.target.value);
+        const media = mediaDeMes(valores);
+        chartBeneficiosMes.data.datasets[0].data = valores.map(() => media);
+        chartBeneficiosMes.data.datasets[1].data = valores;
+        chartBeneficiosMes.update();
+    });
 })();
 
 new Chart(document.getElementById('grafico-pessoal'), {
@@ -308,6 +768,45 @@ new Chart(document.getElementById('grafico-pessoal'), {
         scales: { y: { beginAtZero: true } }
     }
 });
+
+// Lógica para ordenação da tabela
+function getCellValue(tr, idx) {
+    return tr.children[idx].innerText || tr.children[idx].textContent;
+}
+
+function parseValue(v, type) {
+    if (type === 'number') {
+        const num = parseFloat(v.replace(/\./g, '').replace(',', '.'));
+        return isNaN(num) ? 0 : num;
+    }
+    return v.toLowerCase();
+}
+
+function comparer(index, asc, type) {
+    return function(a, b) {
+        const valA = parseValue(getCellValue(asc ? a : b, index), type);
+        const valB = parseValue(getCellValue(asc ? b : a, index), type);
+        if (type === 'number') {
+            return valA - valB;
+        }
+        return valA.toString().localeCompare(valB.toString(), 'pt-BR');
+    };
+}
+
+document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', (() => {
+    const table = th.closest('table');
+    const tbody = table.querySelector('tbody');
+    const type = th.dataset.type || 'string';
+    const index = Array.from(th.parentNode.children).indexOf(th);
+    const asc = !th.classList.contains('sort-asc');
+
+    table.querySelectorAll('th').forEach(t => t.classList.remove('sort-asc', 'sort-desc'));
+    th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+
+    Array.from(tbody.querySelectorAll('tr'))
+        .sort(comparer(index, asc, type))
+        .forEach(tr => tbody.appendChild(tr));
+})));
 </script>
 
     </main>

@@ -225,6 +225,37 @@
     </div>
 </div>
 
+<h2>Perfil dos Atendidos</h2>
+<div class="chart-grid-2">
+    <div class="chart-card categoria-demografia">
+        <h3>Raça/Cor dos Atendidos</h3>
+        <div class="chart-area"><canvas id="grafico-raca-cor"></canvas></div>
+        <div class="chart-footer">
+            Fonte: <strong>BASE - PESSOAS</strong> cruzada com atendimentos PAIF e SCFV.
+            Pessoas únicas atendidas no período, por Raça/Cor autodeclarada.
+        </div>
+    </div>
+    <div class="chart-card categoria-demografia">
+        <h3>Sexo dos Atendidos</h3>
+        <div class="chart-area"><canvas id="grafico-sexo"></canvas></div>
+        <div class="chart-footer">
+            Fonte: <strong>BASE - PESSOAS</strong> cruzada com atendimentos PAIF e SCFV.
+            Pessoas únicas atendidas no período, por Sexo.
+        </div>
+    </div>
+</div>
+
+<h2>Motivos de Atendimento (PAIF)</h2>
+<div class="chart-card categoria-motivos">
+    <h3>Motivos de atendimento mais frequentes</h3>
+    <div class="chart-area"><canvas id="grafico-motivos"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>. Top 10 motivos de atendimento PAIF mais registrados
+        no período, com o restante agrupado em "Outros Motivos". Uma mesma consulta pode
+        registrar mais de um motivo.
+    </div>
+</div>
+
 <h2>Informação entre unidades</h2>
 <div class="gov-table-wrapper">
 <table class="gov-table striped">
@@ -672,6 +703,56 @@
         chartBeneficios.data.datasets[0].data = valores.map(() => media);
         chartBeneficios.data.datasets[1].data = valores;
         chartBeneficios.update();
+    });
+
+    // Gráficos de perfil dos atendidos (Raça/Cor e Sexo)
+    var paletaDemografia = ['#007044', '#005484', '#FDB92E', '#888888', '#155bcb', '#168821'];
+    function corPorIndice(i) { return paletaDemografia[i % paletaDemografia.length]; }
+
+    var labelsRacaCor = ["Branca", "Parda", "Preta", "Amarela", "Indígena", "Não informado"];
+    new Chart(document.getElementById('grafico-raca-cor'), {
+        type: 'doughnut',
+        data: {
+            labels: labelsRacaCor,
+            datasets: [{
+                data: [9048, 3337, 544, 101, 1, 426],
+                backgroundColor: labelsRacaCor.map(function (_, i) { return corPorIndice(i); })
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    var labelsSexo = ["Feminino", "Masculino", "Não informado"];
+    new Chart(document.getElementById('grafico-sexo'), {
+        type: 'doughnut',
+        data: {
+            labels: labelsSexo,
+            datasets: [{
+                data: [9724, 3320, 413],
+                backgroundColor: labelsSexo.map(function (_, i) { return corPorIndice(i); })
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Gráfico de motivos de atendimento (PAIF) mais frequentes
+    new Chart(document.getElementById('grafico-motivos'), {
+        type: 'bar',
+        data: {
+            labels: ["Recepção / Procura Espontânea / Orientações", "Contato Telefônico", "Informação", "Comunicação e Defesa de Direitos", "Orientação Sociofamiliar", "Demanda Espontânea", "Orientação e Encaminhamentos para a Rede de Serviços Locais", "Escuta", "Avaliação Benefício Eventual Alimentação", "Acolhida", "Outros Motivos"],
+            datasets: [{
+                label: 'Ocorrências',
+                data: [13371, 6117, 5394, 5394, 4500, 4121, 3373, 2846, 2565, 1994, 13812],
+                backgroundColor: '#168821'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true } }
+        }
     });
 
     // Lógica para ordenação da tabela
