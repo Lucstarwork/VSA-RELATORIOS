@@ -313,6 +313,12 @@
     </div>
 </div>
 
+<div class="chart-card categoria-demografia">
+    <h3>Pessoas Atendidas Únicas por Mês</h3>
+    <div class="chart-area"><canvas id="grafico-pessoas-unicas-mes"></canvas></div>
+    <div class="chart-footer">Fonte: <strong>IPM Social</strong></div>
+</div>
+
 <h2>Motivos de Atendimento</h2>
 <div class="chart-card categoria-motivos">
     <h3>Motivos de atendimento mais frequentes</h3>
@@ -683,6 +689,108 @@
             },
             onHover: (e, elements, chart) => {
                 e.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+            }
+        }
+    });
+
+    // Gráfico de pessoas atendidas únicas por mês, no município (barra + linha de média)
+    const labelsPessoasUnicasMes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"];
+    const valoresPessoasUnicasMes = [3177, 3437, 3489, 3515, 3225, 3206];
+    const mediaPessoasUnicasMes = valoresPessoasUnicasMes.length > 0
+        ? valoresPessoasUnicasMes.reduce((a, b) => a + b, 0) / valoresPessoasUnicasMes.length
+        : 0;
+
+    new Chart(document.getElementById('grafico-pessoas-unicas-mes'), {
+        data: {
+            labels: labelsPessoasUnicasMes,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média do Período',
+                    data: valoresPessoasUnicasMes.map(() => mediaPessoasUnicasMes),
+                    borderColor: 'rgba(229, 34, 7, 0.4)',
+                    backgroundColor: 'rgba(229, 34, 7, 0.4)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === valoresPessoasUnicasMes.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#e52207',
+                        font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Pessoas Únicas Atendidas',
+                    data: valoresPessoasUnicasMes,
+                    backgroundColor: 'rgba(21, 91, 203, 0.65)',
+                    hoverBackgroundColor: 'rgba(21, 91, 203, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                    bodyFont: { size: 13, family: 'Rawline, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' pessoas';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Rawline, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
             }
         }
     });
@@ -1129,7 +1237,7 @@
                 <span>Vigilância Socioassistencial — PSB</span>
             </div>
             <div class="gov-footer-info">
-                <p>Boletim PSB — período de referência: 1º Semestre de 2026. Emitido em 22 de julho de 2026.</p>
+                <p>Boletim PSB — período de referência: 1º Semestre de 2026. Emitido em 23 de julho de 2026.</p>
                 <p>Dados de uso interno — Secretaria Municipal de Assistência Social de Araucária.</p>
             </div>
         </div>
