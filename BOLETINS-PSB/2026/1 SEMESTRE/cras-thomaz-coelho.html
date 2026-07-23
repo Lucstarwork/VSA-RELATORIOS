@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAS Thomaz Coelho — Araucária</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rawline:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/boletim.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script>Chart.register(ChartDataLabels);</script>
+    <script src="assets/dropdown.js"></script>
+    <script>
+        window.addEventListener('scroll', function() {
+            var header = document.querySelector('.premium-header');
+            if (header) {
+                if (window.scrollY > 40) {
+                    header.classList.add('is-scrolled');
+                } else {
+                    header.classList.remove('is-scrolled');
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <style>
+        .premium-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0;
+            font-family: 'Rawline', sans-serif;
+            position: relative;
+        }
+        /* Detalhe superior muito elegante nas cores da instituição */
+        .premium-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #007044 0%, #005484 100%);
+        }
+        .premium-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+        .premium-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .premium-header.is-scrolled .premium-nav {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            animation: slideUpNav 0.3s ease forwards;
+        }
+        @keyframes slideUpNav {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .premium-logo img {
+            height: 60px;
+            width: auto;
+            display: block;
+        }
+        .premium-separator {
+            width: 1px;
+            height: 35px;
+            background-color: #e2e8f0;
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .premium-separator { display: block; }
+        }
+        .premium-text-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .premium-supertitle {
+            font-family: 'Raleway', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .premium-supertitle span.highlight {
+            color: #007044;
+        }
+        .premium-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        .premium-title span {
+            font-weight: 300;
+            color: #475569;
+        }
+        .premium-nav {
+            display: flex;
+            align-items: center;
+        }
+        .premium-nav .breadcrumb {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            margin: 0;
+        }
+        .premium-nav .breadcrumb a {
+            color: #005484 !important;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        .premium-nav .breadcrumb a:hover {
+            color: #007044 !important;
+        }
+        .premium-nav .breadcrumb-sep {
+            color: #94a3b8;
+            margin: 0 10px;
+            font-size: 15px;
+            line-height: 1;
+            font-weight: 400;
+        }
+        .premium-nav .breadcrumb-atual {
+            color: #0f172a;
+            font-weight: 600;
+        }
+    </style>
+    <header class="premium-header">
+        <div class="container premium-container">
+            <div class="premium-brand">
+                <div class="premium-logo">
+                    <img src="assets/brasao-completo.png" alt="Prefeitura de Araucária">
+                </div>
+                <div class="premium-separator"></div>
+                <div class="premium-text-group">
+                    <div class="premium-supertitle">
+                        PRODUTO DA <span class="highlight">VIGILÂNCIA SOCIOASSISTENCIAL</span> • SMAS
+                    </div>
+                    <h1 class="premium-title">Boletim PSB <span>/ Proteção Social Básica</span></h1>
+                </div>
+            </div>
+            
+            <div class="premium-nav">
+                
+<nav class="breadcrumb" aria-label="Trilha de navegação">
+    <a href="index.html">Início</a>
+    <span class="breadcrumb-sep" aria-hidden="true">›</span>
+    <span class="breadcrumb-atual">CRAS Thomaz Coelho</span>
+</nav>
+
+            </div>
+        </div>
+    </header>
+    <div class="container relatorio-layout">
+        <nav class="relatorio-toc" aria-label="Sumário deste boletim">
+            <span class="relatorio-toc-titulo">Neste boletim</span>
+            <ol class="relatorio-toc-lista" id="relatorio-toc-lista"></ol>
+        </nav>
+        <main class="relatorio-conteudo">
+            
+<div class="page-header" style="margin: 0.5rem 0 0.5rem 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+    <div>
+        <h1 style="font-family: 'Rawline', sans-serif; font-size: 28px; font-weight: 700; color: #0f172a; margin: 0 0 12px 0; letter-spacing: -0.5px;">
+            Boletim PSB <span style="font-weight: 300; color: #cbd5e1; margin: 0 8px;">|</span> <span style="color: #005484;">CRAS Thomaz Coelho</span>
+        </h1>
+        <p style="font-family: 'Raleway', sans-serif; font-size: 14px; color: #64748b; margin: 0; display: inline-flex; align-items: center; gap: 8px; font-weight: 500;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Período de referência: 1º Semestre de 2026
+        </p>
+    </div>
+    
+
+<div class="page-header-ilustracao">
+    <img src="assets/ilustracoes/fundo-01.png" alt="" aria-hidden="true">
+</div>
+</div>
+
+<h2>Perfil do Território</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile">
+        <span class="valor">974</span>
+        <span class="rotulo">Famílias referenciadas (CadÚnico)</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">250</span>
+        <span class="rotulo">Famílias no Bolsa Família</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">R$ 1.049,3</span>
+        <span class="rotulo">Renda média familiar</span>
+    </div>
+</div>
+
+<h2>Agendamentos CadÚnico</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile">
+        <span class="valor">30</span>
+        <span class="rotulo">Agendamentos de Inclusão</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">56</span>
+        <span class="rotulo">Agendamentos de Atualização</span>
+    </div>
+</div>
+
+<h2>Taxa de Comparecimento</h2>
+
+<div class="alerta-box">
+    <p>
+        <strong>76 agendamentos</strong> individuais
+        estão com status "Pendente" (nunca atualizado no sistema para Atendido/Ausente) e não
+        entram no cálculo abaixo — podem indicar registros esquecidos que merecem revisão.
+    </p>
+</div>
+
+<div class="kpi-grid">
+    
+    <div class="kpi-tile">
+        <span class="valor">70.7%</span>
+        <span class="rotulo">Taxa de Comparecimento</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">29.3%</span>
+        <span class="rotulo">Taxa de Ausência</span>
+    </div>
+    
+    <div class="kpi-tile">
+        <span class="valor">280</span>
+        <span class="rotulo">Agendamentos Atendidos</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">116</span>
+        <span class="rotulo">Agendamentos com Ausência</span>
+    </div>
+</div>
+
+
+<div class="chart-card">
+    <h3>Perfil de Vulnerabilidade Territorial</h3>
+    <div class="chart-area"><canvas id="grafico-vulnerabilidade"></canvas></div>
+    <div class="chart-footer">Fonte: Observatório do CadÚnico</div>
+    
+    <div class="kpi-grid" style="margin-top: var(--spacing-scale-3x);">
+        
+        <div class="kpi-tile"><span class="valor">250</span><span class="rotulo">Famílias no Bolsa Família</span></div>
+        
+        <div class="kpi-tile"><span class="valor">220</span><span class="rotulo">Renda per capita — Extrema pobreza (≤ R$ 218)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">256</span><span class="rotulo">Famílias com pessoa com deficiência</span></div>
+        
+        <div class="kpi-tile"><span class="valor">68</span><span class="rotulo">Pessoas com BPC deficiência (fonte: INSS)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">49</span><span class="rotulo">Pessoas com BPC idoso (fonte: INSS)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">18</span><span class="rotulo">Famílias acompanhadas pelo PAIF</span></div>
+        
+    </div>
+    
+</div>
+
+
+<h2>Perfil dos Atendidos</h2>
+<div class="chart-grid-2">
+    <div class="chart-card categoria-demografia">
+        <h3>Raça/Cor dos Atendidos</h3>
+        <div class="chart-area"><canvas id="grafico-raca-cor"></canvas></div>
+        <div class="chart-footer">
+            Fonte: <strong>IPM Social</strong>
+        </div>
+    </div>
+    <div class="chart-card categoria-demografia">
+        <h3>Sexo dos Atendidos</h3>
+        <div class="chart-area"><canvas id="grafico-sexo"></canvas></div>
+        <div class="chart-footer">
+            Fonte: <strong>IPM Social</strong>
+        </div>
+    </div>
+</div>
+
+<div class="chart-card categoria-demografia">
+    <h3>Pessoas Atendidas Únicas por Mês</h3>
+    <div class="chart-area"><canvas id="grafico-pessoas-unicas-mes"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>
+    </div>
+</div>
+
+<h2>Atendimento Individual (PAIF)</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile"><span class="valor">1.124</span><span class="rotulo">Total de atendimentos</span></div>
+    <div class="kpi-tile"><span class="valor">493</span><span class="rotulo">Pessoas únicas atendidas</span></div>
+    <div class="kpi-tile"><span class="valor">405</span><span class="rotulo">Famílias únicas atendidas</span></div>
+    <div class="kpi-tile"><span class="valor">108</span><span class="rotulo">Visitas domiciliares</span></div>
+</div>
+
+<div class="chart-card categoria-motivos">
+    <h3>Motivos de atendimento mais frequentes</h3>
+    <div class="chart-area"><canvas id="grafico-motivos"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>
+    </div>
+</div>
+
+<div class="chart-card categoria-paif">
+    <h3>Atendimentos por mês</h3>
+    <div class="chart-area"><canvas id="grafico-atendimentos-mes"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>
+    </div>
+</div>
+
+<h2>Atendimento Coletivo (SCFV)</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile"><span class="valor">585</span><span class="rotulo">Total de atendimentos SCFV</span></div>
+    <div class="kpi-tile"><span class="valor">94</span><span class="rotulo">Pessoas únicas em grupo</span></div>
+    <div class="kpi-tile"><span class="valor">6</span><span class="rotulo">Grupos únicos</span></div>
+    
+    <div class="kpi-tile"><span class="valor">0,0%</span><span class="rotulo">Frequência média</span></div>
+    
+</div>
+
+<h2>Dispensações e BPC</h2>
+<div class="chart-card categoria-beneficios">
+    <h3>Composição de dispensações</h3>
+    <div class="chart-area"><canvas id="grafico-beneficios"></canvas></div>
+    <div class="chart-footer">Fonte: <strong>IPM Social</strong></div>
+</div>
+
+<div class="chart-card categoria-beneficios">
+    <h3>Dispensações por mês</h3>
+    <div class="chart-filter">
+        <label for="filtro-beneficio-mes">Benefício</label>
+        <select id="filtro-beneficio-mes" class="gov-select">
+            <option value="__todos__">Todos</option>
+            
+            <option value="2ª Via Certidão de Nascimento">2ª Via Certidão de Nascimento</option>
+            
+            <option value="Prato Cheio">Prato Cheio</option>
+            
+            <option value="Triar">Triar</option>
+            
+        </select>
+    </div>
+    <div class="chart-area"><canvas id="grafico-beneficios-mes"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>
+    </div>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-tile"><span class="valor">49</span><span class="rotulo">BPC Idoso ativos</span></div>
+    <div class="kpi-tile"><span class="valor">68</span><span class="rotulo">BPC Pessoa com Deficiência ativos</span></div>
+    <div class="kpi-tile"><span class="valor">117</span><span class="rotulo">Total de BPCs ativos</span></div>
+</div>
+
+<h2>Quadro de Pessoal</h2>
+<div class="chart-card categoria-pessoal">
+    <h3>Carga de atendimento por profissional</h3>
+    <div class="chart-area"><canvas id="grafico-pessoal"></canvas></div>
+    <div class="chart-footer">
+        Carga = atendimentos realizados por profissionais do cargo ÷ profissionais ativos do cargo.
+    </div>
+</div>
+<div class="gov-table-wrapper">
+<table class="gov-table">
+    <thead><tr>
+        <th>Assistente Social</th><th>Psicólogos</th><th>Educadores</th>
+        
+    </tr></thead>
+    <tbody>
+        <tr>
+            <td>2</td>
+            <td>2</td>
+            <td>2</td>
+            
+        </tr>
+    </tbody>
+</table>
+</div>
+
+
+
+<h2>Contexto da Unidade</h2>
+<div class="narrativa">
+    
+    <div class="narrativa-secao">
+        <h4>Atendimento</h4>
+        <p>No período, a unidade realizou <strong>1.124</strong> atendimentos individuais (PAIF) — <strong>69% abaixo do que se observa, em média, nas demais unidades (3.638)</strong> — e <strong>585</strong> atendimentos em grupo (SCFV), ocupando a <strong>8ª posição</strong> em volume de atendimentos PAIF entre os 8 CRAS. Foram <strong>974</strong> famílias referenciadas e <strong>108</strong> visitas domiciliares no período.</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Equipe</h4>
+        <p><strong>AS</strong>: carga de <strong>213,7</strong> atendimentos por profissional (<strong>43% abaixo da média municipal de 377</strong>), <strong>7ª colocação</strong> em carga entre as 8 unidades. <strong>Psicólogo</strong>: carga de <strong>215,2</strong> atendimentos por profissional (<strong>17% abaixo da média municipal de 260</strong>), <strong>6ª colocação</strong> em carga entre as 8 unidades. <strong>Educador Social</strong>: carga de <strong>340,2</strong> atendimentos por profissional (<strong>64% abaixo do que se observa, em média, nas demais unidades (951)</strong>), <strong>8ª colocação</strong> em carga entre as 8 unidades. Considerando a carga combinada dos 3 cargos núcleo (AS, Psicólogo, Educador Social), a unidade ocupa a <strong>7ª posição</strong> em intensidade de demanda por profissional entre as 8 CRAS.</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Território e Vulnerabilidade</h4>
+        <p>A renda média familiar referenciada é de <strong>R$ 1.049,3</strong> (<strong>17% acima do que se observa, em média, nas demais unidades (R$ 899,1)</strong>). <strong>26%</strong> das famílias referenciadas estão no Bolsa Família (<strong>19% abaixo da média municipal de 32%</strong>). O indicador de maior incidência entre as famílias referenciadas é "<strong>Famílias com crianças/adolescentes 0–17 (%)</strong>", em <strong>51%</strong> (<strong>um patamar 5% abaixo da média das 8 unidades, hoje em 53%</strong>).</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Benefícios</h4>
+        <p>Foram <strong>243</strong> dispensações no período — <strong>50% abaixo do que se observa, em média, nas demais unidades (489)</strong> — colocando a unidade na <strong>8ª posição</strong> em volume de dispensações entre as 8 CRAS.  O benefício mais dispensado na unidade foi "Prato Cheio", com <strong>160</strong> dispensações.</p>
+    </div>
+    
+</div>
+
+<script>
+
+(function () {
+    const estimativasVulnerabilidade = [493, 396, 292];
+    new Chart(document.getElementById('grafico-vulnerabilidade'), {
+        type: 'bar',
+        data: {
+            labels: ["Famílias com crianças/adolescentes 0–17 (%)", "Famílias com membro não alfabetizado (%)", "Monoparentais chefiadas por mulher (%)"],
+            datasets: [{
+                label: '% das famílias referenciadas',
+                data: [50.6, 40.7, 30.0],
+                backgroundColor: 'rgba(229, 34, 7, 0.65)',
+                hoverBackgroundColor: 'rgba(229, 34, 7, 1)',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const estimativa = estimativasVulnerabilidade[context.dataIndex];
+                            return context.parsed.x + '% (~' + estimativa.toLocaleString('pt-BR') + ' famílias)';
+                        }
+                    }
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'right',
+                    color: '#555',
+                    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                    borderRadius: 3,
+                    padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                    font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                    formatter: function(value) { return value; }
+                }
+            },
+            scales: { x: { beginAtZero: true, max: 100 } },
+            layout: { padding: { right: 35 } }
+        }
+    });
+})();
+
+
+(function () {
+    function tooltipPercentualDoughnut(context) {
+        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+        const pct = total ? ((context.parsed / total) * 100).toFixed(1) : 0;
+        return context.label + ': ' + context.parsed.toLocaleString('pt-BR') + ' (' + pct + '%)';
+    }
+
+    const optsDoughnut = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        layout: { padding: 10 },
+        plugins: { 
+            legend: { 
+                position: 'right',
+                labels: { font: { family: 'Rawline, sans-serif', size: 12 }, usePointStyle: true, padding: 15 }
+            },
+            tooltip: { 
+                backgroundColor: 'rgba(0, 0, 0, 0.8)', titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                bodyFont: { size: 13, family: 'Rawline, sans-serif' }, padding: 12, cornerRadius: 8,
+                usePointStyle: true, callbacks: { label: tooltipPercentualDoughnut } 
+            },
+            datalabels: {
+                color: '#555',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                borderRadius: 3,
+                padding: { top: 4, bottom: 4, left: 6, right: 6 },
+                font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                display: function(context) {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    const pct = total ? (context.dataset.data[context.dataIndex] / total) * 100 : 0;
+                    return pct >= 5;
+                },
+                formatter: (value, context) => {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    const pct = total ? Math.round((value / total) * 100) : 0;
+                    return pct + '%';
+                },
+                anchor: 'center',
+                align: 'center'
+            }
+        }
+    };
+
+    // Paleta de marca + neutros do design system, ciclada para cobrir
+    // qualquer quantidade de tipos de benefício.
+    var paletaBeneficios = ['#007044', '#005484', '#FDB92E', '#888888', '#155bcb', '#168821', '#e52207', '#636363'];
+    var rawLabels = ["2ª Via Certidão de Nascimento", "Prato Cheio", "Triar", "Outros Benefícios"];
+    var rawValores = [32, 160, 21, 30];
+    
+    var labelsAgrupados = [];
+    var valoresAgrupados = [];
+    
+    for (var i = 0; i < rawLabels.length; i++) {
+        var label = rawLabels[i];
+        if (label === '2ª Via Certidão de Nascimento [fora do Município]') {
+            label = '2ª Via Certidão de Nascimento';
+        }
+        
+        var index = labelsAgrupados.indexOf(label);
+        if (index === -1) {
+            labelsAgrupados.push(label);
+            valoresAgrupados.push(rawValores[i]);
+        } else {
+            valoresAgrupados[index] += rawValores[i];
+        }
+    }
+
+    var coresBeneficios = labelsAgrupados.map(function (_, i) { return paletaBeneficios[i % paletaBeneficios.length]; });
+
+    new Chart(document.getElementById('grafico-beneficios'), {
+        type: 'doughnut',
+        data: {
+            labels: labelsAgrupados,
+            datasets: [{
+                data: valoresAgrupados,
+                backgroundColor: coresBeneficios,
+                borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4
+            }]
+        },
+        options: optsDoughnut
+    });
+
+
+
+    var rawLabelsRacaCor = ["Branca", "Parda", "Preta", "Amarela", "Não informado"];
+    var rawValRacaCor = [412, 82, 20, 1, 22];
+    var fRacaCor = rawLabelsRacaCor.map((l, i) => ({l, v: rawValRacaCor[i]})).filter(x => x.l !== 'Não informado' && x.l !== 'Não Informado');
+    var paletaRacaCor = ['#1351b4', '#007044', '#c2850c', '#e52207', '#155bcb', '#168821'];
+
+    new Chart(document.getElementById('grafico-raca-cor'), {
+        type: 'doughnut',
+        data: {
+            labels: fRacaCor.map(x => x.l),
+            datasets: [{
+                data: fRacaCor.map(x => x.v),
+                backgroundColor: fRacaCor.map((_, i) => paletaRacaCor[i % paletaRacaCor.length]),
+                borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4
+            }]
+        },
+        options: optsDoughnut
+    });
+
+    var rawLabelsSexo = ["Feminino", "Masculino", "Não informado"];
+    var rawValSexo = [367, 148, 22];
+    var fSexo = rawLabelsSexo.map((l, i) => ({l, v: rawValSexo[i]})).filter(x => x.l !== 'Não informado' && x.l !== 'Não Informado');
+    var paletaSexo = ['#007044', '#1351b4', '#ffbe2e', '#c2850c'];
+
+    new Chart(document.getElementById('grafico-sexo'), {
+        type: 'doughnut',
+        data: {
+            labels: fSexo.map(x => x.l),
+            datasets: [{
+                data: fSexo.map(x => x.v),
+                backgroundColor: fSexo.map((_, i) => paletaSexo[i % paletaSexo.length]),
+                borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4
+            }]
+        },
+        options: optsDoughnut
+    });
+})();
+
+new Chart(document.getElementById('grafico-motivos'), {
+    type: 'bar',
+    data: {
+        labels: ["Recepção / Procura Espontânea / Orientações", "Escuta", "Contato Telefônico", "Acompanhamento Familiar", "Avaliação Benefício Eventual Alimentação", "Orientação Sociofamiliar", "Acesso a Documentação Pessoal", "Visita Domiciliar", "Orientação Social", "Atendimento Psicossocial", "Outros Motivos"],
+        datasets: [{
+            label: 'Ocorrências',
+            data: [350, 311, 178, 170, 156, 156, 152, 102, 98, 90, 580],
+            backgroundColor: 'rgba(22, 136, 33, 0.7)',
+            hoverBackgroundColor: 'rgba(22, 136, 33, 1)',
+            borderRadius: 4,
+            borderWidth: 0,
+            barPercentage: 0.7,
+            datalabels: {
+                anchor: 'end',
+                align: 'right',
+                color: '#555',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                borderRadius: 3,
+                padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                formatter: function(value) {
+                    return value.toLocaleString('pt-BR');
+                }
+            }
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { right: 40 } },
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true } }
+    }
+});
+
+(function () {
+    // Gráfico de atendimentos PAIF por mês (barra + linha de média)
+    const labelsAtendimentosMes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"];
+    const valoresAtendimentosMes = [194, 199, 183, 162, 140, 246];
+    const mediaAtendimentosMes = valoresAtendimentosMes.length > 0
+        ? valoresAtendimentosMes.reduce((a, b) => a + b, 0) / valoresAtendimentosMes.length
+        : 0;
+
+    new Chart(document.getElementById('grafico-atendimentos-mes'), {
+        data: {
+            labels: labelsAtendimentosMes,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média do Período',
+                    data: valoresAtendimentosMes.map(() => mediaAtendimentosMes),
+                    borderColor: 'rgba(229, 34, 7, 0.4)',
+                    backgroundColor: 'rgba(229, 34, 7, 0.4)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === valoresAtendimentosMes.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#e52207',
+                        font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Atendimentos',
+                    data: valoresAtendimentosMes,
+                    backgroundColor: 'rgba(0, 112, 68, 0.65)',
+                    hoverBackgroundColor: 'rgba(0, 112, 68, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                    bodyFont: { size: 13, family: 'Rawline, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' atendimentos';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Rawline, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
+            }
+        }
+    });
+
+    // Gráfico de pessoas atendidas únicas por mês (barra + linha de média)
+    const labelsPessoasUnicasMes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"];
+    const valoresPessoasUnicasMes = [120, 155, 130, 121, 96, 162];
+    const mediaPessoasUnicasMes = valoresPessoasUnicasMes.length > 0
+        ? valoresPessoasUnicasMes.reduce((a, b) => a + b, 0) / valoresPessoasUnicasMes.length
+        : 0;
+
+    new Chart(document.getElementById('grafico-pessoas-unicas-mes'), {
+        data: {
+            labels: labelsPessoasUnicasMes,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média do Período',
+                    data: valoresPessoasUnicasMes.map(() => mediaPessoasUnicasMes),
+                    borderColor: 'rgba(229, 34, 7, 0.4)',
+                    backgroundColor: 'rgba(229, 34, 7, 0.4)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === valoresPessoasUnicasMes.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#e52207',
+                        font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Pessoas Únicas Atendidas',
+                    data: valoresPessoasUnicasMes,
+                    backgroundColor: 'rgba(21, 91, 203, 0.65)',
+                    hoverBackgroundColor: 'rgba(21, 91, 203, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                    bodyFont: { size: 13, family: 'Rawline, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' pessoas';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Rawline, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
+            }
+        }
+    });
+
+    // Gráfico de benefícios dispensados por mês, com filtro por tipo
+    const dadosBeneficiosMes = {"labels": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"], "todos": [43, 36, 48, 39, 37, 40], "por_tipo": {"2ª Via Certidão de Nascimento": [12, 3, 7, 6, 1, 3], "Prato Cheio": [19, 26, 32, 26, 25, 32], "Triar": [3, 5, 2, 4, 5, 2]}};
+
+    function valoresParaFiltroBeneficioMes(tipo) {
+        return tipo === '__todos__' ? dadosBeneficiosMes.todos : dadosBeneficiosMes.por_tipo[tipo];
+    }
+
+    function mediaDeMes(valores) {
+        return valores.length > 0 ? valores.reduce((a, b) => a + b, 0) / valores.length : 0;
+    }
+
+    const mediaInicialBeneficiosMes = mediaDeMes(dadosBeneficiosMes.todos);
+
+    const chartBeneficiosMes = new Chart(document.getElementById('grafico-beneficios-mes'), {
+        data: {
+            labels: dadosBeneficiosMes.labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média do Período',
+                    data: dadosBeneficiosMes.todos.map(() => mediaInicialBeneficiosMes),
+                    borderColor: 'rgba(229, 34, 7, 0.4)',
+                    backgroundColor: 'rgba(229, 34, 7, 0.4)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === dadosBeneficiosMes.labels.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#e52207',
+                        font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Benefícios Dispensados',
+                    data: dadosBeneficiosMes.todos,
+                    backgroundColor: 'rgba(253, 185, 46, 0.65)',
+                    hoverBackgroundColor: 'rgba(253, 185, 46, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                    bodyFont: { size: 13, family: 'Rawline, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' benefícios';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Rawline, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
+            }
+        }
+    });
+
+    document.getElementById('filtro-beneficio-mes').addEventListener('change', (e) => {
+        const valores = valoresParaFiltroBeneficioMes(e.target.value);
+        const media = mediaDeMes(valores);
+        chartBeneficiosMes.data.datasets[0].data = valores.map(() => media);
+        chartBeneficiosMes.data.datasets[1].data = valores;
+        chartBeneficiosMes.update();
+    });
+})();
+
+new Chart(document.getElementById('grafico-pessoal'), {
+    type: 'bar',
+    data: {
+        labels: ["Assistente Social", "Psicólogo", "Educador Social"],
+        datasets: [{
+            label: 'Atendimentos por profissional',
+            data: [213.7, 215.2, 340.2],
+            backgroundColor: 'rgba(0, 112, 68, 0.65)',
+            hoverBackgroundColor: 'rgba(0, 112, 68, 1)',
+            borderRadius: 6,
+            borderWidth: 0,
+            barPercentage: 0.6,
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                color: '#555',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                borderRadius: 3,
+                padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                formatter: function(value) {
+                    return value.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+                }
+            }
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { top: 25 } },
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grace: '5%' } }
+    }
+});
+
+// Lógica para ordenação da tabela
+function getCellValue(tr, idx) {
+    return tr.children[idx].innerText || tr.children[idx].textContent;
+}
+
+function parseValue(v, type) {
+    if (type === 'number') {
+        const num = parseFloat(v.replace(/\./g, '').replace(',', '.'));
+        return isNaN(num) ? 0 : num;
+    }
+    return v.toLowerCase();
+}
+
+function comparer(index, asc, type) {
+    return function(a, b) {
+        const valA_raw = getCellValue(a, 0).trim();
+        const valB_raw = getCellValue(b, 0).trim();
+        
+        if (valA_raw.includes('Não identificado')) return 1;
+        if (valB_raw.includes('Não identificado')) return -1;
+
+        const valA = parseValue(getCellValue(asc ? a : b, index), type);
+        const valB = parseValue(getCellValue(asc ? b : a, index), type);
+        if (type === 'number') {
+            return valA - valB;
+        }
+        return valA.toString().localeCompare(valB.toString(), 'pt-BR');
+    };
+}
+
+document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', (() => {
+    const table = th.closest('table');
+    const tbody = table.querySelector('tbody');
+    const type = th.dataset.type || 'string';
+    const index = Array.from(th.parentNode.children).indexOf(th);
+    const asc = !th.classList.contains('sort-asc');
+
+    table.querySelectorAll('th').forEach(t => t.classList.remove('sort-asc', 'sort-desc'));
+    th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+
+    Array.from(tbody.querySelectorAll('tr'))
+        .sort(comparer(index, asc, type))
+        .forEach(tr => tbody.appendChild(tr));
+})));
+
+// Ordenar por Cargo em ordem alfabética por padrão no carregamento
+const thCargo = document.querySelector('.gov-table-wrapper th[data-type="string"]:nth-child(2)');
+if (thCargo) {
+    thCargo.click();
+}
+</script>
+
+        </main>
+    </div>
+    <footer class="gov-footer">
+        <div class="gov-footer-inner">
+            <div class="gov-footer-brand">
+                <img src="assets/brasao-simples.png" alt="Prefeitura de Araucária" class="gov-footer-logo">
+                <span>Vigilância Socioassistencial — PSB</span>
+            </div>
+            <div class="gov-footer-info">
+                <p>Boletim PSB — período de referência: 1º Semestre de 2026. Emitido em 23 de julho de 2026.</p>
+                <p>Dados de uso interno — Secretaria Municipal de Assistência Social de Araucária.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const kpis = document.querySelectorAll('.kpi-tile .valor');
+        
+        kpis.forEach(el => {
+            const textoOriginal = el.innerText.trim();
+            if (textoOriginal === '-' || textoOriginal.toLowerCase() === 'sem profissional') return;
+
+            // Remove caracteres de formatação para encontrar o número real
+            let numStr = textoOriginal.replace(/[^\d,.-]/g, '');
+            if (!numStr) return;
+            
+            // Converte formato brasileiro (ex: 1.000,50) para float (1000.50)
+            numStr = numStr.replace(/\./g, '').replace(',', '.');
+            const valorFinal = parseFloat(numStr);
+            if (isNaN(valorFinal) || valorFinal === 0) return;
+            
+            const isFloat = textoOriginal.includes(',');
+            const isDinheiro = textoOriginal.includes('R$');
+            
+            const duracao = 1500; // 1.5 segundos
+            const inicio = performance.now();
+            
+            // Função para formatar o número em transição de volta pro formato BR
+            const formatar = (num) => {
+                let parts = num.toFixed(isFloat ? 1 : 0).split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                let formatado = parts.join(',');
+                if (isDinheiro) return 'R$ ' + formatado;
+                return formatado;
+            };
+
+            const animar = (tempoAtual) => {
+                const tempoDecorrido = tempoAtual - inicio;
+                const progresso = Math.min(tempoDecorrido / duracao, 1);
+                
+                // EaseOut quintic para um efeito de desaceleração suave
+                const easeOut = 1 - Math.pow(1 - progresso, 5);
+                
+                const valorAtual = valorFinal * easeOut;
+                
+                if (progresso < 1) {
+                    el.innerText = formatar(valorAtual);
+                    requestAnimationFrame(animar);
+                } else {
+                    el.innerText = textoOriginal; // Define exatamente o original no final
+                }
+            };
+            
+            // Define como zero e inicia
+            el.innerText = formatar(0);
+            requestAnimationFrame(animar);
+        });
+    });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sumário lateral: varre os <h2> já existentes no conteúdo — nenhuma
+        // mudança de estrutura Jinja é necessária, funciona igual em
+        // qualquer página que estenda este layout.
+        const secoes = Array.from(document.querySelectorAll(".relatorio-conteudo h2"));
+        const lista = document.getElementById("relatorio-toc-lista");
+
+        if (secoes.length && lista) {
+            secoes.forEach(function (h2, i) {
+                if (!h2.id) h2.id = "secao-" + (i + 1);
+                const item = document.createElement("li");
+                const link = document.createElement("a");
+                link.href = "#" + h2.id;
+                link.textContent = h2.textContent;
+                link.dataset.alvo = h2.id;
+                item.appendChild(link);
+                lista.appendChild(item);
+            });
+
+            const links = Array.from(lista.querySelectorAll("a"));
+            const observerScrollSpy = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    const link = links.find(function (l) { return l.dataset.alvo === entry.target.id; });
+                    if (!link) return;
+                    if (entry.isIntersecting) {
+                        links.forEach(function (l) { l.classList.remove("ativo"); });
+                        link.classList.add("ativo");
+                    }
+                });
+            }, { rootMargin: "-10% 0px -80% 0px" });
+            secoes.forEach(function (h2) { observerScrollSpy.observe(h2); });
+
+            // Garante que o último item fique ativo caso a página chegue ao fim
+            // mas a última seção não alcance a linha de detecção do observer.
+            window.addEventListener('scroll', function() {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+                    links.forEach(function (l) { l.classList.remove("ativo"); });
+                    if (links.length > 0) links[links.length - 1].classList.add("ativo");
+                }
+            });
+        }
+
+        // Revelação suave: cada seção (h2 + irmãos até o próximo h2) entra
+        // com fade + leve deslocamento ao cruzar a viewport, uma vez só.
+        const prefereReducaoMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!prefereReducaoMovimento && secoes.length) {
+            const grupos = secoes.map(function (h2) {
+                const grupo = [h2];
+                let irmao = h2.nextElementSibling;
+                while (irmao && irmao.tagName !== "H2") {
+                    grupo.push(irmao);
+                    irmao = irmao.nextElementSibling;
+                }
+                return grupo;
+            });
+
+            const observerReveal = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("reveal-visivel");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -10% 0px" });
+
+            grupos.forEach(function (grupo) {
+                grupo.forEach(function (el) {
+                    el.classList.add("reveal");
+                    observerReveal.observe(el);
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>
