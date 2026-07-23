@@ -85,19 +85,17 @@ body {
 .breadcrumb-sep { opacity: 0.7; }
 .breadcrumb-atual { font-weight: 700; }
 
-.gov-footer { background-color: var(--gray-90); color: var(--gray-20); }
+.gov-footer { background-color: var(--gray-90); color: var(--gray-40); border-top: 4px solid var(--brand-primary); }
 .gov-footer-inner {
-    max-width: var(--largura-relatorio); margin: 0 auto; padding: var(--spacing-scale-4x) var(--spacing-scale-3x);
+    max-width: var(--largura-relatorio); margin: 0 auto; padding: var(--spacing-scale-6x) var(--spacing-scale-3x);
     display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-    gap: var(--spacing-scale-3x);
+    gap: var(--spacing-scale-4x);
 }
-.gov-footer-brand { display: flex; align-items: center; gap: var(--spacing-scale-2x); font-weight: 600; color: var(--pure-0); }
-/* Aproximação temporária de "brasão negativo": inverte o PNG colorido para branco via
-   filtro CSS até existir um brasao-branco.png oficial. Quando existir, trocar o src do
-   <img> e remover este filter. */
-.gov-footer-logo { height: 32px; width: auto; filter: brightness(0) invert(1); }
-.gov-footer-info { text-align: right; font-size: var(--font-size-scale-base); }
+.gov-footer-brand { display: flex; align-items: center; gap: var(--spacing-scale-3x); font-weight: 700; font-size: var(--font-size-scale-up-01); color: var(--pure-0); letter-spacing: 0.5px; }
+.gov-footer-logo { height: 56px; width: auto; }
+.gov-footer-info { text-align: right; font-size: var(--font-size-scale-down-01); line-height: 1.6; }
 .gov-footer-info p { margin: var(--spacing-scale-half) 0; }
+.gov-footer-info p:first-child { font-weight: 600; color: var(--gray-20); font-size: var(--font-size-scale-base); }
 
 @media (max-width: 576px) {
     .gov-footer-inner { flex-direction: column; align-items: flex-start; }
@@ -288,7 +286,7 @@ tr.linha-fora-da-unidade td:first-child { font-weight: 700; }
     font-size: var(--font-size-scale-up-01); font-weight: 700; color: var(--brand-primary);
     margin: 0 0 var(--spacing-scale-base) 0;
 }
-.narrativa-secao p { margin: 0; color: var(--gray-80); max-width: 850px; }
+.narrativa-secao p { margin: 0; color: var(--gray-80); }
 
 .gov-table-wrapper { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 .gov-table-wrapper::-webkit-scrollbar { display: none; }
