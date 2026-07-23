@@ -14,6 +14,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script>Chart.register(ChartDataLabels);</script>
     <script src="assets/dropdown.js"></script>
+    <script>
+        window.addEventListener('scroll', function() {
+            var header = document.querySelector('.premium-header');
+            if (header) {
+                if (window.scrollY > 40) {
+                    header.classList.add('is-scrolled');
+                } else {
+                    header.classList.remove('is-scrolled');
+                }
+            }
+        });
+    </script>
 </head>
 <body>
     <style>
@@ -40,6 +52,8 @@
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 24px;
+            padding-top: 16px;
+            padding-bottom: 16px;
         }
         .premium-brand {
             display: flex;
@@ -47,8 +61,21 @@
             gap: 16px;
             flex-wrap: wrap;
         }
+        .premium-header.is-scrolled .premium-nav {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            animation: slideUpNav 0.3s ease forwards;
+        }
+        @keyframes slideUpNav {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .premium-logo img {
-            height: 80px;
+            height: 60px;
             width: auto;
             display: block;
         }
@@ -149,66 +176,112 @@
             </div>
         </div>
     </header>
-    <main class="container">
-        
+    <div class="container relatorio-layout">
+        <nav class="relatorio-toc" aria-label="Sumário deste boletim">
+            <span class="relatorio-toc-titulo">Neste boletim</span>
+            <ol class="relatorio-toc-lista" id="relatorio-toc-lista"></ol>
+        </nav>
+        <main class="relatorio-conteudo">
+            
+<div class="capa-relatorio">
 <div class="page-header" style="margin: 0.5rem 0 0.5rem 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
-    <h1 style="font-family: 'Rawline', sans-serif; font-size: 28px; font-weight: 700; color: #0f172a; margin: 0 0 12px 0; letter-spacing: -0.5px;">
-        Boletim PSB <span style="font-weight: 300; color: #cbd5e1; margin: 0 8px;">|</span> <span style="color: #005484;">Visão Municipal</span>
-    </h1>
-    <p style="font-family: 'Raleway', sans-serif; font-size: 14px; color: #64748b; margin: 0; display: inline-flex; align-items: center; gap: 8px; font-weight: 500;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        Período de referência: 1º Semestre de 2026
-    </p>
+    <div>
+        <h1 style="font-family: 'Rawline', sans-serif; font-size: 32px; font-weight: 700; color: #0f172a; margin: 0 0 12px 0; letter-spacing: -0.5px;">Boletim PSB <span style="font-weight: 300; color: #cbd5e1; margin: 0 8px;">|</span> <span style="color: #005484;">Visão Municipal</span></h1>
+        <p style="font-family: 'Raleway', sans-serif; font-size: 14px; color: #64748b; margin: 0; display: inline-flex; align-items: center; gap: 8px; font-weight: 500;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Período de referência: 1º Semestre de 2026</p>
+    </div>
+    
+
+<div class="page-header-ilustracao">
+    <img src="assets/ilustracoes/fundo-05.png" alt="" aria-hidden="true">
+</div>
 </div>
 
-
+<h2>Visão Municipal</h2>
 
 <div class="kpi-grid">
-    <div class="kpi-tile">
+    <div class="kpi-tile destaque">
         <span class="valor">33.462</span>
-        <span class="rotulo">Atendimentos no semestre (PAIF + SCFV)</span>
+        <span class="rotulo">Atendimentos no semestre</span>
     </div>
-    <div class="kpi-tile">
+    <div class="kpi-tile" style="--kpi-accent: var(--brand-secondary);">
         <span class="valor">22.742</span>
         <span class="rotulo">Famílias referenciadas</span>
     </div>
-    <div class="kpi-tile">
+    <div class="kpi-tile" style="--kpi-accent: #b8860b;">
         <span class="valor">3.911</span>
-        <span class="rotulo">Benefícios eventuais concedidos</span>
+        <span class="rotulo">Dispensações</span>
     </div>
-    <div class="kpi-tile">
+    <div class="kpi-tile" style="--kpi-accent: var(--feedback-info);">
         <span class="valor">2.990</span>
         <span class="rotulo">BPCs ativos</span>
     </div>
-    <div class="kpi-tile">
+    <div class="kpi-tile" style="--kpi-accent: var(--feedback-success);">
         <span class="valor">7.325</span>
         <span class="rotulo">Famílias no Bolsa Família</span>
     </div>
-    <div class="kpi-tile">
-        <span class="valor">67</span>
+    <div class="kpi-tile" style="--kpi-accent: var(--gray-60);">
+        <span class="valor">59</span>
         <span class="rotulo">Profissionais e equipe</span>
+    </div>
+</div>
+</div>
+
+<h2>Agendamentos CadÚnico</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile">
+        <span class="valor">540</span>
+        <span class="rotulo">Agendamentos de Inclusão</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">1.467</span>
+        <span class="rotulo">Agendamentos de Atualização</span>
+    </div>
+</div>
+
+<h2>Taxa de Comparecimento</h2>
+
+<div class="alerta-box">
+    <p>
+        <strong>1.849 agendamentos</strong>, no
+        total das 8 unidades, estão com status "Pendente" (nunca atualizado no sistema para
+        Atendido/Ausente) e não entram no cálculo abaixo — podem indicar registros esquecidos
+        que merecem revisão.
+    </p>
+</div>
+
+<div class="kpi-grid">
+    
+    <div class="kpi-tile">
+        <span class="valor">32.0%</span>
+        <span class="rotulo">Taxa de Ausência (municipal)</span>
+    </div>
+    
+    <div class="kpi-tile">
+        <span class="valor">2.886</span>
+        <span class="rotulo">Agendamentos Atendidos</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">1.357</span>
+        <span class="rotulo">Agendamentos com Ausência</span>
     </div>
 </div>
 
 <div class="chart-card categoria-paif">
-    <h3>Atendimentos PAIF por unidade</h3>
+    <h3>Atendimentos por unidade</h3>
     <div class="chart-area"><canvas id="grafico-atendimentos"></canvas></div>
     <div class="chart-footer">
-        Fonte: <strong>IPM Social</strong>. Total de atendimentos individuais
-        (PAIF) registrados em cada CRAS no período.
+        Fonte: <strong>IPM Social</strong>
     </div>
 </div>
 
 <div class="chart-card categoria-beneficios">
-    <h3>Benefícios dispensados por unidade</h3>
+    <h3>Dispensações por unidade</h3>
     <div class="chart-filter">
-        <label for="filtro-beneficio">Benefício</label>
+        <label for="filtro-beneficio">Dispensação</label>
         <select id="filtro-beneficio" class="gov-select">
             <option value="__todos__">Todos</option>
                 
                 <option value="2ª Via Certidão de Nascimento">2ª Via Certidão de Nascimento</option>
-                
-                <option value="2ª Via Certidão de Nascimento [fora do Município]">2ª Via Certidão de Nascimento [fora do Município]</option>
                 
                 <option value="Prato Cheio">Prato Cheio</option>
                 
@@ -218,10 +291,7 @@
     </div>
     <div class="chart-area"><canvas id="grafico-beneficios"></canvas></div>
     <div class="chart-footer">
-        Fonte: <strong>IPM Social</strong>. Quantidade de benefícios eventuais
-        dispensados em cada CRAS no período. O filtro lista os benefícios com
-        mais de 150 dispensações no semestre; "Todos" soma todos os tipos,
-        incluindo os que não atingem esse total.
+        Fonte: <strong>IPM Social</strong>
     </div>
 </div>
 
@@ -231,28 +301,24 @@
         <h3>Raça/Cor dos Atendidos</h3>
         <div class="chart-area"><canvas id="grafico-raca-cor"></canvas></div>
         <div class="chart-footer">
-            Fonte: <strong>BASE - PESSOAS</strong> cruzada com atendimentos PAIF e SCFV.
-            Pessoas únicas atendidas no período, por Raça/Cor autodeclarada.
+            Fonte: <strong>IPM Social</strong>
         </div>
     </div>
     <div class="chart-card categoria-demografia">
         <h3>Sexo dos Atendidos</h3>
         <div class="chart-area"><canvas id="grafico-sexo"></canvas></div>
         <div class="chart-footer">
-            Fonte: <strong>BASE - PESSOAS</strong> cruzada com atendimentos PAIF e SCFV.
-            Pessoas únicas atendidas no período, por Sexo.
+            Fonte: <strong>IPM Social</strong>
         </div>
     </div>
 </div>
 
-<h2>Motivos de Atendimento (PAIF)</h2>
+<h2>Motivos de Atendimento</h2>
 <div class="chart-card categoria-motivos">
     <h3>Motivos de atendimento mais frequentes</h3>
     <div class="chart-area"><canvas id="grafico-motivos"></canvas></div>
     <div class="chart-footer">
-        Fonte: <strong>IPM Social</strong>. Top 10 motivos de atendimento PAIF mais registrados
-        no período, com o restante agrupado em "Outros Motivos". Uma mesma consulta pode
-        registrar mais de um motivo.
+        Fonte: <strong>IPM Social</strong>
     </div>
 </div>
 
@@ -276,7 +342,7 @@
             <td><a href="cras-industrial.html">CRAS Industrial</a></td>
             <td>4.244</td>
             <td>5.919</td>
-            <td>3</td>
+            <td>2</td>
             <td>3</td>
             <td>2</td>
             <td>0</td><td>0</td>
@@ -286,7 +352,17 @@
             <td><a href="cras-centro.html">CRAS Centro</a></td>
             <td>4.377</td>
             <td>4.872</td>
-            <td>5</td>
+            <td>4</td>
+            <td>2</td>
+            <td>2</td>
+            <td>0</td><td>0</td>
+        </tr>
+        
+        <tr>
+            <td><a href="cras-costeira.html">CRAS Costeira</a></td>
+            <td>3.185</td>
+            <td>3.553</td>
+            <td>3</td>
             <td>2</td>
             <td>2</td>
             <td>0</td><td>0</td>
@@ -296,7 +372,7 @@
             <td><a href="cras-california.html">CRAS Califórnia</a></td>
             <td>2.937</td>
             <td>3.654</td>
-            <td>4</td>
+            <td>3</td>
             <td>1</td>
             <td>2</td>
             <td>0</td><td>1</td>
@@ -306,19 +382,9 @@
             <td><a href="cras-boqueirao.html">CRAS Boqueirão</a></td>
             <td>1.935</td>
             <td>4.116</td>
+            <td>2</td>
+            <td>2</td>
             <td>3</td>
-            <td>2</td>
-            <td>3</td>
-            <td>0</td><td>0</td>
-        </tr>
-        
-        <tr>
-            <td><a href="cras-costeira.html">CRAS Costeira</a></td>
-            <td>3.185</td>
-            <td>3.553</td>
-            <td>4</td>
-            <td>2</td>
-            <td>2</td>
             <td>0</td><td>0</td>
         </tr>
         
@@ -326,7 +392,7 @@
             <td><a href="cras-fazenda-velha.html">CRAS Fazenda Velha</a></td>
             <td>1.741</td>
             <td>3.230</td>
-            <td>3</td>
+            <td>2</td>
             <td>2</td>
             <td>3</td>
             <td>0</td><td>1</td>
@@ -336,7 +402,7 @@
             <td><a href="cras-thomaz-coelho.html">CRAS Thomaz Coelho</a></td>
             <td>974</td>
             <td>1.124</td>
-            <td>3</td>
+            <td>2</td>
             <td>2</td>
             <td>2</td>
             <td>0</td><td>0</td>
@@ -346,7 +412,7 @@
             <td><a href="cras-tupy.html">CRAS Tupy</a></td>
             <td>3.349</td>
             <td>2.632</td>
-            <td>4</td>
+            <td>3</td>
             <td>2</td>
             <td>3</td>
             <td>1</td><td>0</td>
@@ -354,6 +420,58 @@
         
     </tbody>
 </table>
+</div>
+
+<h2>Comparação entre unidades</h2>
+<div class="comparacao-unidades">
+    <div class="comparacao-selecao">
+        <div class="chart-filter">
+            <label for="comparar-unidade-a">Unidade Selecionada</label>
+            <select id="comparar-unidade-a" class="gov-select">
+                
+                <option value="cras-industrial">CRAS Industrial</option>
+                
+                <option value="cras-centro">CRAS Centro</option>
+                
+                <option value="cras-costeira">CRAS Costeira</option>
+                
+                <option value="cras-california">CRAS Califórnia</option>
+                
+                <option value="cras-boqueirao">CRAS Boqueirão</option>
+                
+                <option value="cras-fazenda-velha">CRAS Fazenda Velha</option>
+                
+                <option value="cras-thomaz-coelho">CRAS Thomaz Coelho</option>
+                
+                <option value="cras-tupy">CRAS Tupy</option>
+                
+            </select>
+        </div>
+        <div class="chart-filter">
+            <label for="comparar-unidade-b">Comparar com</label>
+            <select id="comparar-unidade-b" class="gov-select">
+                
+                <option value="cras-industrial">CRAS Industrial</option>
+                
+                <option value="cras-centro">CRAS Centro</option>
+                
+                <option value="cras-costeira">CRAS Costeira</option>
+                
+                <option value="cras-california">CRAS Califórnia</option>
+                
+                <option value="cras-boqueirao">CRAS Boqueirão</option>
+                
+                <option value="cras-fazenda-velha">CRAS Fazenda Velha</option>
+                
+                <option value="cras-thomaz-coelho">CRAS Thomaz Coelho</option>
+                
+                <option value="cras-tupy">CRAS Tupy</option>
+                
+            </select>
+        </div>
+    </div>
+    <div class="comparacao-kpis" id="comparacao-kpis"></div>
+    <div class="comparacao-chart-area"><canvas id="grafico-comparacao"></canvas></div>
 </div>
 
 <h2>Unidades</h2>
@@ -380,6 +498,16 @@
     </div>
     
     <div class="gov-card">
+        <div class="gov-card-header"><h3 class="title">CRAS Costeira</h3></div>
+        <div class="gov-card-content">
+            <p>3.553 atendimentos PAIF</p>
+            <p>3.185 famílias referenciadas</p>
+            <p>532 benefícios concedidos</p>
+        </div>
+        <div class="gov-card-footer"><a href="cras-costeira.html">Ver boletim completo →</a></div>
+    </div>
+    
+    <div class="gov-card">
         <div class="gov-card-header"><h3 class="title">CRAS Califórnia</h3></div>
         <div class="gov-card-content">
             <p>3.654 atendimentos PAIF</p>
@@ -397,16 +525,6 @@
             <p>359 benefícios concedidos</p>
         </div>
         <div class="gov-card-footer"><a href="cras-boqueirao.html">Ver boletim completo →</a></div>
-    </div>
-    
-    <div class="gov-card">
-        <div class="gov-card-header"><h3 class="title">CRAS Costeira</h3></div>
-        <div class="gov-card-content">
-            <p>3.553 atendimentos PAIF</p>
-            <p>3.185 famílias referenciadas</p>
-            <p>532 benefícios concedidos</p>
-        </div>
-        <div class="gov-card-footer"><a href="cras-costeira.html">Ver boletim completo →</a></div>
     </div>
     
     <div class="gov-card">
@@ -443,8 +561,8 @@
 
 <script>
 (function() {
-    const labels = ["CRAS Industrial", "CRAS Centro", "CRAS Califórnia", "CRAS Boqueirão", "CRAS Costeira", "CRAS Fazenda Velha", "CRAS Thomaz Coelho", "CRAS Tupy"];
-    const valores = [5919, 4872, 3654, 4116, 3553, 3230, 1124, 2632];
+    const labels = ["CRAS Industrial", "CRAS Centro", "CRAS Costeira", "CRAS Califórnia", "CRAS Boqueirão", "CRAS Fazenda Velha", "CRAS Thomaz Coelho", "CRAS Tupy"];
+    const valores = [5919, 4872, 3553, 3654, 4116, 3230, 1124, 2632];
     const media = valores.length > 0 ? valores.reduce((a, b) => a + b, 0) / valores.length : 0;
     const datasetMedia = valores.map(() => media);
 
@@ -506,10 +624,7 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: {
-                duration: 1500,
-                easing: 'easeOutQuart'
-            },
+            animation: false,
             interaction: {
                 mode: 'index',
                 intersect: false,
@@ -534,16 +649,22 @@
                                 return label + Math.round(value).toLocaleString('pt-BR');
                             }
                             return label + value.toLocaleString('pt-BR') + ' atendimentos';
+                        },
+                        afterLabel: function(context) {
+                            if (context.dataset.type === 'line' || !media) return '';
+                            const variacaoPct = ((context.parsed.y - media) / media) * 100;
+                            const direcao = variacaoPct >= 0 ? 'acima' : 'abaixo';
+                            return Math.abs(Math.round(variacaoPct)) + '% ' + direcao + ' da média municipal';
                         }
                     }
                 }
             },
-            scales: { 
-                x: { 
+            scales: {
+                x: {
                     grid: { display: false },
                     ticks: { font: { family: 'Rawline, sans-serif', size: 11 } }
                 },
-                y: { 
+                y: {
                     beginAtZero: true,
                     grace: '10%',
                     grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
@@ -555,7 +676,7 @@
                 if (elements.length > 0) {
                     const index = elements[0].index;
                     const slugs = [
-                        "cras-industrial","cras-centro","cras-california","cras-boqueirao","cras-costeira","cras-fazenda-velha","cras-thomaz-coelho","cras-tupy"
+                        "cras-industrial","cras-centro","cras-costeira","cras-california","cras-boqueirao","cras-fazenda-velha","cras-thomaz-coelho","cras-tupy"
                     ];
                     window.location.href = slugs[index] + '.html';
                 }
@@ -567,9 +688,9 @@
     });
 
     // Gráfico de benefícios dispensados por unidade, com filtro por tipo
-    const dadosBeneficios = {"labels": ["CRAS Boqueirão", "CRAS Califórnia", "CRAS Centro", "CRAS Costeira", "CRAS Fazenda Velha", "CRAS Industrial", "CRAS Thomaz Coelho", "CRAS Tupy"], "todos": [359, 686, 656, 532, 416, 509, 243, 510], "por_tipo": {"2ª Via Certidão de Nascimento": [0, 61, 50, 47, 27, 43, 0, 84], "2ª Via Certidão de Nascimento [fora do Município]": [32, 45, 105, 38, 40, 76, 0, 83], "Prato Cheio": [270, 453, 319, 328, 209, 287, 160, 228], "Triar": [0, 0, 59, 0, 73, 0, 21, 27]}};
+    const dadosBeneficios = {"labels": ["CRAS Boqueirão", "CRAS Califórnia", "CRAS Centro", "CRAS Costeira", "CRAS Fazenda Velha", "CRAS Industrial", "CRAS Thomaz Coelho", "CRAS Tupy"], "todos": [359, 686, 656, 532, 416, 509, 243, 510], "por_tipo": {"2ª Via Certidão de Nascimento": [39, 106, 155, 85, 67, 119, 32, 167], "Prato Cheio": [270, 453, 319, 328, 209, 287, 160, 228], "Triar": [0, 0, 59, 0, 73, 0, 21, 27]}};
     const slugsBeneficios = [
-        "cras-industrial","cras-centro","cras-california","cras-boqueirao","cras-costeira","cras-fazenda-velha","cras-thomaz-coelho","cras-tupy"
+        "cras-industrial","cras-centro","cras-costeira","cras-california","cras-boqueirao","cras-fazenda-velha","cras-thomaz-coelho","cras-tupy"
     ];
 
     function valoresParaFiltroBeneficio(tipo) {
@@ -616,8 +737,8 @@
                     type: 'bar',
                     label: 'Benefícios Dispensados',
                     data: dadosBeneficios.todos,
-                    backgroundColor: 'rgba(253, 185, 46, 0.65)',
-                    hoverBackgroundColor: 'rgba(253, 185, 46, 1)',
+                    backgroundColor: 'rgba(21, 91, 203, 0.65)',
+                    hoverBackgroundColor: 'rgba(21, 91, 203, 1)',
                     borderRadius: 6,
                     borderWidth: 0,
                     barPercentage: 0.6,
@@ -668,6 +789,14 @@
                                 return label + Math.round(value).toLocaleString('pt-BR');
                             }
                             return label + value.toLocaleString('pt-BR') + ' benefícios';
+                        },
+                        afterLabel: function(context) {
+                            if (context.dataset.type === 'line') return '';
+                            const media = context.chart.data.datasets[0].data[context.dataIndex];
+                            if (!media) return '';
+                            const variacaoPct = ((context.parsed.y - media) / media) * 100;
+                            const direcao = variacaoPct >= 0 ? 'acima' : 'abaixo';
+                            return Math.abs(Math.round(variacaoPct)) + '% ' + direcao + ' da média municipal';
                         }
                     }
                 }
@@ -706,33 +835,83 @@
     });
 
     // Gráficos de perfil dos atendidos (Raça/Cor e Sexo)
-    var paletaDemografia = ['#007044', '#005484', '#FDB92E', '#888888', '#155bcb', '#168821'];
-    function corPorIndice(i) { return paletaDemografia[i % paletaDemografia.length]; }
+    function tooltipPercentualDoughnut(context) {
+        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+        const pct = total ? ((context.parsed / total) * 100).toFixed(1) : 0;
+        return context.label + ': ' + context.parsed.toLocaleString('pt-BR') + ' (' + pct + '%)';
+    }
 
-    var labelsRacaCor = ["Branca", "Parda", "Preta", "Amarela", "Indígena", "Não informado"];
+    const optsDoughnut = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        layout: { padding: 10 },
+        plugins: { 
+            legend: { 
+                position: 'right',
+                labels: { font: { family: 'Rawline, sans-serif', size: 12 }, usePointStyle: true, padding: 15 }
+            },
+            tooltip: { 
+                backgroundColor: 'rgba(0, 0, 0, 0.8)', titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                bodyFont: { size: 13, family: 'Rawline, sans-serif' }, padding: 12, cornerRadius: 8,
+                usePointStyle: true, callbacks: { label: tooltipPercentualDoughnut } 
+            },
+            datalabels: {
+                color: '#555',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                borderRadius: 3,
+                padding: { top: 4, bottom: 4, left: 6, right: 6 },
+                font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                display: function(context) {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    const pct = total ? (context.dataset.data[context.dataIndex] / total) * 100 : 0;
+                    return pct >= 5;
+                },
+                formatter: (value, context) => {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    const pct = total ? Math.round((value / total) * 100) : 0;
+                    return pct + '%';
+                },
+                anchor: 'center',
+                align: 'center'
+            }
+        }
+    };
+
+    var rawLabelsRacaCor = ["Branca", "Parda", "Preta", "Amarela", "Indígena", "Não informado"];
+    var rawValRacaCor = [9048, 3337, 544, 101, 1, 426];
+    var fRacaCor = rawLabelsRacaCor.map((l, i) => ({l, v: rawValRacaCor[i]})).filter(x => x.l !== 'Não informado' && x.l !== 'Não Informado');
+    var paletaRacaCor = ['#1351b4', '#007044', '#c2850c', '#e52207', '#155bcb', '#168821'];
+
     new Chart(document.getElementById('grafico-raca-cor'), {
         type: 'doughnut',
         data: {
-            labels: labelsRacaCor,
+            labels: fRacaCor.map(x => x.l),
             datasets: [{
-                data: [9048, 3337, 544, 101, 1, 426],
-                backgroundColor: labelsRacaCor.map(function (_, i) { return corPorIndice(i); })
+                data: fRacaCor.map(x => x.v),
+                backgroundColor: fRacaCor.map((_, i) => paletaRacaCor[i % paletaRacaCor.length]),
+                borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: optsDoughnut
     });
 
-    var labelsSexo = ["Feminino", "Masculino", "Não informado"];
+    var rawLabelsSexo = ["Feminino", "Masculino", "Não informado"];
+    var rawValSexo = [9724, 3320, 413];
+    var fSexo = rawLabelsSexo.map((l, i) => ({l, v: rawValSexo[i]})).filter(x => x.l !== 'Não informado' && x.l !== 'Não Informado');
+    var paletaSexo = ['#007044', '#1351b4', '#ffbe2e', '#c2850c'];
+
     new Chart(document.getElementById('grafico-sexo'), {
         type: 'doughnut',
         data: {
-            labels: labelsSexo,
+            labels: fSexo.map(x => x.l),
             datasets: [{
-                data: [9724, 3320, 413],
-                backgroundColor: labelsSexo.map(function (_, i) { return corPorIndice(i); })
+                data: fSexo.map(x => x.v),
+                backgroundColor: fSexo.map((_, i) => paletaSexo[i % paletaSexo.length]),
+                borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: optsDoughnut
     });
 
     // Gráfico de motivos de atendimento (PAIF) mais frequentes
@@ -743,17 +922,162 @@
             datasets: [{
                 label: 'Ocorrências',
                 data: [13371, 6117, 5394, 5394, 4500, 4121, 3373, 2846, 2565, 1994, 13812],
-                backgroundColor: '#168821'
+                backgroundColor: 'rgba(22, 136, 33, 0.7)',
+                hoverBackgroundColor: 'rgba(22, 136, 33, 1)',
+                borderRadius: 4,
+                borderWidth: 0,
+                barPercentage: 0.7,
+                datalabels: {
+                    anchor: 'end',
+                    align: 'right',
+                    color: '#555',
+                    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                    borderRadius: 3,
+                    padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                    font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                    formatter: function(value) {
+                        return value.toLocaleString('pt-BR');
+                    }
+                }
             }]
         },
         options: {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { right: 40 } },
             plugins: { legend: { display: false } },
             scales: { x: { beginAtZero: true } }
         }
     });
+
+    // Comparação entre unidades — 100% client-side, usando dados já
+    // embutidos no HTML (comparacao_unidades); trocar A/B só refiltra o
+    // array já carregado, sem nova geração no back-end.
+    (function () {
+        const dadosComparacao = [{"nome": "CRAS Industrial", "slug": "cras-industrial", "atendimentos_paif": 5919, "familias_referenciadas": 4244, "total_beneficios": 509, "total_profissionais": 7, "atendimentos_por_profissional": 845.6}, {"nome": "CRAS Centro", "slug": "cras-centro", "atendimentos_paif": 4872, "familias_referenciadas": 4377, "total_beneficios": 656, "total_profissionais": 8, "atendimentos_por_profissional": 609.0}, {"nome": "CRAS Costeira", "slug": "cras-costeira", "atendimentos_paif": 3553, "familias_referenciadas": 3185, "total_beneficios": 532, "total_profissionais": 7, "atendimentos_por_profissional": 507.6}, {"nome": "CRAS Califórnia", "slug": "cras-california", "atendimentos_paif": 3654, "familias_referenciadas": 2937, "total_beneficios": 686, "total_profissionais": 7, "atendimentos_por_profissional": 522.0}, {"nome": "CRAS Boqueirão", "slug": "cras-boqueirao", "atendimentos_paif": 4116, "familias_referenciadas": 1935, "total_beneficios": 359, "total_profissionais": 7, "atendimentos_por_profissional": 588.0}, {"nome": "CRAS Fazenda Velha", "slug": "cras-fazenda-velha", "atendimentos_paif": 3230, "familias_referenciadas": 1741, "total_beneficios": 416, "total_profissionais": 8, "atendimentos_por_profissional": 403.8}, {"nome": "CRAS Thomaz Coelho", "slug": "cras-thomaz-coelho", "atendimentos_paif": 1124, "familias_referenciadas": 974, "total_beneficios": 243, "total_profissionais": 6, "atendimentos_por_profissional": 187.3}, {"nome": "CRAS Tupy", "slug": "cras-tupy", "atendimentos_paif": 2632, "familias_referenciadas": 3349, "total_beneficios": 510, "total_profissionais": 9, "atendimentos_por_profissional": 292.4}];
+        const porSlug = {};
+        dadosComparacao.forEach(function (u) { porSlug[u.slug] = u; });
+
+        const metricas = [
+            { chave: 'atendimentos_paif', rotulo: 'Atendimentos' },
+            { chave: 'familias_referenciadas', rotulo: 'Famílias referenciadas' },
+            { chave: 'total_beneficios', rotulo: 'Benefícios dispensados' },
+            { chave: 'atendimentos_por_profissional', rotulo: 'Atendimentos por profissional' }
+        ];
+
+        const selectA = document.getElementById('comparar-unidade-a');
+        const selectB = document.getElementById('comparar-unidade-b');
+        const containerKpis = document.getElementById('comparacao-kpis');
+        if (!selectA || !selectB || !containerKpis || dadosComparacao.length < 2) return;
+
+        function formatarValor(valor) {
+            if (valor === null || valor === undefined) return '—';
+            return valor.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+        }
+
+        function renderizarKpis(unidadeA, unidadeB) {
+            containerKpis.innerHTML = metricas.map(function (m) {
+                const valorA = unidadeA[m.chave];
+                const valorB = unidadeB[m.chave];
+                return '<div class="comparacao-kpi">' +
+                    '<span class="rotulo">' + m.rotulo + '</span>' +
+                    '<div class="valores">' +
+                    '<span class="valor-a">' + formatarValor(valorA) + '</span>' +
+                    '<span class="valor-b">' + formatarValor(valorB) + '</span>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        let graficoComparacao = null;
+        function renderizarGrafico(unidadeA, unidadeB) {
+            const labels = metricas.map(function (m) { return m.rotulo; });
+            const valoresA = metricas.map(function (m) { return unidadeA[m.chave] || 0; });
+            const valoresB = metricas.map(function (m) { return unidadeB[m.chave] || 0; });
+
+            if (graficoComparacao) {
+                graficoComparacao.data.datasets[0].label = unidadeA.nome;
+                graficoComparacao.data.datasets[0].data = valoresA;
+                graficoComparacao.data.datasets[1].label = unidadeB.nome;
+                graficoComparacao.data.datasets[1].data = valoresB;
+                graficoComparacao.update();
+                return;
+            }
+
+            graficoComparacao = new Chart(document.getElementById('grafico-comparacao'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: unidadeA.nome, data: valoresA, backgroundColor: 'rgba(0, 112, 68, 0.75)', hoverBackgroundColor: 'rgba(0, 112, 68, 1)', borderRadius: 6 },
+                        { label: unidadeB.nome, data: valoresB, backgroundColor: 'rgba(19, 81, 180, 0.75)', hoverBackgroundColor: 'rgba(19, 81, 180, 1)', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { top: 20 } },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#555',
+                            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                            borderRadius: 3,
+                            padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                            font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
+                            formatter: function(value) {
+                                return value.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+                            }
+                        },
+                        legend: { position: 'bottom', labels: { font: { family: 'Raleway, sans-serif', size: 12 }, boxWidth: 12 } },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { size: 13, family: 'Rawline, sans-serif' },
+                            bodyFont: { size: 13, family: 'Rawline, sans-serif' },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { family: 'Rawline, sans-serif', size: 10.5 } } },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                            ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function atualizarComparacao() {
+            const unidadeA = porSlug[selectA.value];
+            const unidadeB = porSlug[selectB.value];
+            if (!unidadeA || !unidadeB) return;
+            renderizarKpis(unidadeA, unidadeB);
+            renderizarGrafico(unidadeA, unidadeB);
+        }
+
+        // Default: unidade com maior e com menor volume de atendimentos
+        // PAIF, pra abrir com um contraste relevante em vez de vazio.
+        const ordenadoPorAtendimento = dadosComparacao.slice().sort(function (a, b) {
+            return b.atendimentos_paif - a.atendimentos_paif;
+        });
+        selectA.value = ordenadoPorAtendimento[0].slug;
+        selectB.value = ordenadoPorAtendimento[ordenadoPorAtendimento.length - 1].slug;
+
+        selectA.addEventListener('change', atualizarComparacao);
+        selectB.addEventListener('change', atualizarComparacao);
+        atualizarComparacao();
+    })();
 
     // Lógica para ordenação da tabela
     function getCellValue(tr, idx) {
@@ -796,7 +1120,8 @@
 })();
 </script>
 
-    </main>
+        </main>
+    </div>
     <footer class="gov-footer">
         <div class="gov-footer-inner">
             <div class="gov-footer-brand">
@@ -804,7 +1129,7 @@
                 <span>Vigilância Socioassistencial — PSB</span>
             </div>
             <div class="gov-footer-info">
-                <p>Boletim PSB — período de referência: 1º Semestre de 2026. Emitido em 21 de julho de 2026.</p>
+                <p>Boletim PSB — período de referência: 1º Semestre de 2026. Emitido em 22 de julho de 2026.</p>
                 <p>Dados de uso interno — Secretaria Municipal de Assistência Social de Araucária.</p>
             </div>
         </div>
@@ -862,6 +1187,81 @@
             el.innerText = formatar(0);
             requestAnimationFrame(animar);
         });
+    });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sumário lateral: varre os <h2> já existentes no conteúdo — nenhuma
+        // mudança de estrutura Jinja é necessária, funciona igual em
+        // qualquer página que estenda este layout.
+        const secoes = Array.from(document.querySelectorAll(".relatorio-conteudo h2"));
+        const lista = document.getElementById("relatorio-toc-lista");
+
+        if (secoes.length && lista) {
+            secoes.forEach(function (h2, i) {
+                if (!h2.id) h2.id = "secao-" + (i + 1);
+                const item = document.createElement("li");
+                const link = document.createElement("a");
+                link.href = "#" + h2.id;
+                link.textContent = h2.textContent;
+                link.dataset.alvo = h2.id;
+                item.appendChild(link);
+                lista.appendChild(item);
+            });
+
+            const links = Array.from(lista.querySelectorAll("a"));
+            const observerScrollSpy = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    const link = links.find(function (l) { return l.dataset.alvo === entry.target.id; });
+                    if (!link) return;
+                    if (entry.isIntersecting) {
+                        links.forEach(function (l) { l.classList.remove("ativo"); });
+                        link.classList.add("ativo");
+                    }
+                });
+            }, { rootMargin: "-10% 0px -80% 0px" });
+            secoes.forEach(function (h2) { observerScrollSpy.observe(h2); });
+
+            // Garante que o último item fique ativo caso a página chegue ao fim
+            // mas a última seção não alcance a linha de detecção do observer.
+            window.addEventListener('scroll', function() {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+                    links.forEach(function (l) { l.classList.remove("ativo"); });
+                    if (links.length > 0) links[links.length - 1].classList.add("ativo");
+                }
+            });
+        }
+
+        // Revelação suave: cada seção (h2 + irmãos até o próximo h2) entra
+        // com fade + leve deslocamento ao cruzar a viewport, uma vez só.
+        const prefereReducaoMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!prefereReducaoMovimento && secoes.length) {
+            const grupos = secoes.map(function (h2) {
+                const grupo = [h2];
+                let irmao = h2.nextElementSibling;
+                while (irmao && irmao.tagName !== "H2") {
+                    grupo.push(irmao);
+                    irmao = irmao.nextElementSibling;
+                }
+                return grupo;
+            });
+
+            const observerReveal = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("reveal-visivel");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -10% 0px" });
+
+            grupos.forEach(function (grupo) {
+                grupo.forEach(function (el) {
+                    el.classList.add("reveal");
+                    observerReveal.observe(el);
+                });
+            });
+        }
     });
     </script>
 </body>
