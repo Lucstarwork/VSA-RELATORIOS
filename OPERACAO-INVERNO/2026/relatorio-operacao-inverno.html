@@ -3,8 +3,10 @@
 <html lang='pt-BR'>
 <head>
 <meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>Relatório Semanal de Atendimentos — Operação Inverno — Araucária</title>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet'>
+<link href='https://unpkg.com/@phosphor-icons/web@2.1.1/src/thin/style.css' rel='stylesheet'>
 <link href='https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap' rel='stylesheet'>
 <style>
   @import url('https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css');
@@ -36,6 +38,7 @@
     --feedback-danger: #e52207;
     --feedback-success: #168821;
     --feedback-warning: #ffcd07;
+    --feedback-warning-text: #5c4a00;
     --feedback-info: #155bcb;
 
     --fs-down-01: 12px;
@@ -51,338 +54,440 @@
     --rounder-md: 8px;
     --rounder-pill: 999em;
     --shadow-sm: 0 1px 6px rgba(0,0,0,.16);
+    --shadow-md: 0 3px 6px rgba(0,0,0,.16);
+    --shadow-lg: 0 6px 6px rgba(0,0,0,.16);
 
     --font-family: 'Rawline', 'Raleway', sans-serif;
+    --ease: cubic-bezier(.25,.1,.25,1);
+    --topbar-h: 58px;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  ::selection{ background:var(--brand-primary-a16); }
+  html,body{ height:100%; }
   body{
     font-family:var(--font-family);
     color:var(--gray-80);
     background:var(--gray-2);
     font-size:var(--fs-base);
+    line-height:var(--lh-medium);
+    overflow:hidden;
   }
-  .pagina{ display:flex; justify-content:center; padding: 0.5vh 1vw; height: 100vh; overflow-y: auto; overflow-x: hidden; }
-  .folha{
-    width: 100%;
-    max-width: none;
-    height: 100%;
-    background:var(--pure-0);
-    padding: 20px 24px;
-    border-radius:var(--rounder-md);
-    box-shadow:var(--shadow-md);
-    display:flex;
-    flex-direction:column;
-  }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--gray-30); border-radius:var(--rounder-pill); }
+  ::-webkit-scrollbar-track{ background:var(--gray-5); }
 
-  /* ===== Timbre (cabeçalho institucional) ===== */
-  .hero{
-    padding:22px 26px;
-    display:flex;
-    align-items:center;
-    gap:20px;
-    color:var(--gray-80);
-    border-left: 6px solid var(--brand-primary);
-    flex:none;
-    position: relative;
-    background: var(--gray-2);
-  }
-  .faixa-institucional {
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, var(--brand-primary) 40%, var(--brand-accent) 40% 55%, var(--brand-secondary) 55%);
-  }
-  
-  .hero-meta{ display:flex; gap:8px; flex:none; }
-  .hero-meta .chip{
-    background:var(--pure-0); border:1px solid var(--gray-10);
-    border-radius:var(--rounder-md); padding:8px 18px; font-size:var(--fs-down-01); font-weight:600; color:var(--gray-70); white-space:nowrap;
-  }
-  .hero-meta .chip b{ font-weight:700; color:var(--brand-primary); }
+  @keyframes viewIn{ from{ opacity:0; transform:scale(.98) translateY(6px);} }
+  @keyframes hintFloat{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(5px);} }
 
-  .hero-lockup{ display:flex; align-items:center; gap:16px; margin:0 auto; }
-  .hero-lockup .lockup-texto{ line-height:var(--lh-low); text-align:left; }
-  .hero-lockup .eyebrow{
-    font-family:var(--font-family); font-size:var(--fs-down-01); font-weight:600; letter-spacing:0.05em; color:var(--gray-60); text-transform:uppercase;
-  }
-  .hero-lockup .titulo-inverno{
-    font-family:var(--font-family); font-size:var(--fs-up-02); font-weight:700; color:var(--brand-primary); text-transform:uppercase; line-height:var(--lh-low); margin-top:3px;
-  }
-  .hero-lockup .subtitulo{
-    font-size:var(--fs-base); color:var(--gray-70); font-weight:500; line-height:var(--lh-medium);
-    padding-left:18px; margin-left:2px; border-left:1px solid var(--gray-10);
-  }
+  /* ============================================================
+     SHELL — trilho de capítulos + coluna principal (mesma dinâmica
+     do Observatório do CadÚnico: 1 giro de scroll = 1 tela)
+     ============================================================ */
+  .shell{ display:flex; height:100dvh; }
 
-  /* ===== Duas colunas ===== */
-  .colunas{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:16px; flex:1; min-height:0; }
-  .coluna{ display:flex; flex-direction:column; min-height:0; }
+  .rail{ width:72px; flex:0 0 72px; display:flex; align-items:center; justify-content:center; }
+  .rail-track{ position:relative; display:flex; flex-direction:column; gap:14px; }
+  .rail-track::before{
+    content:''; position:absolute; left:50%; top:20px; bottom:20px; width:2px;
+    transform:translateX(-50%); background:var(--gray-10);
+  }
+  .rail-dot{
+    position:relative; z-index:1; width:40px; height:40px; border-radius:50%;
+    background:var(--pure-0); border:1px solid var(--gray-10); color:var(--gray-50);
+    font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:color .1s var(--ease), border-color .1s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .rail-dot:hover{ border-color:var(--brand-primary); color:var(--brand-primary); }
+  .rail-dot:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+  .rail-dot.ativo{ background:var(--brand-primary); border-color:var(--brand-primary); color:#fff; box-shadow:0 0 0 4px var(--brand-primary-a16); }
+  .rail-tip{
+    position:absolute; left:calc(100% + 12px); top:50%; transform:translate(-4px,-50%);
+    background:var(--gray-90); color:#fff; font-size:12px; font-weight:500; white-space:nowrap;
+    padding:6px 12px; border-radius:var(--rounder-sm); opacity:0; visibility:hidden; pointer-events:none;
+    z-index:60; transition:opacity .15s var(--ease), transform .15s var(--ease), visibility .15s;
+  }
+  .rail-tip b{ font-weight:700; color:var(--gray-30); margin-right:6px; font-variant-numeric:tabular-nums; }
+  .rail-dot:hover .rail-tip, .rail-dot:focus-visible .rail-tip{ opacity:1; visibility:visible; transform:translate(0,-50%); }
 
-  /* ===== Pill de seção ===== */
-  .pill-secao{
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    background:var(--brand-primary); color:var(--pure-0);
-    border-radius:var(--rounder-sm); padding:6px 16px 6px 6px;
-    font-family:var(--font-family); font-size:var(--fs-down-01); font-weight:600; text-transform:uppercase; letter-spacing:0.05em;
-    margin:0 0 12px; flex:none;
-  }
-  .pill-secao .icone-mini{
-    width:24px; height:24px; border-radius:var(--rounder-sm);
-    background:var(--brand-primary-dark);
-    display:flex; align-items:center; justify-content:center; flex:none;
-  }
-  .pill-secao .icone-mini i{ font-size: 12px; color:var(--pure-0); }
-  .pill-secao .periodo{ font-family:var(--font-family); font-weight:500; opacity:.8; text-transform:none; letter-spacing:0; margin-left:2px; }
-  .pill-secao .seletor-semana{
-    font-family:var(--font-family); font-size:var(--fs-down-01); font-weight:600;
-    text-transform:uppercase; letter-spacing:0.05em;
-    background:var(--brand-primary-dark); color:var(--pure-0);
-    border:1px solid rgba(255,255,255,.35); border-radius:var(--rounder-sm);
-    padding:2px 6px; cursor:pointer;
-  }
-  .pill-secao .seletor-semana:focus{ outline:2px solid var(--focus); outline-offset:1px; }
-  .pill-secao .rotulo-impressao{ display:none; }
+  .main{ flex:1; min-width:0; display:flex; flex-direction:column; position:relative; }
 
-  /* ===== Cards KPI ===== */
-  .kpi-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; flex:none; }
-  .kpi-grid--4{ grid-template-columns:repeat(4,1fr); }
-  .kpi-grid--5{ grid-template-columns:repeat(5,1fr); gap: 10px; }
+  .progresso{ height:3px; flex:0 0 3px; background:var(--gray-5); position:relative; z-index:5; }
+  .progresso i{ position:absolute; inset:0 auto 0 0; width:0; background:var(--brand-primary); transition:width .7s var(--ease); }
+
+  .topbar{ height:var(--topbar-h); flex:0 0 var(--topbar-h); display:flex; align-items:center; gap:14px; padding:0 24px 0 28px; border-bottom:1px solid var(--gray-10); }
+  .tb-brand{ margin-right:auto; display:flex; align-items:center; gap:12px; }
+  .tb-brand img{ height:38px; width:auto; display:block; }
+  .tb-credito{ display:flex; flex-direction:column; justify-content:center; line-height:1.25; font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--gray-50); }
+  .tb-credito b{ display:flex; align-items:center; gap:6px; font-size:16px; font-weight:800; letter-spacing:-.01em; text-transform:none; color:var(--gray-90); }
+  .tb-credito b i{ font-size:16px; color:var(--brand-secondary); }
+  .tb-ref{ font-size:12px; color:var(--gray-60); text-align:right; }
+  .tb-ref strong{ color:var(--gray-80); font-weight:700; }
+  .tb-fs{
+    width:32px; height:32px; border:0; border-radius:var(--rounder-sm); background:transparent;
+    color:var(--gray-50); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:background .1s var(--ease), color .1s var(--ease);
+  }
+  .tb-fs:hover{ background:var(--gray-4); color:var(--gray-80); }
+  .tb-fs:focus-visible{ outline:none; box-shadow:0 0 0 2px var(--focus); }
+
+  /* ===== Deck — telas empilhadas; 1 scroll = 1 tela ===== */
+  .deck{ flex:1; min-height:0; overflow:hidden; position:relative; }
+  .deck-track{ height:100%; transition:transform .7s var(--ease); will-change:transform; }
+  @media (prefers-reduced-motion:reduce){ .deck-track{ transition:none; } .progresso i{ transition:none; } }
+
+  .tela{ height:100%; padding:20px 32px 26px; display:flex; flex-direction:column; overflow:hidden; }
+
+  /* ===== Cabeçalho de seção editorial (eyebrow + régua fina) ===== */
+  .opi-sec-head{ margin:0 0 14px; flex:none; }
+  .opi-sec-head-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .opi-eyebrow{ font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--gray-50); }
+  .opi-sec-rule{ height:0; border-top:1px solid var(--gray-10); margin-top:8px; }
+  .opi-sec-meta{ font-size:var(--fs-up-01); color:var(--gray-90); font-weight:700; margin-top:6px; }
+
+  .opi-sec-head-actions{ display:flex; align-items:center; gap:8px; }
+  .opi-semana-select{
+    font-family:var(--font-family); font-size:13px; font-weight:600;
+    color:var(--brand-primary); background:var(--pure-0);
+    border:1px solid var(--gray-20); border-radius:var(--rounder-sm);
+    padding:5px 10px; cursor:pointer;
+  }
+  .opi-semana-select:focus{ outline:2px solid var(--focus); outline-offset:1px; }
+  #rotuloSemanaImpressa{ display:none; }
+
+  /* ===== Cards KPI (stat-tile elevado — identidade própria da Operação
+     Inverno, distinta do hairline plano do Observatório/Comida Boa) ===== */
+  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:14px; flex:none; }
   .kpi-card{
-    background:var(--pure-0); border:1px solid var(--gray-10); border-radius:var(--rounder-sm);
-    padding:12px; box-shadow:var(--shadow-sm);
-    height:auto; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-    text-align:center; overflow:hidden;
+    background:var(--pure-0); border-radius:16px;
+    padding:16px 18px; box-shadow:var(--shadow-sm);
+    display:flex; flex-direction:column; align-items:flex-start;
   }
-  .kpi-card .icone-badge{
-    width:32px; height:32px; border-radius:var(--rounder-pill); flex:none;
-    background:var(--brand-primary-a08);
-    display:flex; align-items:center; justify-content:center; color:var(--brand-primary); margin-bottom:6px;
+  .kpi-head{ display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:12px; }
+  .kpi-icon-wrap{
+    width:38px; height:38px; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--brand-primary-a08); color:var(--brand-primary);
   }
-  .kpi-card .icone-badge i{ font-size:14px; }
-  .kpi-card.warning .icone-badge { background: var(--feedback-warning); color: #5c4a00; }
-  .kpi-card.info .icone-badge { background: var(--feedback-info); color: var(--pure-0); }
-  .kpi-card.success .icone-badge { background: var(--feedback-success); color: var(--pure-0); }
+  .kpi-icon-wrap i{ font-size:19px; }
+  .kpi-card.warning .kpi-icon-wrap{ background:rgba(92,74,0,.1); color:var(--feedback-warning-text); }
+  .kpi-card.info .kpi-icon-wrap{ background:rgba(21,91,203,.1); color:var(--feedback-info); }
+  .kpi-card.success .kpi-icon-wrap{ background:rgba(22,136,33,.1); color:var(--feedback-success); }
 
-  .kpi-card .valor{ font-family:var(--font-family); font-size:var(--fs-up-03); font-weight:700; color:var(--brand-primary); line-height:var(--lh-low); }
-  .kpi-card .rotulo{ font-size:var(--fs-down-01); color:var(--gray-60); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
-  .kpi-card .extra{
-    align-self:stretch; margin-top:auto;
-    padding-top:6px; border-top:1px dashed var(--gray-10);
-    display:flex; align-items:center; justify-content:center; gap:6px;
+  .kpi-delta{
+    display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:700;
+    padding:3px 9px; border-radius:var(--rounder-pill); font-variant-numeric:tabular-nums;
   }
-  .kpi-card .contexto{ font-size:11px; color:var(--gray-60); }
-  .kpi-card .contexto b{ color:var(--brand-primary); }
+  .kpi-delta:empty{ display:none; }
+  .kpi-delta.up{ background:rgba(22,136,33,.12); color:var(--feedback-success); }
+  .kpi-delta.down{ background:rgba(229,34,7,.12); color:var(--feedback-danger); }
+
+  .kpi-value{ font-family:var(--font-family); font-size:28px; font-weight:800; color:var(--gray-90); line-height:var(--lh-low); font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+  .kpi-title{ font-size:11px; color:var(--gray-50); font-weight:700; text-transform:uppercase; letter-spacing:.09em; margin-top:5px; }
+  .kpi-caption{ font-size:11px; color:var(--gray-50); margin-top:6px; }
+  .kpi-extra{
+    align-self:stretch; margin-top:10px;
+    padding-top:8px; border-top:1px solid var(--gray-10);
+    display:flex; align-items:center; gap:6px;
+  }
+  .kpi-contexto{ font-size:12px; color:var(--gray-60); }
+  .kpi-contexto b{ color:var(--brand-primary); }
 
   /* ===== Gráficos ===== */
-  .grafico-linha{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; flex:1; min-height:0; }
-  .grafico-linha--3{ grid-template-columns:repeat(3, 1fr); }
+  .grafico-linha{ display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:16px; margin-top:16px; flex:1; min-height:0; }
+  .grafico-linha--3{ grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); }
   .grafico{
-    background:var(--pure-0); border:1px solid var(--gray-10); border-radius:var(--rounder-sm);
-    padding:12px; box-shadow:var(--shadow-sm);
-    display:flex; flex-direction:column; overflow:hidden; min-height:0;
+    background:var(--pure-0); border-radius:16px;
+    padding:14px 16px; box-shadow:var(--shadow-sm);
+    display:flex; flex-direction:column; min-height:0;
   }
-  .grafico .titulo-row{ display:flex; align-items:center; gap:8px; margin-bottom:2px; flex:none; }
-  .grafico .mini-icon{
-    width:24px; height:24px; border-radius:var(--rounder-sm); background:var(--gray-5); color:var(--brand-primary);
-    display:flex; align-items:center; justify-content:center; flex:none;
-  }
-  .grafico .mini-icon i{ font-size:13px; }
-  .grafico h3{ font-size:13px; font-weight:600; color:var(--brand-primary); margin:0; text-transform:uppercase; letter-spacing:0.05em; }
-  .grafico .nota{ font-size:11px; color:var(--gray-60); margin:0 0 6px 32px; flex:none; }
-  .grafico .corpo{ flex:1; position:relative; min-height:0; }
+  .grafico-head{ display:flex; align-items:center; gap:8px; margin-bottom:2px; flex:none; }
+  .grafico-head i{ font-size:15px; color:var(--brand-primary); flex:none; }
+  .grafico h3{ font-size:11px; font-weight:700; color:var(--brand-primary); margin:0; text-transform:uppercase; letter-spacing:.09em; }
+  .grafico .nota{ font-size:11px; color:var(--gray-60); margin:0 0 8px 23px; flex:none; }
+  .grafico .corpo{ position:relative; flex:1; min-height:0; }
+  .anel-legenda{ display:flex; gap:14px; margin:0 0 6px 23px; flex:none; }
+  .anel-legenda span{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--gray-60); }
+  .anel-legenda i{ width:8px; height:8px; border-radius:50%; flex:none; }
 
   /* ===== Nota de leitura (insight) ===== */
+  .insight-grupo{ display:flex; flex-direction:column; gap:8px; margin-top:14px; flex:none; }
   .insight{
-    margin-top:12px; min-height:36px; flex:none;
     background:var(--gray-2); border:1px solid var(--gray-10); border-left:4px solid var(--brand-primary);
-    border-radius:var(--rounder-sm); padding:6px 14px;
-    font-size:var(--fs-base); color:var(--gray-70); line-height:var(--lh-medium);
-    display:flex; gap:10px; align-items:center; overflow:hidden;
+    border-radius:var(--rounder-sm); padding:9px 14px;
+    font-size:13px; color:var(--gray-70); line-height:var(--lh-medium);
+    display:flex; gap:10px; align-items:center;
   }
-  .insight i{ font-size:16px; color:var(--brand-primary); flex:none; margin-top:1px; }
+  .insight i{ font-size:15px; color:var(--brand-primary); flex:none; }
   .insight b{ color:var(--brand-primary); font-weight:600; }
 
-  /* ===== Rodapé ===== */
-  .rodape{
-    margin-top:12px; padding-top:12px; border-top:1px solid var(--gray-10);
-    display:flex; align-items:center; justify-content:space-between;
-    font-size:var(--fs-down-01); color:var(--gray-50); flex:none;
+  /* ===== Dica de navegação por scroll ===== */
+  .scroll-hint{
+    position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:10;
+    display:flex; align-items:center; gap:8px; font-size:11px; font-weight:600; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--gray-50); background:var(--pure-0); border:1px solid var(--gray-10);
+    border-radius:var(--rounder-pill); padding:6px 14px; box-shadow:var(--shadow-sm);
+    transition:opacity .4s var(--ease); pointer-events:none;
   }
-  .rodape .nota-rodape{ display:flex; align-items:center; gap:8px; }
-  .rodape .nota-rodape i{ font-size:14px; color:var(--brand-primary); }
-  .rodape .fecho{ font-weight:600; color:var(--gray-70); }
+  .scroll-hint i{ animation:hintFloat 1.6s var(--ease) infinite; color:var(--brand-primary); }
+  .scroll-hint.oculta{ opacity:0; }
 
-  @media print{
-    .pill-secao .seletor-semana{ display:none; }
-    .pill-secao .rotulo-impressao{ display:inline; }
-    body{ background:var(--pure-0); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .pagina{ padding:0; }
-    .folha{ box-shadow:none; margin:0; width:auto; min-height:auto; }
-    @page{ size:A4 landscape; margin:0; }
+  @media (max-width:1120px){
+    .tela{ height:auto; min-height:100%; padding-left:28px; }
+    .deck{ overflow-y:auto; }
+    .deck-track{ transform:none !important; }
+  }
+  @media (max-width:860px){
+    .rail{ display:none; }
+    .kpi-grid{ grid-template-columns:repeat(2,1fr); }
   }
 </style>
 </head>
 <body>
-<div class='pagina'>
-  <div class='folha'>
 
-    <header class='hero'>
-      <div class='faixa-institucional'></div>
-      <div class='brasao-chip' style='padding-right: 20px; border-right: 1px solid var(--gray-10); display: flex; align-items: center;'>
-        <img src="Design/brasao.png" alt="Prefeitura de Araucária" style="height: 42px; width: auto; object-fit: contain;">
-      </div>
+<div class='shell'>
 
-      <div class='hero-lockup' style='margin: 0 auto 0 0;'>
-        <div class='snow-badge'>
-          <i class='fa-solid fa-snowflake' style='font-size:30px;color:var(--brand-secondary);'></i>
-        </div>
-        <div class='lockup-texto'>
-          <div class='eyebrow'>Vigilância Socioassistencial</div>
-          <div class='titulo-inverno'>Operação Inverno</div>
-        </div>
-        <div class='subtitulo'>Relatório Semanal de Atendimentos</div>
-      </div>
+  <nav class='rail' aria-label='Telas do relatório'>
+    <div class='rail-track' id='railTrack'></div>
+  </nav>
 
-      <div class='hero-meta'>
-        <div class='chip'>Atualizado em: <b><span id='dataEmissao'></span></b></div>
+  <div class='main'>
+
+    <div class='progresso' role='presentation'><i id='progFill'></i></div>
+
+    <header class='topbar'>
+      <div class='tb-brand'>
+        <img src="Design/brasao.png" alt="Prefeitura de Araucária">
+        <span class='tb-credito'>Vigilância Socioassistencial<b><i class='ph-thin ph-snowflake' aria-hidden='true'></i>Operação Inverno</b></span>
       </div>
+      <span class='tb-ref'>Atualizado em<br><strong id='dataEmissao'></strong></span>
+      <button class='tb-fs' id='btnFs' aria-label='Tela cheia' title='Tela cheia (F11)'>
+        <i class='fa-solid fa-expand'></i>
+      </button>
     </header>
 
-    <main class='colunas'>
-    <section class='coluna' aria-label='Semana atual'>
+    <div class='deck' id='deck'>
+      <div class='deck-track' id='deckTrack'>
 
-      <div class='pill-secao'>
-        <span class='icone-mini'><i class='fa-solid fa-calendar-week'></i></span>
-        <select id='seletorSemana' class='seletor-semana' aria-label='Selecionar semana'></select>
-        <span class='rotulo-impressao' id='rotuloSemanaImpressa'></span>
-        <span class='periodo' id='tituloSemanaAtual'></span>
-      </div>
+        <section class='tela' id='tela-0' role='region' aria-label='Semana atual'>
 
-      <div class='kpi-grid'>
-        <div class='kpi-card'>
-          <div class='icone-badge'><i class='fa-solid fa-users'></i></div>
-          <div class='valor' id='valTotalSemana'></div>
-          <div class='rotulo'>Atendimentos</div>
-        </div>
-        <div class='kpi-card'>
-          <div class='icone-badge'><i class='fa-solid fa-chart-line'></i></div>
-          <div class='valor' id='valMediaSemana'></div>
-          <div class='rotulo'>Média diária</div>
-        </div>
-        <div class='kpi-card'>
-          <div class='icone-badge'><i class='fa-solid fa-bed'></i></div>
-          <div class='valor' id='valPernoites'></div>
-          <div class='rotulo' id='rotuloPernoites'>Pernoites</div>
-          <div class='extra'>
-            <div class='contexto'><b id='valPessoasPernoite'></b> pessoas · <b id='tagMediaPernoite'></b>/pess.</div>
+          <div class='opi-sec-head'>
+            <div class='opi-sec-head-row'>
+              <span class='opi-eyebrow'>Selecione o período</span>
+              <div class='opi-sec-head-actions'>
+                <select id='seletorSemana' class='opi-semana-select' aria-label='Selecionar semana'></select>
+                <span id='rotuloSemanaImpressa'></span>
+              </div>
+            </div>
+            <div class='opi-sec-rule'></div>
+            <div class='opi-sec-meta' id='tituloSemanaAtual'></div>
           </div>
-        </div>
-      </div>
 
-      <div class='grafico-linha'>
-        <div class='grafico'>
-          <div class='titulo-row'>
-            <span class='mini-icon'><i class='fa-solid fa-chart-bar'></i></span>
-            <h3>Comparativo Semanal</h3>
+          <div class='kpi-grid'>
+            <div class='kpi-card'>
+              <div class='kpi-head'>
+                <span class='kpi-icon-wrap'><i class='ph-thin ph-users' aria-hidden='true'></i></span>
+                <span class='kpi-delta' id='deltaTotalSemana'></span>
+              </div>
+              <div class='kpi-value' id='valTotalSemana'></div>
+              <div class='kpi-title'>Atendimentos</div>
+              <div class='kpi-caption' id='captionTotalSemana'></div>
+            </div>
+            <div class='kpi-card'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-fingerprint' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valPessoasUnicasSemana'></div>
+              <div class='kpi-title'>Pessoas Únicas</div>
+            </div>
+            <div class='kpi-card success'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-user-plus' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valNovasPessoasSemana'></div>
+              <div class='kpi-title'>Público Inédito <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que não participaram em nenhum dia da operação inverno do ano anterior (2025).'></i></div>
+            </div>
+            <div class='kpi-card info'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-clock-clockwise' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valPessoasAntigasSemana'></div>
+              <div class='kpi-title'>Público Recorrente <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que já participaram em algum dia da operação inverno do ano anterior (2025).'></i></div>
+            </div>
+            <div class='kpi-card'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-gauge' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valMediaSemana'></div>
+              <div class='kpi-title'>Média diária</div>
+            </div>
+            <div class='kpi-card'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-bed' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valPernoites'></div>
+              <div class='kpi-title' id='rotuloPernoites'>Pernoites</div>
+              <div class='kpi-extra'>
+                <div class='kpi-contexto'><b id='valPessoasPernoite'></b> pessoas · <b id='tagMediaPernoite'></b>/pess.</div>
+              </div>
+            </div>
           </div>
-          <div class='nota'>Semanas Anteriores</div>
-          <div class='corpo'><canvas id='chartComparativoSemanas'></canvas></div>
-        </div>
-        <div class='grafico'>
-          <div class='titulo-row'>
-            <span class='mini-icon'><i class='fa-solid fa-chart-area'></i></span>
-            <h3>Tendência Diária</h3>
+
+          <div class='grafico-linha'>
+            <div class='grafico'>
+              <div class='grafico-head'>
+                <i class='ph-thin ph-chart-bar' aria-hidden='true'></i>
+                <h3>Comparativo Semanal</h3>
+              </div>
+              <div class='nota'>Semanas Anteriores</div>
+              <div class='corpo'><canvas id='chartComparativoSemanas'></canvas></div>
+            </div>
+            <div class='grafico'>
+              <div class='grafico-head'>
+                <i class='ph-thin ph-trend-up' aria-hidden='true'></i>
+                <h3>Tendência Diária</h3>
+              </div>
+              <div class='nota'>Atendimentos e Pernoites na Semana</div>
+              <div class='corpo'><canvas id='chartTendenciaDiaria'></canvas></div>
+            </div>
           </div>
-          <div class='nota'>Atendimentos e Pernoites na Semana</div>
-          <div class='corpo'><canvas id='chartTendenciaDiaria'></canvas></div>
-        </div>
-      </div>
 
-      <div class='insight'>
-        <i class='fa-solid fa-lightbulb'></i>
-        <span id='textoInsightSemanal'></span>
-      </div>
-      
-      <div class='insight' style='margin-top:8px;'>
-        <i class='fa-solid fa-bed'></i>
-        <span id='textoPernoitesFrequencia'>Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.</span>
-      </div>
-
-    </section>
-    
-    <section class='coluna' aria-label='Base total'>
-
-      <div class='pill-secao'>
-        <span class='icone-mini'><i class='fa-solid fa-layer-group'></i></span>
-        Base Total <span class='periodo' id='tituloAcumulado'></span>
-      </div>
-
-      <div class='kpi-grid kpi-grid--5'>
-        <div class='kpi-card'>
-          <div class='icone-badge'><i class='fa-solid fa-users'></i></div>
-          <div class='valor' id='valTotalAcumulado'></div>
-          <div class='rotulo'>Atend. Total</div>
-        </div>
-        <div class='kpi-card success'>
-          <div class='icone-badge'><i class='fa-solid fa-user-plus'></i></div>
-          <div class='valor' id='valNovasPessoas'></div>
-          <div class='rotulo'>Público Inédito <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que não participaram em nenhum dia da operação inverno do ano anterior (2025).'></i></div>
-        </div>
-        <div class='kpi-card info'>
-          <div class='icone-badge'><i class='fa-solid fa-user-clock'></i></div>
-          <div class='valor' id='valPessoasAntigas'></div>
-          <div class='rotulo'>Público Recorrente <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que já participaram em algum dia da operação inverno do ano anterior (2025).'></i></div>
-        </div>
-        <div class='kpi-card'>
-          <div class='icone-badge'><i class='fa-solid fa-bed'></i></div>
-          <div class='valor' id='valPessoasComPernoiteTotal'></div>
-          <div class='rotulo'>Pess. c/ Pernoite</div>
-        </div>
-        <div class='kpi-card'>
-          <div class='icone-badge'><i class='fa-solid fa-calendar-day'></i></div>
-          <div class='valor' id='valMediaGeral'></div>
-          <div class='rotulo'>Média Diária</div>
-        </div>
-      </div>
-
-      <div class='grafico-linha grafico-linha--3'>
-        <div class='grafico'>
-          <div class='titulo-row'>
-            <span class='mini-icon'><i class='fa-solid fa-chart-bar'></i></span>
-            <h3>Faixa Etária</h3>
+          <div class='insight-grupo'>
+            <div class='insight'>
+              <i class='ph-thin ph-lightbulb' aria-hidden='true'></i>
+              <span id='textoInsightSemanal'></span>
+            </div>
+            <div class='insight'>
+              <i class='ph-thin ph-bed' aria-hidden='true'></i>
+              <span id='textoPernoitesFrequencia'>Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.</span>
+            </div>
           </div>
-          <div class='nota'>Total Acumulado</div>
-          <div class='corpo'><canvas id='chartFaixaEtaria'></canvas></div>
-        </div>
-        <div class='grafico'>
-          <div class='titulo-row'>
-            <span class='mini-icon'><i class='fa-solid fa-chart-pie'></i></span>
-            <h3>Sexo</h3>
-          </div>
-          <div class='nota'>Total Acumulado</div>
-          <div class='corpo'><canvas id='chartSexo'></canvas></div>
-        </div>
-        <div class='grafico'>
-          <div class='titulo-row'>
-            <span class='mini-icon'><i class='fa-solid fa-users'></i></span>
-            <h3>Raça/Cor</h3>
-          </div>
-          <div class='nota'>Total Acumulado</div>
-          <div class='corpo'><canvas id='chartRaca'></canvas></div>
-        </div>
-      </div>
 
-      <div class='insight'>
-        <i class='fa-solid fa-lightbulb'></i>
-        <span id='textoInsightTotal'></span>
-      </div>
-      
-      <div class='insight' style='margin-top:8px;'>
-        <i class='fa-solid fa-bed'></i>
-        <span>No total, <b id='total1Noite'></b> pessoas pernoitaram 1 noite e <b id='totalMais2Noites'></b> pernoitaram mais de 2 noites.</span>
-      </div>
+        </section>
 
-    </section>
-    </main>
+        <section class='tela' id='tela-1' role='region' aria-label='Base total'>
+
+          <div class='opi-sec-head'>
+            <div class='opi-sec-head-row'>
+              <span class='opi-eyebrow'>Acumulado desde o início da operação</span>
+            </div>
+            <div class='opi-sec-rule'></div>
+            <div class='opi-sec-meta' id='tituloAcumulado'></div>
+          </div>
+
+          <div class='kpi-grid'>
+            <div class='kpi-card'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-users' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valTotalAcumulado'></div>
+              <div class='kpi-title'>Atend. Total</div>
+            </div>
+            <div class='kpi-card'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-fingerprint' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valPessoasUnicasAcumulado'></div>
+              <div class='kpi-title'>Pessoas Únicas</div>
+            </div>
+            <div class='kpi-card success'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-user-plus' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valNovasPessoas'></div>
+              <div class='kpi-title'>Público Inédito <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que não participaram em nenhum dia da operação inverno do ano anterior (2025).'></i></div>
+            </div>
+            <div class='kpi-card info'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-clock-clockwise' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valPessoasAntigas'></div>
+              <div class='kpi-title'>Público Recorrente <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que já participaram em algum dia da operação inverno do ano anterior (2025).'></i></div>
+            </div>
+            <div class='kpi-card'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-bed' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valPessoasComPernoiteTotal'></div>
+              <div class='kpi-title'>Pess. c/ Pernoite</div>
+            </div>
+            <div class='kpi-card'>
+              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-gauge' aria-hidden='true'></i></span></div>
+              <div class='kpi-value' id='valMediaGeral'></div>
+              <div class='kpi-title'>Média Diária</div>
+            </div>
+          </div>
+
+          <div class='grafico-linha grafico-linha--3'>
+            <div class='grafico'>
+              <div class='grafico-head'>
+                <i class='ph-thin ph-chart-bar' aria-hidden='true'></i>
+                <h3>Faixa Etária</h3>
+              </div>
+              <div class='nota'>Total Acumulado</div>
+              <div class='corpo'><canvas id='chartFaixaEtaria'></canvas></div>
+            </div>
+            <div class='grafico'>
+              <div class='grafico-head'>
+                <i class='ph-thin ph-chart-donut' aria-hidden='true'></i>
+                <h3>Sexo &amp; Pernoite</h3>
+              </div>
+              <div class='nota'>Anel externo: sexo · Anel interno: com pernoite</div>
+              <div class='anel-legenda' id='legendaSexo'></div>
+              <div class='corpo'><canvas id='chartSexo'></canvas></div>
+            </div>
+            <div class='grafico'>
+              <div class='grafico-head'>
+                <i class='ph-thin ph-users' aria-hidden='true'></i>
+                <h3>Raça/Cor</h3>
+              </div>
+              <div class='nota'>Total Acumulado</div>
+              <div class='corpo'><canvas id='chartRaca'></canvas></div>
+            </div>
+          </div>
+
+          <div class='insight-grupo'>
+            <div class='insight'>
+              <i class='ph-thin ph-lightbulb' aria-hidden='true'></i>
+              <span id='textoInsightTotal'></span>
+            </div>
+            <div class='insight'>
+              <i class='ph-thin ph-bed' aria-hidden='true'></i>
+              <span>No total, <b id='total1Noite'></b> pessoas pernoitaram 1 noite e <b id='totalMais2Noites'></b> pernoitaram mais de 2 noites.</span>
+            </div>
+          </div>
+
+        </section>
+
+        <section class='tela' id='tela-2' role='region' aria-label='Detalhamento do atendimento'>
+
+          <div class='opi-sec-head'>
+            <div class='opi-sec-head-row'>
+              <span class='opi-eyebrow'>Perfil do atendimento · acumulado desde o início da operação</span>
+            </div>
+            <div class='opi-sec-rule'></div>
+            <div class='opi-sec-meta' id='tituloDetalhamento'></div>
+          </div>
+
+          <div class='grafico-linha grafico-linha--3'>
+            <div class='grafico'>
+              <div class='grafico-head'>
+                <i class='ph-thin ph-clipboard-text' aria-hidden='true'></i>
+                <h3>Motivos de Atendimento</h3>
+              </div>
+              <div class='nota'>Excluído o motivo-guarda-chuva da operação · top 5</div>
+              <div class='corpo'><canvas id='chartMotivos'></canvas></div>
+            </div>
+            <div class='grafico'>
+              <div class='grafico-head'>
+                <i class='ph-thin ph-user-focus' aria-hidden='true'></i>
+                <h3>Atendimentos por Profissional</h3>
+              </div>
+              <div class='nota'>Top 8 · um atendimento pode envolver mais de um profissional</div>
+              <div class='corpo'><canvas id='chartProfissionais'></canvas></div>
+            </div>
+            <div class='grafico'>
+              <div class='grafico-head'>
+                <i class='ph-thin ph-clock-afternoon' aria-hidden='true'></i>
+                <h3>Horário dos Atendimentos</h3>
+              </div>
+              <div class='nota'>Distribuição por hora do dia</div>
+              <div class='corpo'><canvas id='chartHorario'></canvas></div>
+            </div>
+          </div>
+
+          <div class='insight-grupo'>
+            <div class='insight'>
+              <i class='ph-thin ph-lightbulb' aria-hidden='true'></i>
+              <span id='textoInsightDetalhamento'></span>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </div>
+
+    <div class='scroll-hint' id='scrollHint'><i class='fa-solid fa-chevron-down' aria-hidden='true'></i> Role para navegar</div>
 
   </div>
 </div>
@@ -392,24 +497,24 @@
 <script>
 const dados = {
   "identificacao": {
-    "numero": "04/2026"
+    "numero": "05/2026"
   },
   "semanaAtual": {
-    "inicio": "13/07/2026",
-    "fim": "19/07/2026",
+    "inicio": "20/07/2026",
+    "fim": "26/07/2026",
     "porDia": {
-      "Seg": 44,
-      "Ter": 48,
-      "Qua": 49,
-      "Qui": 48,
-      "Sex": 39,
-      "Sáb": 29,
-      "Dom": 33
+      "Seg": 39,
+      "Ter": 37,
+      "Qua": 56,
+      "Qui": 44,
+      "Sex": 37,
+      "Sáb": 24,
+      "Dom": 41
     },
     "porDiaPernoites": {
       "Seg": 0,
       "Ter": 0,
-      "Qua": 45,
+      "Qua": 0,
       "Qui": 0,
       "Sex": 0,
       "Sáb": 0,
@@ -420,6 +525,9 @@ const dados = {
     "1": {
       "inicio": "22/06/2026",
       "fim": "28/06/2026",
+      "pessoasUnicas": 44,
+      "novasPessoas": 32,
+      "pessoasAntigas": 12,
       "porDia": {
         "Seg": 28,
         "Ter": 19,
@@ -451,6 +559,9 @@ const dados = {
     "2": {
       "inicio": "29/06/2026",
       "fim": "05/07/2026",
+      "pessoasUnicas": 49,
+      "novasPessoas": 34,
+      "pessoasAntigas": 15,
       "porDia": {
         "Seg": 26,
         "Ter": 21,
@@ -482,6 +593,9 @@ const dados = {
     "3": {
       "inicio": "06/07/2026",
       "fim": "12/07/2026",
+      "pessoasUnicas": 75,
+      "novasPessoas": 54,
+      "pessoasAntigas": 21,
       "porDia": {
         "Seg": 36,
         "Ter": 46,
@@ -513,6 +627,9 @@ const dados = {
     "4": {
       "inicio": "13/07/2026",
       "fim": "19/07/2026",
+      "pessoasUnicas": 75,
+      "novasPessoas": 61,
+      "pessoasAntigas": 14,
       "porDia": {
         "Seg": 44,
         "Ter": 48,
@@ -540,6 +657,40 @@ const dados = {
         "umaNoite": 43,
         "maisDeDuasNoites": 0
       }
+    },
+    "5": {
+      "inicio": "20/07/2026",
+      "fim": "26/07/2026",
+      "pessoasUnicas": 81,
+      "novasPessoas": 64,
+      "pessoasAntigas": 17,
+      "porDia": {
+        "Seg": 39,
+        "Ter": 37,
+        "Qua": 56,
+        "Qui": 44,
+        "Sex": 37,
+        "Sáb": 24,
+        "Dom": 41
+      },
+      "porDiaPernoites": {
+        "Seg": 0,
+        "Ter": 0,
+        "Qua": 0,
+        "Qui": 0,
+        "Sex": 0,
+        "Sáb": 0,
+        "Dom": 0
+      },
+      "pernoites": {
+        "total": 0,
+        "pessoasComPernoite": 0,
+        "mediaPorPessoa": 0.0
+      },
+      "pernoitesFrequencia": {
+        "umaNoite": 0,
+        "maisDeDuasNoites": 0
+      }
     }
   },
   "ultimasSemanas": [
@@ -558,43 +709,47 @@ const dados = {
     {
       "label": "S4",
       "total": 290
+    },
+    {
+      "label": "S5",
+      "total": 278
     }
   ],
   "pernoites": {
-    "total": 45,
-    "pessoasComPernoite": 44,
-    "mediaPorPessoa": 1.02
+    "total": 0,
+    "pessoasComPernoite": 0,
+    "mediaPorPessoa": 0.0
   },
   "periodoOperacao": {
     "inicio": "22/06/2026",
-    "fimReferencia": "19/07/2026",
-    "diasCorridos": 28
+    "fimReferencia": "26/07/2026",
+    "diasCorridos": 35
   },
-  "totalAcumulado": 878,
-  "pessoasUnicasAcumulado": 121,
+  "totalAcumulado": 1156,
+  "pessoasUnicasAcumulado": 142,
   "pessoasComPernoiteAcumulado": 91,
   "faixaEtaria": {
     "0–17": 0,
-    "18–29": 31,
-    "30–44": 72,
-    "45–59": 17,
+    "18–29": 39,
+    "30–44": 80,
+    "45–59": 22,
     "60+": 1
   },
   "sexo": {
-    "Masculino": 106,
-    "Feminino": 15
+    "Masculino": 126,
+    "Feminino": 16
   },
   "raca": {
-    "Branca": 58,
-    "Parda": 47,
-    "Preta": 15,
-    "Não Informado": 1
+    "Branca": 66,
+    "Parda": 54,
+    "Preta": 16,
+    "Não Informado": 6
   },
-  "idadeMedia": 35.77,
-  "novasPessoas": 95,
-  "pessoasAntigas": 26,
+  "idadeMedia": 35.87,
+  "novasPessoas": 111,
+  "pessoasAntigas": 31,
   "pernoitesFrequencia": {
-    "semana1Noite": 43,
+    "semana1Noite": 0,
     "semanaMais2Noites": 0,
     "total1Noite": 35,
     "totalMais2Noites": 47
@@ -638,7 +793,7 @@ const dados = {
       "idade": 41,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 14
     },
     {
       "id": "20921",
@@ -648,7 +803,7 @@ const dados = {
       "idade": 28,
       "pernoites": 9,
       "inedito": true,
-      "totalAtendimentos": 24
+      "totalAtendimentos": 31
     },
     {
       "id": "27512",
@@ -658,7 +813,7 @@ const dados = {
       "idade": 30,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 16
     },
     {
       "id": "28555",
@@ -668,7 +823,17 @@ const dados = {
       "idade": 45,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 12
+    },
+    {
+      "id": "53052",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 47,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "62295",
@@ -678,7 +843,7 @@ const dados = {
       "idade": 31,
       "pernoites": 11,
       "inedito": true,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 24
     },
     {
       "id": "76633",
@@ -688,7 +853,7 @@ const dados = {
       "idade": 25,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 4
     },
     {
       "id": "79646",
@@ -698,7 +863,7 @@ const dados = {
       "idade": 32,
       "pernoites": 4,
       "inedito": false,
-      "totalAtendimentos": 13
+      "totalAtendimentos": 18
     },
     {
       "id": "83620",
@@ -711,6 +876,16 @@ const dados = {
       "totalAtendimentos": 5
     },
     {
+      "id": "94811",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 24,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "100791",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -721,6 +896,16 @@ const dados = {
       "totalAtendimentos": 4
     },
     {
+      "id": "103456",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 47,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
       "id": "105745",
       "sexo": "Masculino",
       "raca": "Parda",
@@ -728,7 +913,7 @@ const dados = {
       "idade": 39,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 3
     },
     {
       "id": "109324",
@@ -738,7 +923,7 @@ const dados = {
       "idade": 29,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 22
     },
     {
       "id": "118976",
@@ -748,7 +933,7 @@ const dados = {
       "idade": 30,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 14
     },
     {
       "id": "119780",
@@ -758,7 +943,7 @@ const dados = {
       "idade": 26,
       "pernoites": 3,
       "inedito": false,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 7
     },
     {
       "id": "121168",
@@ -788,7 +973,7 @@ const dados = {
       "idade": 31,
       "pernoites": 14,
       "inedito": true,
-      "totalAtendimentos": 28
+      "totalAtendimentos": 35
     },
     {
       "id": "128819",
@@ -818,7 +1003,7 @@ const dados = {
       "idade": 40,
       "pernoites": 8,
       "inedito": false,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 14
     },
     {
       "id": "147155",
@@ -831,6 +1016,26 @@ const dados = {
       "totalAtendimentos": 8
     },
     {
+      "id": "163173",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 59,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "163762",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 57,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
       "id": "167490",
       "sexo": "Feminino",
       "raca": "Branca",
@@ -838,7 +1043,7 @@ const dados = {
       "idade": 34,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 7
     },
     {
       "id": "168999",
@@ -848,7 +1053,7 @@ const dados = {
       "idade": 27,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 3
     },
     {
       "id": "181561",
@@ -858,7 +1063,7 @@ const dados = {
       "idade": 47,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 5
+      "totalAtendimentos": 8
     },
     {
       "id": "189775",
@@ -878,7 +1083,7 @@ const dados = {
       "idade": 54,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 5
+      "totalAtendimentos": 8
     },
     {
       "id": "209304",
@@ -908,7 +1113,7 @@ const dados = {
       "idade": 32,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 13
     },
     {
       "id": "259522",
@@ -918,14 +1123,14 @@ const dados = {
       "idade": 37,
       "pernoites": 4,
       "inedito": false,
-      "totalAtendimentos": 9
+      "totalAtendimentos": 12
     },
     {
       "id": "265680",
       "sexo": "Masculino",
       "raca": "Parda",
       "faixaEtaria": "45–59",
-      "idade": 46,
+      "idade": 47,
       "pernoites": 1,
       "inedito": false,
       "totalAtendimentos": 1
@@ -938,7 +1143,7 @@ const dados = {
       "idade": 41,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 5
     },
     {
       "id": "279680",
@@ -1008,7 +1213,7 @@ const dados = {
       "idade": 31,
       "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 11
     },
     {
       "id": "366770",
@@ -1048,7 +1253,17 @@ const dados = {
       "idade": 29,
       "pernoites": 13,
       "inedito": true,
-      "totalAtendimentos": 29
+      "totalAtendimentos": 36
+    },
+    {
+      "id": "425757",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 44,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 4
     },
     {
       "id": "434712",
@@ -1058,7 +1273,7 @@ const dados = {
       "idade": 35,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 7
     },
     {
       "id": "443574",
@@ -1068,7 +1283,7 @@ const dados = {
       "idade": 35,
       "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 15
+      "totalAtendimentos": 20
     },
     {
       "id": "443615",
@@ -1081,6 +1296,16 @@ const dados = {
       "totalAtendimentos": 2
     },
     {
+      "id": "446240",
+      "sexo": "Feminino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 25,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 2
+    },
+    {
       "id": "458751",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -1088,7 +1313,7 @@ const dados = {
       "idade": 30,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 5
+      "totalAtendimentos": 8
     },
     {
       "id": "465608",
@@ -1099,6 +1324,16 @@ const dados = {
       "pernoites": 3,
       "inedito": false,
       "totalAtendimentos": 5
+    },
+    {
+      "id": "466689",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 33,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
     },
     {
       "id": "467657",
@@ -1118,7 +1353,7 @@ const dados = {
       "idade": 23,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 10
     },
     {
       "id": "468075",
@@ -1131,6 +1366,16 @@ const dados = {
       "totalAtendimentos": 2
     },
     {
+      "id": "474727",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "477571",
       "sexo": "Masculino",
       "raca": "Preta",
@@ -1138,7 +1383,7 @@ const dados = {
       "idade": 40,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 6
     },
     {
       "id": "479455",
@@ -1148,7 +1393,27 @@ const dados = {
       "idade": 31,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 9
+      "totalAtendimentos": 15
+    },
+    {
+      "id": "484920",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 37,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "488970",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
     },
     {
       "id": "489199",
@@ -1158,7 +1423,17 @@ const dados = {
       "idade": 50,
       "pernoites": 5,
       "inedito": false,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 10
+    },
+    {
+      "id": "489833",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 54,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 4
     },
     {
       "id": "490483",
@@ -1168,7 +1443,7 @@ const dados = {
       "idade": 29,
       "pernoites": 5,
       "inedito": false,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 9
     },
     {
       "id": "491166",
@@ -1208,7 +1483,7 @@ const dados = {
       "idade": 50,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 7
     },
     {
       "id": "499157",
@@ -1218,7 +1493,7 @@ const dados = {
       "idade": 53,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 7
     },
     {
       "id": "500735",
@@ -1231,6 +1506,16 @@ const dados = {
       "totalAtendimentos": 5
     },
     {
+      "id": "500999",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 34,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 2
+    },
+    {
       "id": "503778",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -1238,7 +1523,7 @@ const dados = {
       "idade": 43,
       "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 15
     },
     {
       "id": "504837",
@@ -1265,10 +1550,10 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Parda",
       "faixaEtaria": "30–44",
-      "idade": 43,
+      "idade": 44,
       "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 11
     },
     {
       "id": "507300",
@@ -1278,7 +1563,7 @@ const dados = {
       "idade": 30,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 9
     },
     {
       "id": "507924",
@@ -1308,7 +1593,7 @@ const dados = {
       "idade": 33,
       "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 11
     },
     {
       "id": "513344",
@@ -1328,7 +1613,7 @@ const dados = {
       "idade": 46,
       "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 23
     },
     {
       "id": "515250",
@@ -1338,7 +1623,7 @@ const dados = {
       "idade": 37,
       "pernoites": 3,
       "inedito": false,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 6
     },
     {
       "id": "516158",
@@ -1348,7 +1633,7 @@ const dados = {
       "idade": 37,
       "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 5
     },
     {
       "id": "517643",
@@ -1358,17 +1643,27 @@ const dados = {
       "idade": 43,
       "pernoites": 3,
       "inedito": false,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 15
     },
     {
       "id": "519111",
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "30–44",
-      "idade": 41,
+      "idade": 42,
       "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 21
+    },
+    {
+      "id": "519748",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 26,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 3
     },
     {
       "id": "522331",
@@ -1498,7 +1793,7 @@ const dados = {
       "idade": 22,
       "pernoites": 8,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 20
     },
     {
       "id": "534937",
@@ -1518,7 +1813,17 @@ const dados = {
       "idade": 37,
       "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 10
+    },
+    {
+      "id": "535258",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "18–29",
+      "idade": 20,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 3
     },
     {
       "id": "535674",
@@ -1528,7 +1833,7 @@ const dados = {
       "idade": 24,
       "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 17
+      "totalAtendimentos": 23
     },
     {
       "id": "535841",
@@ -1538,7 +1843,17 @@ const dados = {
       "idade": 42,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "536402",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "30–44",
+      "idade": 38,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "536514",
@@ -1558,7 +1873,17 @@ const dados = {
       "idade": 32,
       "pernoites": 12,
       "inedito": true,
-      "totalAtendimentos": 24
+      "totalAtendimentos": 25
+    },
+    {
+      "id": "538660",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 28,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "539141",
@@ -1598,7 +1923,7 @@ const dados = {
       "idade": 48,
       "pernoites": 13,
       "inedito": true,
-      "totalAtendimentos": 27
+      "totalAtendimentos": 34
     },
     {
       "id": "540497",
@@ -1608,7 +1933,7 @@ const dados = {
       "idade": 19,
       "pernoites": 9,
       "inedito": true,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 13
     },
     {
       "id": "540511",
@@ -1648,7 +1973,7 @@ const dados = {
       "idade": 45,
       "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 15
+      "totalAtendimentos": 19
     },
     {
       "id": "541031",
@@ -1658,7 +1983,7 @@ const dados = {
       "idade": 34,
       "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 16
     },
     {
       "id": "541037",
@@ -1668,7 +1993,7 @@ const dados = {
       "idade": 25,
       "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 15
     },
     {
       "id": "541159",
@@ -1678,7 +2003,7 @@ const dados = {
       "idade": 38,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 18
     },
     {
       "id": "541161",
@@ -1688,7 +2013,7 @@ const dados = {
       "idade": 54,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 13
+      "totalAtendimentos": 20
     },
     {
       "id": "541222",
@@ -1728,7 +2053,7 @@ const dados = {
       "idade": 32,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 10
+      "totalAtendimentos": 16
     },
     {
       "id": "541381",
@@ -1748,7 +2073,7 @@ const dados = {
       "idade": 31,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 8
     },
     {
       "id": "541416",
@@ -1758,7 +2083,7 @@ const dados = {
       "idade": 51,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 13
     },
     {
       "id": "541459",
@@ -1768,7 +2093,7 @@ const dados = {
       "idade": 29,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 5
+      "totalAtendimentos": 6
     },
     {
       "id": "541516",
@@ -1778,7 +2103,7 @@ const dados = {
       "idade": 31,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 3
     },
     {
       "id": "541576",
@@ -1788,7 +2113,7 @@ const dados = {
       "idade": 41,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 8
     },
     {
       "id": "541628",
@@ -1808,10 +2133,112 @@ const dados = {
       "idade": 51,
       "pernoites": 0,
       "inedito": true,
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "541910",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 0,
+      "inedito": true,
       "totalAtendimentos": 3
+    },
+    {
+      "id": "541912",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "541976",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "18–29",
+      "idade": 27,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "541977",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
     }
-  ]
+  ],
+  "motivos": {
+    "Pernoite Casa de Passagem": 339,
+    "Escuta": 54,
+    "Orientação Social": 50,
+    "Demanda Espontânea": 23,
+    "Orientação e Encaminhamentos para a Habitação": 1,
+    "Encaminhamentos Recebidos da Rede Socioassistencial": 1,
+    "Contato Telefônico": 1,
+    "Acompanhamento e Monitoramento dos Encaminhamentos Realizados": 1
+  },
+  "profissionais": {
+    "Gabriely Celestino Cardoso": 789,
+    "Leandro Ferreira Schonrock": 357,
+    "Walmor Jose Ruhr": 317,
+    "Claudia Portella Macedo Fuchner": 314,
+    "Josney Garcia dos Santos": 312,
+    "Jhenyfer Maciel da Silva": 298,
+    "Fernanda de Fatima Czerban": 275,
+    "Jefferson Vanderlei Chiarello": 261,
+    "Eva da Silva Vieira": 260,
+    "Marcos Augusto Carvalho": 249,
+    "Bernardo Paim Cunha Masson": 201,
+    "Deivit Cristian Ramos": 147,
+    "Alexandre Lima Costa Ferreira": 147,
+    "Jose Eugenio do Nascimento": 111,
+    "Felix da Silva Neto": 51,
+    "Jucelma Silveira Martinatto Bueno da Silva": 31,
+    "Fernanda Laverde Torres": 1
+  },
+  "porHora": {
+    "00h": 0,
+    "01h": 1,
+    "02h": 0,
+    "03h": 0,
+    "04h": 0,
+    "05h": 0,
+    "06h": 1,
+    "07h": 0,
+    "08h": 0,
+    "09h": 0,
+    "10h": 0,
+    "11h": 0,
+    "12h": 0,
+    "13h": 1,
+    "14h": 0,
+    "15h": 1,
+    "16h": 0,
+    "17h": 19,
+    "18h": 43,
+    "19h": 194,
+    "20h": 404,
+    "21h": 164,
+    "22h": 108,
+    "23h": 220
+  }
 };
+
+// Limpeza de exibição pedida pelo usuário: some categorias vazias/"Não
+// Informado" dos gráficos sem afetar os totais reais (Excel etc.).
+if (dados.raca) delete dados.raca["Não Informado"];
+if (dados.faixaEtaria) {
+  Object.keys(dados.faixaEtaria).forEach(k => { if (!dados.faixaEtaria[k]) delete dados.faixaEtaria[k]; });
+}
 
 const paleta = ["#007044", "#005484", "#FDB92E", "#ED3237", "#34B778", "#0098DA", "#757575"];
 Chart.register(ChartDataLabels);
@@ -1960,7 +2387,7 @@ function renderizarSemana(n){
   let porDiaPernoites = s.porDiaPernoites || {};
   let umaNoite = (s.pernoitesFrequencia && s.pernoitesFrequencia.umaNoite) || 0;
   let maisDeDuasNoites = (s.pernoitesFrequencia && s.pernoitesFrequencia.maisDeDuasNoites) || 0;
-  
+
   const rotuloPernoites = document.getElementById("rotuloPernoites");
   const textoPernoitesFrequencia = document.getElementById("textoPernoitesFrequencia");
 
@@ -1971,7 +2398,7 @@ function renderizarSemana(n){
     porDiaPernoites = s.porDia;
     umaNoite = totalSemana;
     maisDeDuasNoites = 0;
-    
+
     if (rotuloPernoites) {
       rotuloPernoites.innerHTML = "Pernoites <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='Devido a uma falha de comunicação, os registros de pernoites a partir da semana 3 estão incorretos. A quantidade exibida é baseada no total de atendimentos.'></i>";
     }
@@ -1988,6 +2415,9 @@ function renderizarSemana(n){
   }
 
   animarNumero(document.getElementById("valTotalSemana"), totalSemana, fmt);
+  animarNumero(document.getElementById("valPessoasUnicasSemana"), s.pessoasUnicas || 0, fmt);
+  animarNumero(document.getElementById("valNovasPessoasSemana"), s.novasPessoas || 0, fmt);
+  animarNumero(document.getElementById("valPessoasAntigasSemana"), s.pessoasAntigas || 0, fmt);
   animarNumero(document.getElementById("valMediaSemana"), mediaDiaria, v=>dec(v,1));
   animarNumero(document.getElementById("valPernoites"), pernoitesTotal, fmt);
   document.getElementById("valPessoasPernoite").textContent = fmt(pessoasComPernoite);
@@ -2006,6 +2436,22 @@ function renderizarSemana(n){
     chartComparativo.data.datasets[0].backgroundColor =
       dados.ultimasSemanas.map(sem => sem.label === `S${n}` ? paleta[0] : "#e6e6e6");
     chartComparativo.update();
+  }
+
+  const deltaEl = document.getElementById("deltaTotalSemana");
+  const captionEl = document.getElementById("captionTotalSemana");
+  if (deltaEl && captionEl) {
+    if (dados.ultimasSemanas.length > 1) {
+      const deltaMedia = ((totalSemana - mediaUltimasSemanas) / (mediaUltimasSemanas || 1)) * 100;
+      const subiu = deltaMedia >= 0;
+      deltaEl.textContent = (subiu ? "▲ " : "▼ ") + dec(Math.abs(deltaMedia), 1) + "%";
+      deltaEl.className = "kpi-delta " + (subiu ? "up" : "down");
+      captionEl.textContent = `${fmt(Math.round(mediaUltimasSemanas))} em média nas semanas anteriores`;
+    } else {
+      deltaEl.textContent = "";
+      deltaEl.className = "kpi-delta";
+      captionEl.textContent = "1ª semana da operação";
+    }
   }
 
   document.getElementById("textoInsightSemanal").innerHTML = dados.ultimasSemanas.length>1
@@ -2040,6 +2486,7 @@ function renderizarAcumulado() {
     const diasOperacao = dados.periodoOperacao.diasCorridos;
     const mediaDiariaTotal = dados.totalAcumulado/diasOperacao;
     animarNumero(document.getElementById("valTotalAcumulado"), dados.totalAcumulado, fmt);
+    animarNumero(document.getElementById("valPessoasUnicasAcumulado"), dados.pessoasUnicasAcumulado, fmt);
     animarNumero(document.getElementById("valPessoasComPernoiteTotal"), dados.pessoasComPernoiteAcumulado, fmt);
     animarNumero(document.getElementById("valMediaGeral"), mediaDiariaTotal, n=>dec(n,1));
     animarNumero(document.getElementById("valNovasPessoas"), dados.novasPessoas, fmt);
@@ -2052,46 +2499,47 @@ function renderizarAcumulado() {
   }
 
   let base = dados.dadosBrutosAcumulados;
-  
+
   if (filtroSexo) base = base.filter(p => p.sexo === filtroSexo);
   if (filtroFaixa) base = base.filter(p => p.faixaEtaria === filtroFaixa);
   if (filtroRaca) base = base.filter(p => p.raca === filtroRaca);
-  
+
   let totalAtend = 0;
   let pessPernoite = 0;
   let novas = 0;
   let antigas = 0;
   let umaNoite = 0;
   let maisDuas = 0;
-  
+
   let aggFaixa = {};
   let aggSexo = {};
   let aggRaca = {};
-  
+
   const faixasOriginais = Object.keys(dados.faixaEtaria || {});
   const racasOriginais = Object.keys(dados.raca || {});
-  
+
   faixasOriginais.forEach(f => aggFaixa[f] = 0);
   Object.keys(dados.sexo || {}).forEach(s => aggSexo[s] = 0);
   racasOriginais.forEach(r => aggRaca[r] = 0);
-  
+
   base.forEach(p => {
     totalAtend += p.totalAtendimentos;
     if (p.pernoites > 0) pessPernoite++;
     if (p.inedito) novas++; else antigas++;
-    
+
     if (p.pernoites === 1) umaNoite++;
     if (p.pernoites > 2) maisDuas++;
-    
+
     if (aggFaixa[p.faixaEtaria] !== undefined) aggFaixa[p.faixaEtaria]++;
     if (aggSexo[p.sexo] !== undefined) aggSexo[p.sexo]++;
     if (aggRaca[p.raca] !== undefined) aggRaca[p.raca]++;
   });
-  
+
   const diasOperacao = dados.periodoOperacao.diasCorridos;
   const mediaDiariaTotal = totalAtend/diasOperacao;
 
   animarNumero(document.getElementById("valTotalAcumulado"), totalAtend, fmt);
+  animarNumero(document.getElementById("valPessoasUnicasAcumulado"), base.length, fmt);
   animarNumero(document.getElementById("valPessoasComPernoiteTotal"), pessPernoite, fmt);
   animarNumero(document.getElementById("valMediaGeral"), mediaDiariaTotal, n=>dec(n,1));
   animarNumero(document.getElementById("valNovasPessoas"), novas, fmt);
@@ -2099,31 +2547,31 @@ function renderizarAcumulado() {
 
   if (document.getElementById("total1Noite")) document.getElementById("total1Noite").textContent = umaNoite;
   if (document.getElementById("totalMais2Noites")) document.getElementById("totalMais2Noites").textContent = maisDuas;
-  
+
   if (chartFaixaEtaria) {
     chartFaixaEtaria.data.datasets[0].data = faixasOriginais.map(f => aggFaixa[f]);
-    chartFaixaEtaria.data.datasets[0].backgroundColor = faixasOriginais.map(f => 
+    chartFaixaEtaria.data.datasets[0].backgroundColor = faixasOriginais.map(f =>
        filtroFaixa && filtroFaixa !== f ? "#e6e6e6" : paleta[0]
     );
     chartFaixaEtaria.update();
   }
-  
+
   if (chartSexo) {
     chartSexo.data.datasets[0].data = Object.keys(aggSexo).map(s => aggSexo[s]);
-    chartSexo.data.datasets[0].backgroundColor = Object.keys(aggSexo).map((s, i) => 
+    chartSexo.data.datasets[0].backgroundColor = Object.keys(aggSexo).map((s, i) =>
        filtroSexo && filtroSexo !== s ? "#e6e6e6" : paleta[i]
     );
     chartSexo.update();
   }
-  
+
   if (chartRaca) {
     chartRaca.data.datasets[0].data = racasOriginais.map(r => aggRaca[r]);
-    chartRaca.data.datasets[0].backgroundColor = racasOriginais.map((r, i) => 
+    chartRaca.data.datasets[0].backgroundColor = racasOriginais.map((r, i) =>
        filtroRaca && filtroRaca !== r ? "#e6e6e6" : paleta[i % paleta.length]
     );
     chartRaca.update();
   }
-  
+
   const topFaixa = Object.entries(aggFaixa).sort((a,b)=>b[1]-a[1])[0] || ["",0];
   const topSexo = Object.entries(aggSexo).sort((a,b)=>b[1]-a[1])[0] || ["",0];
   const topRaca = Object.entries(aggRaca).sort((a,b)=>b[1]-a[1])[0] || ["",0];
@@ -2177,26 +2625,38 @@ if(document.getElementById("chartFaixaEtaria")) {
   });
 }
 
-// Chart: Sexo
+// Chart: Sexo & Pernoite (anel duplo — identidade própria deste relatório)
 if(document.getElementById("chartSexo")) {
+  const semPernoiteAcumulado = Math.max(0, (dados.pessoasUnicasAcumulado || 0) - (dados.pessoasComPernoiteAcumulado || 0));
   chartSexo = new Chart(document.getElementById("chartSexo"), {
     type: "doughnut",
     data: {
       labels: Object.keys(dados.sexo),
-      datasets: [{
-        data: Object.values(dados.sexo),
-        backgroundColor: [paleta[0], paleta[1], paleta[2]],
-        borderWidth: 2,
-        borderColor: "#fff",
-        hoverOffset: 4
-      }]
+      datasets: [
+        {
+          label: "Sexo",
+          data: Object.values(dados.sexo),
+          backgroundColor: [paleta[0], paleta[1]],
+          borderWidth: 3,
+          borderColor: "#fff",
+          hoverOffset: 4
+        },
+        {
+          label: "Pernoite",
+          data: [dados.pessoasComPernoiteAcumulado || 0, semPernoiteAcumulado],
+          backgroundColor: [paleta[2], "#636363"],
+          borderWidth: 3,
+          borderColor: "#fff",
+          hoverOffset: 4
+        }
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: "70%",
+      cutout: "40%",
       onClick: (e, activeElements) => {
-        if (activeElements.length > 0) {
+        if (activeElements.length > 0 && activeElements[0].datasetIndex === 0) {
           const index = activeElements[0].index;
           const lbl = chartSexo.data.labels[index];
           filtroSexo = (filtroSexo === lbl) ? null : lbl;
@@ -2204,15 +2664,20 @@ if(document.getElementById("chartSexo")) {
         }
       },
       onHover: (e, activeElements) => {
-        e.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+        e.native.target.style.cursor = (activeElements.length > 0 && activeElements[0].datasetIndex === 0) ? 'pointer' : 'default';
       },
       plugins: {
-        legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 6, font: { size: 10 } } },
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: ${ctx.label} — ${fmt(ctx.parsed)}`
+          }
+        },
         datalabels: {
           color: "#fff",
           font: { size: 11, weight: "bold" },
           formatter: (val, ctx) => {
-            const total = ctx.chart._metasets[0].total;
+            const total = ctx.chart._metasets[ctx.datasetIndex].total;
             if(val < total * 0.04) return null;
             return val;
           }
@@ -2220,6 +2685,18 @@ if(document.getElementById("chartSexo")) {
       }
     }
   });
+
+  const legendaSexo = document.getElementById("legendaSexo");
+  const rotulosSexo = Object.keys(dados.sexo);
+  const swatches = [
+    [paleta[0], rotulosSexo[0] || ""],
+    [paleta[1], rotulosSexo[1] || ""],
+    [paleta[2], "Com pernoite"]
+  ];
+  legendaSexo.innerHTML = swatches
+    .filter(([, rotulo]) => rotulo)
+    .map(([cor, rotulo]) => `<span><i style="background:${cor}"></i>${rotulo}</span>`)
+    .join("");
 }
 
 // Chart: Raca/Cor
@@ -2266,6 +2743,218 @@ if(document.getElementById("chartRaca")) {
 }
 
 renderizarAcumulado();
+
+// ===== Tela 3: Detalhamento (Motivos, Profissionais, Horário) =====
+document.getElementById("tituloDetalhamento").textContent = `${dados.periodoOperacao.inicio} – ${dados.periodoOperacao.fimReferencia}`;
+
+function truncar(texto, max){ return texto.length > max ? texto.slice(0, max - 1) + "…" : texto; }
+function nomeCurto(nome){
+  const partes = nome.trim().split(/\s+/);
+  if (partes.length <= 2) return nome;
+  const conectores = new Set(["de", "da", "do", "dos", "das", "e"]);
+  const penultima = partes[partes.length - 2].toLowerCase();
+  const cauda = conectores.has(penultima) ? partes.slice(-2).join(" ") : partes[partes.length - 1];
+  return `${partes[0]} ${cauda}`;
+}
+function topEntry(obj){
+  const entradas = Object.entries(obj || {});
+  if(!entradas.length) return null;
+  return entradas.reduce((a,b) => b[1] > a[1] ? b : a);
+}
+
+// Chart: Motivos de Atendimento
+if(document.getElementById("chartMotivos")) {
+  const entradasMotivos = Object.entries(dados.motivos || {}).slice(0, 5);
+  new Chart(document.getElementById("chartMotivos"), {
+    type: "bar",
+    data: {
+      labels: entradasMotivos.map(([k]) => truncar(k, 28)),
+      datasets: [{
+        data: entradasMotivos.map(([,v]) => v),
+        backgroundColor: paleta[0],
+        borderRadius: 4,
+        maxBarThickness: 20
+      }]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { title: (itens) => entradasMotivos[itens[0].dataIndex][0] } },
+        datalabels: { anchor: "end", align: "end", font: { size: 10, weight: "bold" }, formatter: Math.round }
+      },
+      scales: {
+        x: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "15%" },
+        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+// Chart: Atendimentos por Profissional
+if(document.getElementById("chartProfissionais")) {
+  const entradasProfissionais = Object.entries(dados.profissionais || {}).slice(0, 8);
+  new Chart(document.getElementById("chartProfissionais"), {
+    type: "bar",
+    data: {
+      labels: entradasProfissionais.map(([k]) => nomeCurto(k)),
+      datasets: [{
+        data: entradasProfissionais.map(([,v]) => v),
+        backgroundColor: paleta[1],
+        borderRadius: 4,
+        maxBarThickness: 20
+      }]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { title: (itens) => entradasProfissionais[itens[0].dataIndex][0] } },
+        datalabels: { anchor: "end", align: "end", font: { size: 10, weight: "bold" }, formatter: Math.round }
+      },
+      scales: {
+        x: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "15%" },
+        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+// Chart: Horário dos Atendimentos
+if(document.getElementById("chartHorario")) {
+  const entradasHora = Object.entries(dados.porHora || {}).filter(([, v]) => v >= 1);
+  new Chart(document.getElementById("chartHorario"), {
+    type: "bar",
+    data: {
+      labels: entradasHora.map(([k]) => k),
+      datasets: [{
+        data: entradasHora.map(([, v]) => v),
+        backgroundColor: paleta[2],
+        borderRadius: 3,
+        maxBarThickness: 16
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: { display: false }
+      },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: true, autoSkipPadding: 4 } },
+        y: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "15%" }
+      }
+    }
+  });
+}
+
+(() => {
+  const topMotivo = topEntry(dados.motivos);
+  const topProfissional = topEntry(dados.profissionais);
+  const topHora = topEntry(dados.porHora);
+  const el = document.getElementById("textoInsightDetalhamento");
+  el.innerHTML = topMotivo
+    ? `Motivo mais frequente (fora o guarda-chuva da operação): <b>${topMotivo[0]}</b> (${fmt(topMotivo[1])} atendimentos)` +
+      (topProfissional ? ` · Profissional com mais atendimentos: <b>${topProfissional[0]}</b> (${fmt(topProfissional[1])})` : "") +
+      (topHora ? ` · Horário de pico: <b>${topHora[0]}</b> (${fmt(topHora[1])} atendimentos).` : ".")
+    : "Dados de motivos, profissionais e horário não disponíveis para este período.";
+})();
+
+/* ================================================================
+   NAVEGAÇÃO POR SCROLL — 1 giro = 1 tela (mesma dinâmica do
+   Observatório do CadÚnico: deck com trilho de bolinhas, barra de
+   progresso, roda do mouse, toque e teclado)
+   ================================================================ */
+const CAPITULOS = [
+  { titulo: 'Semana Atual', icone: 'fa-calendar-week' },
+  { titulo: 'Base Total', icone: 'fa-layer-group' },
+  { titulo: 'Detalhamento', icone: 'fa-clipboard-list' }
+];
+
+let idxAtual = 0, travado = false, jaScrollou = false;
+const REDUZ_MOVIMENTO = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const modoMobile = () => matchMedia('(max-width:1120px)').matches;
+
+function montarNav() {
+  const trilho = document.getElementById('railTrack');
+  CAPITULOS.forEach((cap, i) => {
+    const num = String(i + 1).padStart(2, '0');
+    const b = document.createElement('button');
+    b.className = 'rail-dot' + (i === 0 ? ' ativo' : '');
+    b.setAttribute('aria-label', `Tela ${num} — ${cap.titulo}`);
+    b.innerHTML = `<i class="fa-solid ${cap.icone}" aria-hidden="true"></i>
+       <span class="rail-tip" role="presentation"><b>${num}</b>${cap.titulo}</span>`;
+    b.addEventListener('click', () => irPara(i));
+    trilho.appendChild(b);
+  });
+}
+
+function irPara(i) {
+  const alvo = Math.max(0, Math.min(CAPITULOS.length - 1, i));
+  if (alvo === idxAtual) return;
+  idxAtual = alvo;
+
+  if (modoMobile()) {
+    document.getElementById('tela-' + alvo).scrollIntoView({ behavior: REDUZ_MOVIMENTO ? 'auto' : 'smooth' });
+  } else {
+    document.getElementById('deckTrack').style.transform = `translateY(-${alvo * 100}%)`;
+  }
+
+  document.querySelectorAll('.rail-dot').forEach((b, k) => b.classList.toggle('ativo', k === alvo));
+  document.getElementById('progFill').style.width = (alvo / (CAPITULOS.length - 1)) * 100 + '%';
+  document.getElementById('scrollHint').classList.toggle('oculta', jaScrollou && alvo > 0 || alvo === CAPITULOS.length - 1);
+
+  travado = true;
+  setTimeout(() => travado = false, REDUZ_MOVIMENTO ? 150 : 780);
+}
+
+document.getElementById('deck').addEventListener('wheel', e => {
+  if (modoMobile()) return;
+  e.preventDefault();
+  if (travado || Math.abs(e.deltaY) < 18) return;
+  jaScrollou = true;
+  irPara(idxAtual + (e.deltaY > 0 ? 1 : -1));
+}, { passive: false });
+
+/* Toque (tablets) */
+let toqueY = null;
+document.getElementById('deck').addEventListener('touchstart', e => { toqueY = e.touches[0].clientY; }, { passive: true });
+document.getElementById('deck').addEventListener('touchend', e => {
+  if (modoMobile() || toqueY === null) return;
+  const dy = toqueY - e.changedTouches[0].clientY;
+  toqueY = null;
+  if (Math.abs(dy) < 60 || travado) return;
+  jaScrollou = true;
+  irPara(idxAtual + (dy > 0 ? 1 : -1));
+});
+
+/* Teclado */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'SELECT') return;
+  const prox = { 'ArrowDown': 1, 'PageDown': 1, ' ': 1, 'ArrowUp': -1, 'PageUp': -1 }[e.key];
+  if (prox) { e.preventDefault(); jaScrollou = true; irPara(idxAtual + prox); }
+  else if (e.key === 'Home') { e.preventDefault(); irPara(0); }
+  else if (e.key === 'End') { e.preventDefault(); irPara(CAPITULOS.length - 1); }
+});
+
+/* Tela cheia */
+const btnFs = document.getElementById('btnFs');
+btnFs.addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen();
+});
+document.addEventListener('fullscreenchange', () => {
+  const cheia = !!document.fullscreenElement;
+  btnFs.querySelector('i').className = 'fa-solid ' + (cheia ? 'fa-compress' : 'fa-expand');
+  btnFs.setAttribute('aria-label', cheia ? 'Sair da tela cheia' : 'Tela cheia');
+});
+
+montarNav();
 </script>
 </body>
 </html>
