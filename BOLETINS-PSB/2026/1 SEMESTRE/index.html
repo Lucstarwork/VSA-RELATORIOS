@@ -208,7 +208,7 @@
         <span class="rotulo">Famílias referenciadas</span>
     </div>
     <div class="kpi-tile" style="--kpi-accent: #b8860b;">
-        <span class="valor">3.911</span>
+        <span class="valor">3.916</span>
         <span class="rotulo">Dispensações</span>
     </div>
     <div class="kpi-tile" style="--kpi-accent: var(--feedback-info);">
@@ -293,6 +293,14 @@
     <div class="chart-footer">
         Fonte: <strong>IPM Social</strong>
     </div>
+</div>
+
+<h2>Programas e Serviços</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile"><span class="valor">565</span><span class="rotulo">Famílias Ativas no PAIF</span></div>
+    <div class="kpi-tile"><span class="valor">138</span><span class="rotulo">Famílias Desligadas do PAIF</span></div>
+    <div class="kpi-tile"><span class="valor">157</span><span class="rotulo">Famílias Ativas no PRC</span></div>
+    <div class="kpi-tile"><span class="valor">2</span><span class="rotulo">Famílias Desligadas do PRC</span></div>
 </div>
 
 <h2>Perfil dos Atendidos</h2>
@@ -488,7 +496,7 @@
         <div class="gov-card-content">
             <p>5.919 atendimentos PAIF</p>
             <p>4.244 famílias referenciadas</p>
-            <p>509 benefícios concedidos</p>
+            <p>514 benefícios concedidos</p>
         </div>
         <div class="gov-card-footer"><a href="cras-industrial.html">Ver boletim completo →</a></div>
     </div>
@@ -778,6 +786,12 @@
                                 return label + Math.round(value).toLocaleString('pt-BR');
                             }
                             return label + value.toLocaleString('pt-BR') + ' pessoas';
+                        },
+                        afterLabel: function(context) {
+                            if (context.dataset.type === 'line' || !mediaPessoasUnicasMes) return '';
+                            const variacaoPct = ((context.parsed.y - mediaPessoasUnicasMes) / mediaPessoasUnicasMes) * 100;
+                            const direcao = variacaoPct >= 0 ? 'acima' : 'abaixo';
+                            return Math.abs(Math.round(variacaoPct)) + '% ' + direcao + ' da média do período';
                         }
                     }
                 }
@@ -796,7 +810,7 @@
     });
 
     // Gráfico de benefícios dispensados por unidade, com filtro por tipo
-    const dadosBeneficios = {"labels": ["CRAS Boqueirão", "CRAS Califórnia", "CRAS Centro", "CRAS Costeira", "CRAS Fazenda Velha", "CRAS Industrial", "CRAS Thomaz Coelho", "CRAS Tupy"], "todos": [359, 686, 656, 532, 416, 509, 243, 510], "por_tipo": {"2ª Via Certidão de Nascimento": [39, 106, 155, 85, 67, 119, 32, 167], "Prato Cheio": [270, 453, 319, 328, 209, 287, 160, 228], "Triar": [0, 0, 59, 0, 73, 0, 21, 27]}};
+    const dadosBeneficios = {"labels": ["CRAS Boqueirão", "CRAS Califórnia", "CRAS Centro", "CRAS Costeira", "CRAS Fazenda Velha", "CRAS Industrial", "CRAS Thomaz Coelho", "CRAS Tupy"], "todos": [359, 686, 656, 532, 416, 514, 243, 510], "por_tipo": {"2ª Via Certidão de Nascimento": [39, 106, 155, 85, 67, 119, 32, 167], "Prato Cheio": [270, 453, 319, 328, 209, 292, 160, 228], "Triar": [0, 0, 59, 0, 73, 0, 21, 27]}};
     const slugsBeneficios = [
         "cras-industrial","cras-centro","cras-costeira","cras-california","cras-boqueirao","cras-fazenda-velha","cras-thomaz-coelho","cras-tupy"
     ];
@@ -1063,7 +1077,7 @@
     // embutidos no HTML (comparacao_unidades); trocar A/B só refiltra o
     // array já carregado, sem nova geração no back-end.
     (function () {
-        const dadosComparacao = [{"nome": "CRAS Industrial", "slug": "cras-industrial", "atendimentos_paif": 5919, "familias_referenciadas": 4244, "total_beneficios": 509, "total_profissionais": 7, "atendimentos_por_profissional": 845.6}, {"nome": "CRAS Centro", "slug": "cras-centro", "atendimentos_paif": 4872, "familias_referenciadas": 4377, "total_beneficios": 656, "total_profissionais": 8, "atendimentos_por_profissional": 609.0}, {"nome": "CRAS Costeira", "slug": "cras-costeira", "atendimentos_paif": 3553, "familias_referenciadas": 3185, "total_beneficios": 532, "total_profissionais": 7, "atendimentos_por_profissional": 507.6}, {"nome": "CRAS Califórnia", "slug": "cras-california", "atendimentos_paif": 3654, "familias_referenciadas": 2937, "total_beneficios": 686, "total_profissionais": 7, "atendimentos_por_profissional": 522.0}, {"nome": "CRAS Boqueirão", "slug": "cras-boqueirao", "atendimentos_paif": 4116, "familias_referenciadas": 1935, "total_beneficios": 359, "total_profissionais": 7, "atendimentos_por_profissional": 588.0}, {"nome": "CRAS Fazenda Velha", "slug": "cras-fazenda-velha", "atendimentos_paif": 3230, "familias_referenciadas": 1741, "total_beneficios": 416, "total_profissionais": 8, "atendimentos_por_profissional": 403.8}, {"nome": "CRAS Thomaz Coelho", "slug": "cras-thomaz-coelho", "atendimentos_paif": 1124, "familias_referenciadas": 974, "total_beneficios": 243, "total_profissionais": 6, "atendimentos_por_profissional": 187.3}, {"nome": "CRAS Tupy", "slug": "cras-tupy", "atendimentos_paif": 2632, "familias_referenciadas": 3349, "total_beneficios": 510, "total_profissionais": 9, "atendimentos_por_profissional": 292.4}];
+        const dadosComparacao = [{"nome": "CRAS Industrial", "slug": "cras-industrial", "atendimentos_paif": 5919, "familias_referenciadas": 4244, "total_beneficios": 514, "total_profissionais": 7, "atendimentos_por_profissional": 845.6}, {"nome": "CRAS Centro", "slug": "cras-centro", "atendimentos_paif": 4872, "familias_referenciadas": 4377, "total_beneficios": 656, "total_profissionais": 8, "atendimentos_por_profissional": 609.0}, {"nome": "CRAS Costeira", "slug": "cras-costeira", "atendimentos_paif": 3553, "familias_referenciadas": 3185, "total_beneficios": 532, "total_profissionais": 7, "atendimentos_por_profissional": 507.6}, {"nome": "CRAS Califórnia", "slug": "cras-california", "atendimentos_paif": 3654, "familias_referenciadas": 2937, "total_beneficios": 686, "total_profissionais": 7, "atendimentos_por_profissional": 522.0}, {"nome": "CRAS Boqueirão", "slug": "cras-boqueirao", "atendimentos_paif": 4116, "familias_referenciadas": 1935, "total_beneficios": 359, "total_profissionais": 7, "atendimentos_por_profissional": 588.0}, {"nome": "CRAS Fazenda Velha", "slug": "cras-fazenda-velha", "atendimentos_paif": 3230, "familias_referenciadas": 1741, "total_beneficios": 416, "total_profissionais": 8, "atendimentos_por_profissional": 403.8}, {"nome": "CRAS Thomaz Coelho", "slug": "cras-thomaz-coelho", "atendimentos_paif": 1124, "familias_referenciadas": 974, "total_beneficios": 243, "total_profissionais": 6, "atendimentos_por_profissional": 187.3}, {"nome": "CRAS Tupy", "slug": "cras-tupy", "atendimentos_paif": 2632, "familias_referenciadas": 3349, "total_beneficios": 510, "total_profissionais": 9, "atendimentos_por_profissional": 292.4}];
         const porSlug = {};
         dadosComparacao.forEach(function (u) { porSlug[u.slug] = u; });
 
@@ -1237,7 +1251,7 @@
                 <span>Vigilância Socioassistencial — PSB</span>
             </div>
             <div class="gov-footer-info">
-                <p>Boletim PSB — período de referência: 1º Semestre de 2026. Emitido em 23 de julho de 2026.</p>
+                <p>Boletim PSB — período de referência: 1º Semestre de 2026. Emitido em 28 de julho de 2026.</p>
                 <p>Dados de uso interno — Secretaria Municipal de Assistência Social de Araucária.</p>
             </div>
         </div>
