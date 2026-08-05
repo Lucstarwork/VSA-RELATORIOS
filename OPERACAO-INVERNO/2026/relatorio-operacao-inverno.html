@@ -497,28 +497,28 @@
 <script>
 const dados = {
   "identificacao": {
-    "numero": "05/2026"
+    "numero": "06/2026"
   },
   "semanaAtual": {
-    "inicio": "20/07/2026",
-    "fim": "26/07/2026",
+    "inicio": "27/07/2026",
+    "fim": "02/08/2026",
     "porDia": {
-      "Seg": 39,
-      "Ter": 37,
-      "Qua": 56,
-      "Qui": 44,
-      "Sex": 37,
-      "Sáb": 24,
-      "Dom": 41
+      "Seg": 48,
+      "Ter": 48,
+      "Qua": 49,
+      "Qui": 51,
+      "Sex": 26,
+      "Sáb": 30,
+      "Dom": 35
     },
     "porDiaPernoites": {
       "Seg": 0,
-      "Ter": 0,
+      "Ter": 46,
       "Qua": 0,
-      "Qui": 0,
-      "Sex": 0,
-      "Sáb": 0,
-      "Dom": 0
+      "Qui": 50,
+      "Sex": 25,
+      "Sáb": 29,
+      "Dom": 28
     }
   },
   "semanas": {
@@ -691,6 +691,40 @@ const dados = {
         "umaNoite": 0,
         "maisDeDuasNoites": 0
       }
+    },
+    "6": {
+      "inicio": "27/07/2026",
+      "fim": "02/08/2026",
+      "pessoasUnicas": 86,
+      "novasPessoas": 66,
+      "pessoasAntigas": 20,
+      "porDia": {
+        "Seg": 48,
+        "Ter": 48,
+        "Qua": 49,
+        "Qui": 51,
+        "Sex": 26,
+        "Sáb": 30,
+        "Dom": 35
+      },
+      "porDiaPernoites": {
+        "Seg": 0,
+        "Ter": 46,
+        "Qua": 0,
+        "Qui": 50,
+        "Sex": 25,
+        "Sáb": 29,
+        "Dom": 28
+      },
+      "pernoites": {
+        "total": 178,
+        "pessoasComPernoite": 73,
+        "mediaPorPessoa": 2.44
+      },
+      "pernoitesFrequencia": {
+        "umaNoite": 26,
+        "maisDeDuasNoites": 29
+      }
     }
   },
   "ultimasSemanas": [
@@ -713,46 +747,50 @@ const dados = {
     {
       "label": "S5",
       "total": 278
+    },
+    {
+      "label": "S6",
+      "total": 287
     }
   ],
   "pernoites": {
-    "total": 0,
-    "pessoasComPernoite": 0,
-    "mediaPorPessoa": 0.0
+    "total": 178,
+    "pessoasComPernoite": 73,
+    "mediaPorPessoa": 2.44
   },
   "periodoOperacao": {
     "inicio": "22/06/2026",
-    "fimReferencia": "26/07/2026",
-    "diasCorridos": 35
+    "fimReferencia": "02/08/2026",
+    "diasCorridos": 42
   },
-  "totalAcumulado": 1156,
-  "pessoasUnicasAcumulado": 142,
-  "pessoasComPernoiteAcumulado": 91,
+  "totalAcumulado": 1443,
+  "pessoasUnicasAcumulado": 155,
+  "pessoasComPernoiteAcumulado": 127,
   "faixaEtaria": {
     "0–17": 0,
-    "18–29": 39,
-    "30–44": 80,
-    "45–59": 22,
-    "60+": 1
+    "18–29": 40,
+    "30–44": 85,
+    "45–59": 27,
+    "60+": 3
   },
   "sexo": {
-    "Masculino": 126,
+    "Masculino": 139,
     "Feminino": 16
   },
   "raca": {
-    "Branca": 66,
-    "Parda": 54,
+    "Branca": 72,
+    "Parda": 58,
     "Preta": 16,
-    "Não Informado": 6
+    "Não Informado": 9
   },
-  "idadeMedia": 35.87,
-  "novasPessoas": 111,
-  "pessoasAntigas": 31,
+  "idadeMedia": 36.48,
+  "novasPessoas": 123,
+  "pessoasAntigas": 32,
   "pernoitesFrequencia": {
-    "semana1Noite": 0,
-    "semanaMais2Noites": 0,
-    "total1Noite": 35,
-    "totalMais2Noites": 47
+    "semana1Noite": 26,
+    "semanaMais2Noites": 29,
+    "total1Noite": 36,
+    "totalMais2Noites": 74
   },
   "dadosBrutosAcumulados": [
     {
@@ -776,14 +814,24 @@ const dados = {
       "totalAtendimentos": 21
     },
     {
+      "id": "12216",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
       "id": "13597",
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 3
     },
     {
       "id": "15771",
@@ -791,9 +839,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 41,
-      "pernoites": 1,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 21
     },
     {
       "id": "20921",
@@ -801,9 +849,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 28,
-      "pernoites": 9,
+      "pernoites": 13,
       "inedito": true,
-      "totalAtendimentos": 31
+      "totalAtendimentos": 38
     },
     {
       "id": "27512",
@@ -811,9 +859,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 30,
-      "pernoites": 1,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 20
     },
     {
       "id": "28555",
@@ -821,9 +869,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 45,
-      "pernoites": 1,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 15
     },
     {
       "id": "53052",
@@ -841,9 +889,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 31,
-      "pernoites": 11,
+      "pernoites": 12,
       "inedito": true,
-      "totalAtendimentos": 24
+      "totalAtendimentos": 27
     },
     {
       "id": "76633",
@@ -851,9 +899,19 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 25,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 6
+    },
+    {
+      "id": "77886",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "45–59",
+      "idade": 47,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 2
     },
     {
       "id": "79646",
@@ -861,9 +919,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 4,
+      "pernoites": 8,
       "inedito": false,
-      "totalAtendimentos": 18
+      "totalAtendimentos": 22
     },
     {
       "id": "83620",
@@ -881,9 +939,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 24,
-      "pernoites": 0,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 4
     },
     {
       "id": "100791",
@@ -901,9 +959,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 47,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 8
     },
     {
       "id": "105745",
@@ -919,11 +977,21 @@ const dados = {
       "id": "109324",
       "sexo": "Masculino",
       "raca": "Preta",
-      "faixaEtaria": "18–29",
-      "idade": 29,
-      "pernoites": 1,
+      "faixaEtaria": "30–44",
+      "idade": 30,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 22
+      "totalAtendimentos": 26
+    },
+    {
+      "id": "112563",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 58,
+      "pernoites": 4,
+      "inedito": true,
+      "totalAtendimentos": 7
     },
     {
       "id": "118976",
@@ -933,7 +1001,7 @@ const dados = {
       "idade": 30,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 15
     },
     {
       "id": "119780",
@@ -956,6 +1024,16 @@ const dados = {
       "totalAtendimentos": 1
     },
     {
+      "id": "121821",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 21,
+      "pernoites": 0,
+      "inedito": false,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "122837",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -971,9 +1049,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 31,
-      "pernoites": 14,
+      "pernoites": 18,
       "inedito": true,
-      "totalAtendimentos": 35
+      "totalAtendimentos": 42
     },
     {
       "id": "128819",
@@ -986,6 +1064,16 @@ const dados = {
       "totalAtendimentos": 3
     },
     {
+      "id": "129263",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 36,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
       "id": "130687",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -996,14 +1084,24 @@ const dados = {
       "totalAtendimentos": 3
     },
     {
+      "id": "133764",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "45–59",
+      "idade": 45,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
       "id": "141624",
       "sexo": "Masculino",
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 40,
-      "pernoites": 8,
+      "pernoites": 10,
       "inedito": false,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 16
     },
     {
       "id": "147155",
@@ -1031,9 +1129,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 57,
-      "pernoites": 0,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 10
     },
     {
       "id": "167490",
@@ -1051,9 +1149,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 27,
-      "pernoites": 0,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 8
     },
     {
       "id": "181561",
@@ -1063,7 +1161,7 @@ const dados = {
       "idade": 47,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 10
     },
     {
       "id": "189775",
@@ -1076,6 +1174,16 @@ const dados = {
       "totalAtendimentos": 3
     },
     {
+      "id": "190324",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 40,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "194832",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -1083,7 +1191,7 @@ const dados = {
       "idade": 54,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 10
     },
     {
       "id": "209304",
@@ -1094,6 +1202,16 @@ const dados = {
       "pernoites": 1,
       "inedito": true,
       "totalAtendimentos": 1
+    },
+    {
+      "id": "214454",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 33,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
     },
     {
       "id": "231974",
@@ -1113,7 +1231,7 @@ const dados = {
       "idade": 32,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 13
+      "totalAtendimentos": 14
     },
     {
       "id": "259522",
@@ -1121,9 +1239,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 37,
-      "pernoites": 4,
+      "pernoites": 5,
       "inedito": false,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 15
     },
     {
       "id": "265680",
@@ -1169,8 +1287,8 @@ const dados = {
       "id": "303191",
       "sexo": "Feminino",
       "raca": "Branca",
-      "faixaEtaria": "30–44",
-      "idade": 44,
+      "faixaEtaria": "45–59",
+      "idade": 45,
       "pernoites": 13,
       "inedito": true,
       "totalAtendimentos": 21
@@ -1216,14 +1334,24 @@ const dados = {
       "totalAtendimentos": 11
     },
     {
+      "id": "346434",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "60+",
+      "idade": 60,
+      "pernoites": 2,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
       "id": "366770",
       "sexo": "Masculino",
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 27,
-      "pernoites": 2,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 4
     },
     {
       "id": "415034",
@@ -1231,9 +1359,9 @@ const dados = {
       "raca": "Preta",
       "faixaEtaria": "45–59",
       "idade": 49,
-      "pernoites": 4,
+      "pernoites": 5,
       "inedito": false,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 10
     },
     {
       "id": "419477",
@@ -1246,14 +1374,24 @@ const dados = {
       "totalAtendimentos": 6
     },
     {
+      "id": "421041",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "30–44",
+      "idade": 44,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "421738",
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 29,
-      "pernoites": 13,
+      "pernoites": 18,
       "inedito": true,
-      "totalAtendimentos": 36
+      "totalAtendimentos": 43
     },
     {
       "id": "425757",
@@ -1261,9 +1399,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 44,
-      "pernoites": 0,
+      "pernoites": 3,
       "inedito": false,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 9
     },
     {
       "id": "434712",
@@ -1271,9 +1409,9 @@ const dados = {
       "raca": "Preta",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 1,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 8
     },
     {
       "id": "443574",
@@ -1281,9 +1419,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 2,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 27
     },
     {
       "id": "443615",
@@ -1301,9 +1439,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 25,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": false,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 5
     },
     {
       "id": "458751",
@@ -1311,9 +1449,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 30,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 11
     },
     {
       "id": "465608",
@@ -1323,7 +1461,7 @@ const dados = {
       "idade": 37,
       "pernoites": 3,
       "inedito": false,
-      "totalAtendimentos": 5
+      "totalAtendimentos": 6
     },
     {
       "id": "466689",
@@ -1351,9 +1489,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 23,
-      "pernoites": 1,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 10
+      "totalAtendimentos": 15
     },
     {
       "id": "468075",
@@ -1363,7 +1501,7 @@ const dados = {
       "idade": 36,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 3
     },
     {
       "id": "474727",
@@ -1381,9 +1519,9 @@ const dados = {
       "raca": "Preta",
       "faixaEtaria": "30–44",
       "idade": 40,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 10
     },
     {
       "id": "479455",
@@ -1391,16 +1529,16 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 31,
-      "pernoites": 1,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 15
+      "totalAtendimentos": 19
     },
     {
       "id": "484920",
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "30–44",
-      "idade": 37,
+      "idade": 38,
       "pernoites": 0,
       "inedito": false,
       "totalAtendimentos": 1
@@ -1421,9 +1559,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "45–59",
       "idade": 50,
-      "pernoites": 5,
+      "pernoites": 6,
       "inedito": false,
-      "totalAtendimentos": 10
+      "totalAtendimentos": 11
     },
     {
       "id": "489833",
@@ -1431,9 +1569,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 54,
-      "pernoites": 0,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 11
     },
     {
       "id": "490483",
@@ -1441,9 +1579,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 29,
-      "pernoites": 5,
+      "pernoites": 7,
       "inedito": false,
-      "totalAtendimentos": 9
+      "totalAtendimentos": 11
     },
     {
       "id": "491166",
@@ -1453,7 +1591,7 @@ const dados = {
       "idade": 44,
       "pernoites": 9,
       "inedito": false,
-      "totalAtendimentos": 13
+      "totalAtendimentos": 14
     },
     {
       "id": "496585",
@@ -1481,9 +1619,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 50,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 8
     },
     {
       "id": "499157",
@@ -1491,9 +1629,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 53,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 8
     },
     {
       "id": "500735",
@@ -1511,9 +1649,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 34,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": false,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 5
     },
     {
       "id": "503778",
@@ -1551,9 +1689,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 44,
-      "pernoites": 5,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 14
     },
     {
       "id": "507300",
@@ -1561,9 +1699,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 30,
-      "pernoites": 1,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 9
+      "totalAtendimentos": 11
     },
     {
       "id": "507924",
@@ -1591,9 +1729,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 33,
-      "pernoites": 2,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 18
     },
     {
       "id": "513344",
@@ -1611,9 +1749,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "45–59",
       "idade": 46,
-      "pernoites": 1,
+      "pernoites": 6,
       "inedito": false,
-      "totalAtendimentos": 23
+      "totalAtendimentos": 30
     },
     {
       "id": "515250",
@@ -1621,9 +1759,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 37,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": false,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 7
     },
     {
       "id": "516158",
@@ -1641,9 +1779,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 43,
-      "pernoites": 3,
+      "pernoites": 6,
       "inedito": false,
-      "totalAtendimentos": 15
+      "totalAtendimentos": 22
     },
     {
       "id": "519111",
@@ -1651,9 +1789,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 42,
-      "pernoites": 1,
+      "pernoites": 4,
       "inedito": false,
-      "totalAtendimentos": 21
+      "totalAtendimentos": 27
     },
     {
       "id": "519748",
@@ -1661,9 +1799,19 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 26,
-      "pernoites": 0,
+      "pernoites": 3,
       "inedito": false,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 10
+    },
+    {
+      "id": "519911",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "30–44",
+      "idade": 30,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "522331",
@@ -1681,9 +1829,9 @@ const dados = {
       "raca": "Preta",
       "faixaEtaria": "30–44",
       "idade": 43,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 3
     },
     {
       "id": "525441",
@@ -1691,9 +1839,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 22,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 5
     },
     {
       "id": "525671",
@@ -1711,9 +1859,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 6,
+      "pernoites": 9,
       "inedito": false,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 15
     },
     {
       "id": "526835",
@@ -1791,9 +1939,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 22,
-      "pernoites": 8,
+      "pernoites": 12,
       "inedito": true,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 25
     },
     {
       "id": "534937",
@@ -1821,9 +1969,9 @@ const dados = {
       "raca": "Preta",
       "faixaEtaria": "18–29",
       "idade": 20,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 5
     },
     {
       "id": "535674",
@@ -1833,7 +1981,17 @@ const dados = {
       "idade": 24,
       "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 23
+      "totalAtendimentos": 24
+    },
+    {
+      "id": "535741",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "60+",
+      "idade": 67,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "535841",
@@ -1843,7 +2001,7 @@ const dados = {
       "idade": 42,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 7
     },
     {
       "id": "536402",
@@ -1851,9 +2009,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "30–44",
       "idade": 38,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 4
     },
     {
       "id": "536514",
@@ -1911,9 +2069,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 43,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 4
     },
     {
       "id": "540278",
@@ -1921,9 +2079,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "45–59",
       "idade": 48,
-      "pernoites": 13,
+      "pernoites": 18,
       "inedito": true,
-      "totalAtendimentos": 34
+      "totalAtendimentos": 41
     },
     {
       "id": "540497",
@@ -1971,9 +2129,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "45–59",
       "idade": 45,
-      "pernoites": 7,
+      "pernoites": 8,
       "inedito": true,
-      "totalAtendimentos": 19
+      "totalAtendimentos": 20
     },
     {
       "id": "541031",
@@ -1981,9 +2139,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 34,
-      "pernoites": 2,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 22
     },
     {
       "id": "541037",
@@ -1991,9 +2149,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 25,
-      "pernoites": 4,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 15
+      "totalAtendimentos": 18
     },
     {
       "id": "541159",
@@ -2001,9 +2159,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 38,
-      "pernoites": 1,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 18
+      "totalAtendimentos": 25
     },
     {
       "id": "541161",
@@ -2011,9 +2169,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 54,
-      "pernoites": 1,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 27
     },
     {
       "id": "541222",
@@ -2021,9 +2179,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 3
     },
     {
       "id": "541303",
@@ -2051,9 +2209,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 1,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 23
     },
     {
       "id": "541381",
@@ -2071,9 +2229,9 @@ const dados = {
       "raca": "Preta",
       "faixaEtaria": "30–44",
       "idade": 31,
-      "pernoites": 0,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 13
     },
     {
       "id": "541416",
@@ -2091,9 +2249,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 29,
-      "pernoites": 1,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 11
     },
     {
       "id": "541516",
@@ -2103,7 +2261,7 @@ const dados = {
       "idade": 31,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 4
     },
     {
       "id": "541576",
@@ -2111,9 +2269,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 41,
-      "pernoites": 1,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 9
     },
     {
       "id": "541628",
@@ -2131,9 +2289,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "45–59",
       "idade": 51,
-      "pernoites": 0,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 10
     },
     {
       "id": "541910",
@@ -2141,9 +2299,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "18–29",
       "idade": 29,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 7
     },
     {
       "id": "541912",
@@ -2151,9 +2309,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "18–29",
       "idade": 29,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 5
     },
     {
       "id": "541976",
@@ -2161,9 +2319,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "18–29",
       "idade": 27,
-      "pernoites": 0,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 6
     },
     {
       "id": "541977",
@@ -2174,12 +2332,22 @@ const dados = {
       "pernoites": 0,
       "inedito": true,
       "totalAtendimentos": 1
+    },
+    {
+      "id": "542179",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "45–59",
+      "idade": 47,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 2
     }
   ],
   "motivos": {
-    "Pernoite Casa de Passagem": 339,
-    "Escuta": 54,
-    "Orientação Social": 50,
+    "Pernoite Casa de Passagem": 517,
+    "Escuta": 65,
+    "Orientação Social": 58,
     "Demanda Espontânea": 23,
     "Orientação e Encaminhamentos para a Habitação": 1,
     "Encaminhamentos Recebidos da Rede Socioassistencial": 1,
@@ -2187,22 +2355,22 @@ const dados = {
     "Acompanhamento e Monitoramento dos Encaminhamentos Realizados": 1
   },
   "profissionais": {
-    "Gabriely Celestino Cardoso": 789,
-    "Leandro Ferreira Schonrock": 357,
-    "Walmor Jose Ruhr": 317,
+    "Gabriely Celestino Cardoso": 992,
+    "Leandro Ferreira Schonrock": 430,
+    "Josney Garcia dos Santos": 387,
+    "Fernanda de Fatima Czerban": 381,
+    "Walmor Jose Ruhr": 367,
+    "Jhenyfer Maciel da Silva": 347,
+    "Jefferson Vanderlei Chiarello": 339,
+    "Eva da Silva Vieira": 339,
+    "Marcos Augusto Carvalho": 334,
     "Claudia Portella Macedo Fuchner": 314,
-    "Josney Garcia dos Santos": 312,
-    "Jhenyfer Maciel da Silva": 298,
-    "Fernanda de Fatima Czerban": 275,
-    "Jefferson Vanderlei Chiarello": 261,
-    "Eva da Silva Vieira": 260,
-    "Marcos Augusto Carvalho": 249,
-    "Bernardo Paim Cunha Masson": 201,
+    "Bernardo Paim Cunha Masson": 272,
+    "Jose Eugenio do Nascimento": 236,
+    "Alexandre Lima Costa Ferreira": 219,
     "Deivit Cristian Ramos": 147,
-    "Alexandre Lima Costa Ferreira": 147,
-    "Jose Eugenio do Nascimento": 111,
-    "Felix da Silva Neto": 51,
-    "Jucelma Silveira Martinatto Bueno da Silva": 31,
+    "Felix da Silva Neto": 55,
+    "Jucelma Silveira Martinatto Bueno da Silva": 39,
     "Fernanda Laverde Torres": 1
   },
   "porHora": {
@@ -2223,13 +2391,13 @@ const dados = {
     "14h": 0,
     "15h": 1,
     "16h": 0,
-    "17h": 19,
-    "18h": 43,
-    "19h": 194,
-    "20h": 404,
-    "21h": 164,
-    "22h": 108,
-    "23h": 220
+    "17h": 23,
+    "18h": 44,
+    "19h": 221,
+    "20h": 527,
+    "21h": 224,
+    "22h": 173,
+    "23h": 227
   }
 };
 
