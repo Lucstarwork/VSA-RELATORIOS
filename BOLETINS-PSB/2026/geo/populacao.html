@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<title>Total da população</title>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+<style>
+  :root {
+    --azul-escuro: #0f1f3d; --azul: #2b3a5c; --cinza-texto: #55596b;
+    --cinza-borda: #e6e8ee; --fundo: #eef1f6;
+  }
+  * { box-sizing: border-box; }
+  html, body { height:100%; margin:0; overflow:hidden; }
+  body {
+    font-family: "Segoe UI", -apple-system, Arial, sans-serif;
+    background: var(--fundo); color:#1f2430;
+    display:flex; flex-direction:column;
+  }
+  header {
+    flex: 0 0 auto; display:flex; justify-content:space-between; align-items:center;
+    padding: 18px 28px; background:#fff; border-bottom:1px solid var(--cinza-borda);
+    box-shadow: 0 1px 3px rgba(15,31,61,0.04);
+  }
+  header h1 {
+    font-size: 14px; font-weight:700; letter-spacing: 0.8px; color: var(--azul-escuro); margin:0;
+  }
+  .breadcrumb { color:#9198a8; font-size:13px; }
+  .breadcrumb b { color: var(--azul); font-weight:600; }
+  .painel {
+    flex: 1 1 auto; display:flex; gap:18px; padding:18px; overflow:hidden; min-height:0;
+  }
+  .card {
+    background:#fff; border:1px solid var(--cinza-borda); border-radius:10px;
+    box-shadow: 0 1px 4px rgba(15,31,61,0.05);
+    display:flex; flex-direction:column; overflow:hidden; min-height:0;
+  }
+  .mapa-card { flex: 1 1 55%; }
+  .mapa-card iframe { width:100%; flex:1; border:0; display:block; }
+  .tabela-card { flex: 1 1 45%; padding: 18px 20px; min-width: 0; }
+  .tabela-card h2 {
+    font-size:12px; text-transform:uppercase; letter-spacing:0.6px; color:#9198a8;
+    margin: 0 0 12px 0; font-weight:700;
+  }
+  table.dataTable { width:100% !important; border-collapse: collapse; }
+  table.dataTable thead th {
+    color: #9198a8; font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:0.4px;
+    border-bottom: 2px solid var(--cinza-borda); padding: 10px 12px; text-align:left;
+  }
+  table.dataTable tbody td {
+    padding: 11px 12px; font-size:13.5px; border-bottom:1px solid var(--cinza-borda);
+  }
+  table.dataTable tbody tr:hover { background: #f4f7fc; }
+  td.valor, th.valor { text-align:right; font-variant-numeric: tabular-nums; }
+  td.valor { color: var(--azul-escuro); font-weight:600; }
+  .dataTables_wrapper { display:flex; flex-direction:column; flex:1; min-height:0; }
+  .dataTables_scrollHead { flex: 0 0 auto; }
+  .dataTables_scrollBody { flex: 1 1 auto !important; overflow-y:auto !important; max-height: none !important; }
+  .dt-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex:0 0 auto; }
+  .dt-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:12px; flex:0 0 auto; font-size:13px; color:#9198a8; }
+  .dataTables_length select { border:1px solid var(--cinza-borda); border-radius:6px; padding:3px 6px; margin:0 4px; }
+  .dataTables_filter input {
+    border:1px solid var(--cinza-borda); border-radius:6px; padding:6px 10px; margin-left:8px; width:160px;
+  }
+  .dataTables_paginate { display:flex; gap:4px; }
+  .dataTables_paginate .paginate_button {
+    padding: 4px 10px; border-radius:6px; cursor:pointer; color: var(--azul);
+  }
+  .dataTables_paginate .paginate_button.current { background: var(--azul-escuro); color:#fff; }
+  .dataTables_paginate .paginate_button.disabled { color:#c3c7d1; cursor:default; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TOTAL DA POPULAÇÃO</h1>
+  <div class="breadcrumb">Territorização &nbsp;/&nbsp; <b>Total da população por bairro</b></div>
+</header>
+<div class="painel">
+  <div class="card mapa-card"><iframe src="mapa_populacao.html"></iframe></div>
+  <div class="card tabela-card">
+    <h2>População por bairro</h2>
+    <table id="tabela-populacao" class="display">
+      <thead><tr><th>Bairro</th><th class="valor">População</th></tr></thead>
+      <tbody>
+      <tr><td>Capela Velha</td><td class="valor" data-order="71990">71.990</td></tr>
+<tr><td>Campina da Barra</td><td class="valor" data-order="37031">37.031</td></tr>
+<tr><td>Costeira</td><td class="valor" data-order="33281">33.281</td></tr>
+<tr><td>Iguaçu</td><td class="valor" data-order="28790">28.790</td></tr>
+<tr><td>Cachoeira</td><td class="valor" data-order="14876">14.876</td></tr>
+<tr><td>Centro</td><td class="valor" data-order="13818">13.818</td></tr>
+<tr><td>Fazenda Velha</td><td class="valor" data-order="12848">12.848</td></tr>
+<tr><td>Estação</td><td class="valor" data-order="11627">11.627</td></tr>
+<tr><td>Thomaz Coelho</td><td class="valor" data-order="9684">9.684</td></tr>
+<tr><td>Tindiquera</td><td class="valor" data-order="8549">8.549</td></tr>
+<tr><td>Boqueirão</td><td class="valor" data-order="6790">6.790</td></tr>
+<tr><td>Passaúna</td><td class="valor" data-order="6343">6.343</td></tr>
+<tr><td>Área Rural</td><td class="valor" data-order="5911">5.911</td></tr>
+<tr><td>Porto das Laranjeiras</td><td class="valor" data-order="4343">4.343</td></tr>
+<tr><td>Sabiá</td><td class="valor" data-order="3884">3.884</td></tr>
+<tr><td>Vila Nova</td><td class="valor" data-order="2129">2.129</td></tr>
+<tr><td>Barigui</td><td class="valor" data-order="1994">1.994</td></tr>
+<tr><td>Guajuvira</td><td class="valor" data-order="1690">1.690</td></tr>
+<tr><td>Chapada</td><td class="valor" data-order="981">981</td></tr>
+<tr><td>São Miguel</td><td class="valor" data-order="541">541</td></tr>
+<tr><td>Rio Verde Abaixo</td><td class="valor" data-order="322">322</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function () {
+  $('#tabela-populacao').DataTable({
+    order: [[1, 'desc']],
+    pageLength: 20,
+    lengthMenu: [10, 20, 50, 100],
+    scrollY: '50vh',
+    scrollCollapse: true,
+    dom: '<"dt-top"lf>rt<"dt-bottom"ip>',
+    language: {
+      search: "Busca:", lengthMenu: "Exibindo _MENU_ registros",
+      info: "Exibindo _START_ a _END_ de _TOTAL_ registros",
+      infoFiltered: "(filtrado de _MAX_ registros totais)",
+      paginate: { previous: "Anterior", next: "Próximo" },
+      zeroRecords: "Nenhum registro encontrado", infoEmpty: "Sem registros"
+    }
+  });
+});
+</script>
+</body>
+</html>
