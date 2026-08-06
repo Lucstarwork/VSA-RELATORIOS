@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Total da população — Vigilância Socioassistencial</title>
+<link rel="stylesheet" href="../assets/design_system.css">
+<style>
+  html,body{height:100%;margin:0;overflow:hidden;background:var(--paper)}
+  .shell{display:flex;flex-direction:column;height:100%}
+  .appbar-wrap{flex:0 0 auto;padding:var(--sp-3) var(--sp-4) 0}
+  .brand-name{font-size:15px}
+  .crumbs-row{flex:0 0 auto;padding:var(--sp-2) var(--sp-4) 0;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}
+  .visao-switch{padding:0;gap:10px;font-size:13px;color:var(--ink-2);font-weight:500}
+  #conteudo{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+  .painel{flex:1 1 auto;display:flex;gap:var(--sp-4);padding:var(--sp-2) var(--sp-4) var(--sp-4);overflow:hidden;min-height:0}
+  .mapa-card{flex:1 1 55%;padding:0;display:flex;flex-direction:column;overflow:hidden}
+  .mapa-card iframe{width:100%;flex:1;border:0;display:block;border-radius:var(--radius-md)}
+  .tabela-card{flex:1 1 45%;padding:0;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+  /* A tabela de CRAS tem 6 colunas -- precisa de mais largura que a de
+     bairro (2 colunas) pra não estourar em scroll horizontal. */
+  #painel-cras .mapa-card{flex:1 1 58%}
+  #painel-cras .tabela-card{flex:1 1 42%}
+  .tabela-head{padding:var(--sp-3) var(--sp-5) 0}
+  .tabela-eb{font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+  .tabela-titulo{font-family:var(--font-serif);font-size:17px;font-weight:600;margin:2px 0 0}
+  .dtable-wrap{flex:1 1 auto;overflow:auto;margin:var(--sp-3) var(--sp-5);border-radius:var(--radius-md)}
+  .dtable{font-size:13px}
+  .dtable th,.dtable td{padding:7px 10px;white-space:nowrap}
+  /* Override do design system: valores centralizados na coluna, em vez de
+     colados na direita (fica mais legível com colunas largas). */
+  .dtable .num,.dtable th.num{text-align:center}
+  .dtable th[data-sort]{cursor:pointer;user-select:none}
+  .dtable th[data-sort] i{font-size:12px;margin-left:4px;color:var(--ink-3);transition:transform var(--dur-fast)}
+  .dtable th.sort-desc i{transform:rotate(180deg)}
+  .dtable th.sort-asc i,.dtable th.sort-desc i{color:var(--primary)}
+  .contador{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);padding:0 var(--sp-5) var(--sp-3);flex:0 0 auto}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <div class="appbar-wrap">
+    <header class="appbar">
+      <div class="appbar-left">
+        <img class="brand-crest crest-color" src="../assets/brasao-completo.png" alt="Brasão de Araucária">
+        <img class="brand-crest crest-neg" src="../assets/brasao-negativo.png" alt="Brasão de Araucária">
+        <div>
+          <div class="brand-name">Vigilância Socioassistencial</div>
+          <div class="brand-sub">TERRITÓRIO &amp; POPULAÇÃO</div>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <nav class="crumbs-row" aria-label="Trilha de navegação">
+    <span class="crumbs">
+      <span>Territorização</span>
+      <i class="ph ph-caret-right sep" aria-hidden="true"></i>
+      <span class="cur" id="breadcrumb-atual" aria-current="page">Total da população por CRAS</span>
+    </span>
+    <label class="opt-row visao-switch">
+      <input type="checkbox" id="switchVisao" checked>
+      <span class="switch"></span>
+      <span id="switchLabel">Por CRAS</span>
+    </label>
+  </nav>
+
+  <main id="conteudo">
+  <div class="painel" id="painel-bairro" style="display:none">
+    <div class="card mapa-card"><iframe data-src="mapa_populacao.html" title="Mapa de população por bairro"></iframe></div>
+    <div class="card tabela-card">
+      <div class="tabela-head">
+        <div class="tabela-eb">Territorização</div>
+        <h2 class="tabela-titulo">População por bairro</h2>
+      </div>
+      <div class="dtable-wrap">
+        <table class="dtable" id="tabela-populacao">
+          <thead><tr>
+            <th data-sort="text">Bairro</th>
+            <th class="num" data-sort="num" data-sort-dir="desc">População<i class="ph ph-caret-down"></i></th>
+          </tr></thead>
+          <tbody>
+          <tr><td>Capela Velha</td><td class="num" data-order="71990">71.990</td></tr>
+<tr><td>Campina da Barra</td><td class="num" data-order="37031">37.031</td></tr>
+<tr><td>Costeira</td><td class="num" data-order="33281">33.281</td></tr>
+<tr><td>Iguaçu</td><td class="num" data-order="28790">28.790</td></tr>
+<tr><td>Cachoeira</td><td class="num" data-order="14876">14.876</td></tr>
+<tr><td>Centro</td><td class="num" data-order="13818">13.818</td></tr>
+<tr><td>Fazenda Velha</td><td class="num" data-order="12848">12.848</td></tr>
+<tr><td>Estação</td><td class="num" data-order="11627">11.627</td></tr>
+<tr><td>Thomaz Coelho</td><td class="num" data-order="9684">9.684</td></tr>
+<tr><td>Tindiquera</td><td class="num" data-order="8549">8.549</td></tr>
+<tr><td>Boqueirão</td><td class="num" data-order="6790">6.790</td></tr>
+<tr><td>Passaúna</td><td class="num" data-order="6343">6.343</td></tr>
+<tr><td>Área Rural</td><td class="num" data-order="5911">5.911</td></tr>
+<tr><td>Porto das Laranjeiras</td><td class="num" data-order="4343">4.343</td></tr>
+<tr><td>Sabiá</td><td class="num" data-order="3884">3.884</td></tr>
+<tr><td>Vila Nova</td><td class="num" data-order="2129">2.129</td></tr>
+<tr><td>Barigui</td><td class="num" data-order="1994">1.994</td></tr>
+<tr><td>Guajuvira</td><td class="num" data-order="1690">1.690</td></tr>
+<tr><td>Chapada</td><td class="num" data-order="981">981</td></tr>
+<tr><td>São Miguel</td><td class="num" data-order="541">541</td></tr>
+<tr><td>Rio Verde Abaixo</td><td class="num" data-order="322">322</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="contador" data-contador-de="tabela-populacao"></div>
+    </div>
+  </div>
+
+  <div class="painel" id="painel-cras">
+    <div class="card mapa-card"><iframe src="mapa_populacao_cras.html" title="Mapa de população por CRAS"></iframe></div>
+    <div class="card tabela-card">
+      <div class="tabela-head">
+        <div class="tabela-eb">Territorização</div>
+        <h2 class="tabela-titulo">População por CRAS</h2>
+      </div>
+      <div class="dtable-wrap">
+        <table class="dtable" id="tabela-cras">
+          <thead><tr>
+            <th data-sort="text">CRAS</th>
+            <th class="num" data-sort="num" data-sort-dir="desc">Pop. geral<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num">CadÚnico<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num">Cobertura<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num">Extrema pobreza<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num">Bolsa Família<i class="ph ph-caret-down"></i></th>
+          </tr></thead>
+          <tbody>
+          <tr><td>Boqueirão</td><td class="num" data-order="19605">19.605</td><td class="num" data-order="4946">4.946</td><td class="num" data-order="25.2">25,2%</td><td class="num" data-order="28.6">28,6%</td><td class="num" data-order="34.3">34,3%</td></tr>
+<tr><td>Centro</td><td class="num" data-order="47038">47.038</td><td class="num" data-order="11018">11.018</td><td class="num" data-order="23.4">23,4%</td><td class="num" data-order="27.3">27,3%</td><td class="num" data-order="32.9">32,9%</td></tr>
+<tr><td>Costeira</td><td class="num" data-order="62071">62.071</td><td class="num" data-order="8170">8.170</td><td class="num" data-order="13.2">13,2%</td><td class="num" data-order="26.1">26,1%</td><td class="num" data-order="32.4">32,4%</td></tr>
+<tr><td>Fazenda Velha</td><td class="num" data-order="25456">25.456</td><td class="num" data-order="4230">4.230</td><td class="num" data-order="16.6">16,6%</td><td class="num" data-order="23.8">23,8%</td><td class="num" data-order="29.9">29,9%</td></tr>
+<tr><td>Thomaz Coelho</td><td class="num" data-order="12219">12.219</td><td class="num" data-order="2520">2.520</td><td class="num" data-order="20.6">20,6%</td><td class="num" data-order="21.5">21,5%</td><td class="num" data-order="26.5">26,5%</td></tr>
+<tr><td>Tupy</td><td class="num" data-order="37031">37.031</td><td class="num" data-order="8980">8.980</td><td class="num" data-order="24.2">24,2%</td><td class="num" data-order="25.5">25,5%</td><td class="num" data-order="31.9">31,9%</td></tr>
+<tr><td>Califórnia</td><td class="num" data-order="30099">30.099</td><td class="num" data-order="7552">7.552</td><td class="num" data-order="25.1">25,1%</td><td class="num" data-order="40.3">40,3%</td><td class="num" data-order="47.2">47,2%</td></tr>
+<tr><td>Industrial</td><td class="num" data-order="41891">41.891</td><td class="num" data-order="10836">10.836</td><td class="num" data-order="25.9">25,9%</td><td class="num" data-order="29.4">29,4%</td><td class="num" data-order="36.5">36,5%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="contador" data-contador-de="tabela-cras"></div>
+    </div>
+  </div>
+  </main>
+</div>
+
+<script>
+/* ---- Switch de visão: CRAS (padrão) <-> Bairro ---- */
+var switchVisao = document.getElementById('switchVisao');
+function aplicarVisao(mostrarCras) {
+  document.getElementById('painel-cras').style.display = mostrarCras ? '' : 'none';
+  document.getElementById('painel-bairro').style.display = mostrarCras ? 'none' : '';
+  document.getElementById('switchLabel').textContent = mostrarCras ? 'Por CRAS' : 'Por bairro';
+  document.getElementById('breadcrumb-atual').textContent =
+    mostrarCras ? 'Total da população por CRAS' : 'Total da população por bairro';
+
+  var painelAtivo = mostrarCras ? 'painel-cras' : 'painel-bairro';
+  var iframeAtivo = document.querySelector('#' + painelAtivo + ' iframe');
+  // O iframe só recebe o src (e o Leaflet lá dentro só mede o tamanho do
+  // container) depois que o painel já está visível -- senão o mapa mede um
+  // container com display:none (tamanho zero) e fica com o viewport quebrado,
+  // mostrando só os controles.
+  if (!iframeAtivo.getAttribute('src')) {
+    iframeAtivo.setAttribute('src', iframeAtivo.dataset.src);
+  } else {
+    setTimeout(function () { iframeAtivo.contentWindow.dispatchEvent(new Event('resize')); }, 50);
+  }
+}
+switchVisao.addEventListener('change', function () { aplicarVisao(switchVisao.checked); });
+
+/* ---- Tabela: ordenação por coluna + busca (substitui DataTables por algo
+   leve e alinhado ao componente .dtable do Design System) ---- */
+function ativarTabela(idTabela) {
+  var tabela = document.getElementById(idTabela);
+  var corpo = tabela.querySelector('tbody');
+  var contador = document.querySelector('[data-contador-de="' + idTabela + '"]');
+
+  function atualizarContador() {
+    contador.textContent = 'Exibindo ' + corpo.querySelectorAll('tr').length + ' registros';
+  }
+
+  tabela.querySelectorAll('th[data-sort]').forEach(function (th) {
+    th.addEventListener('click', function () {
+      var tipo = th.dataset.sort;
+      var indice = Array.prototype.indexOf.call(th.parentElement.children, th);
+      var atual = th.dataset.sortDir === 'asc' ? 'asc' : (th.dataset.sortDir === 'desc' ? 'desc' : null);
+      var proximo = atual === 'desc' ? 'asc' : 'desc';
+
+      tabela.querySelectorAll('th').forEach(function (outro) {
+        if (outro !== th) { outro.classList.remove('sort-asc', 'sort-desc'); delete outro.dataset.sortDir; }
+      });
+      th.dataset.sortDir = proximo;
+      th.classList.toggle('sort-asc', proximo === 'asc');
+      th.classList.toggle('sort-desc', proximo === 'desc');
+
+      var linhas = Array.prototype.slice.call(corpo.querySelectorAll('tr'));
+      linhas.sort(function (a, b) {
+        var celA = a.children[indice], celB = b.children[indice];
+        var valA = tipo === 'num' ? parseFloat(celA.dataset.order) : celA.textContent.trim().toLowerCase();
+        var valB = tipo === 'num' ? parseFloat(celB.dataset.order) : celB.textContent.trim().toLowerCase();
+        if (valA < valB) return proximo === 'asc' ? -1 : 1;
+        if (valA > valB) return proximo === 'asc' ? 1 : -1;
+        return 0;
+      });
+      linhas.forEach(function (linha) { corpo.appendChild(linha); });
+    });
+  });
+
+  // Ordenação inicial: coluna com data-sort-dir já marcada no HTML.
+  var thInicial = tabela.querySelector('th[data-sort-dir]');
+  if (thInicial) thInicial.click();
+  atualizarContador();
+}
+ativarTabela('tabela-populacao');
+ativarTabela('tabela-cras');
+</script>
+</body>
+</html>
