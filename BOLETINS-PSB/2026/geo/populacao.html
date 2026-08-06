@@ -19,14 +19,17 @@
   .tabela-card{flex:1 1 45%;padding:0;display:flex;flex-direction:column;overflow:hidden;min-width:0}
   /* A tabela de CRAS tem 6 colunas -- precisa de mais largura que a de
      bairro (2 colunas) pra não estourar em scroll horizontal. */
-  #painel-cras .mapa-card{flex:1 1 42%}
-  #painel-cras .tabela-card{flex:1 1 58%}
+  #painel-cras .mapa-card{flex:1 1 58%}
+  #painel-cras .tabela-card{flex:1 1 42%}
   .tabela-head{padding:var(--sp-3) var(--sp-5) 0}
   .tabela-eb{font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
   .tabela-titulo{font-family:var(--font-serif);font-size:17px;font-weight:600;margin:2px 0 0}
   .dtable-wrap{flex:1 1 auto;overflow:auto;margin:var(--sp-3) var(--sp-5);border-radius:var(--radius-md)}
   .dtable{font-size:13px}
   .dtable th,.dtable td{padding:7px 10px;white-space:nowrap}
+  /* Override do design system: valores centralizados na coluna, em vez de
+     colados na direita (fica mais legível com colunas largas). */
+  .dtable .num,.dtable th.num{text-align:center}
   .dtable th[data-sort]{cursor:pointer;user-select:none}
   .dtable th[data-sort] i{font-size:12px;margin-left:4px;color:var(--ink-3);transition:transform var(--dur-fast)}
   .dtable th.sort-desc i{transform:rotate(180deg)}
