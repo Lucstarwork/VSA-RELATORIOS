@@ -749,9 +749,9 @@ kbd,
 }
 
 .brand-crest {
-  width: 55px;
+  width: 46px;
   height: auto;
-  flex: 0 0 46px;
+  flex: 0 0 55px;
   display: block
 }
 
