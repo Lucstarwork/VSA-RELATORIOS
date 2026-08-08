@@ -6,490 +6,440 @@
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>Relatório Semanal de Atendimentos — Operação Inverno — Araucária</title>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet'>
-<link href='https://unpkg.com/@phosphor-icons/web@2.1.1/src/thin/style.css' rel='stylesheet'>
-<link href='https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap' rel='stylesheet'>
+<link rel='preconnect' href='https://fonts.googleapis.com'>
+<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+<link href='https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
 <style>
-  @import url('https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css');
-
   :root{
-    --gray-90: #1b1b1b;
-    --gray-80: #333333;
-    --gray-70: #555555;
-    --gray-60: #636363;
-    --gray-50: #757575;
-    --gray-40: #888888;
-    --gray-30: #adadad;
-    --gray-20: #cccccc;
-    --gray-10: #e6e6e6;
-    --gray-5: #f0f0f0;
-    --gray-4: #f3f3f3;
-    --gray-2: #f8f8f8;
-    --pure-0: #ffffff;
-
-    --brand-primary: #007044;
-    --brand-primary-dark: #005a37;
-    --brand-primary-darker: #00492c;
-    --brand-primary-a08: rgba(0,112,68,.08);
-    --brand-primary-a16: rgba(0,112,68,.16);
-    --brand-secondary: #005484;
-    --brand-accent: #FDB92E;
-
-    --focus: #c2850c;
-    --feedback-danger: #e52207;
-    --feedback-success: #168821;
-    --feedback-warning: #ffcd07;
-    --feedback-warning-text: #5c4a00;
-    --feedback-info: #155bcb;
-
-    --fs-down-01: 12px;
-    --fs-base: 14px;
-    --fs-up-01: 16.8px;
-    --fs-up-02: 20.2px;
-    --fs-up-03: 24.2px;
-
-    --lh-low: 1.15;
-    --lh-medium: 1.45;
-
-    --rounder-sm: 4px;
-    --rounder-md: 8px;
-    --rounder-pill: 999em;
-    --shadow-sm: 0 1px 6px rgba(0,0,0,.16);
-    --shadow-md: 0 3px 6px rgba(0,0,0,.16);
-    --shadow-lg: 0 6px 6px rgba(0,0,0,.16);
-
-    --font-family: 'Rawline', 'Raleway', sans-serif;
-    --ease: cubic-bezier(.25,.1,.25,1);
-    --topbar-h: 58px;
+    --brand:#007044; --brand-deep:#00492c; --blue:#155bcb; --gold:#a9740a;
+    --focus:#c2850c;
+    --ink:#1a1a17; --ink-2:#3a3a38; --ink-3:#6b6b66;
+    --line:#e2e2dd; --line-2:#ededea;
+    --paper:#fafaf9; --paper-2:#f5f5f3; --card:#ffffff; --grid:#ededea;
+    --pos:#127a1e; --neg:#c42b1c;
+    --serif:"Spectral", Georgia, "Times New Roman", serif;
+    --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  ::selection{ background:var(--brand-primary-a16); }
-  html,body{ height:100%; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  ::selection{ background:rgba(0,112,68,.16); }
+  html{ scroll-behavior:smooth; }
   body{
-    font-family:var(--font-family);
-    color:var(--gray-80);
-    background:var(--gray-2);
-    font-size:var(--fs-base);
-    line-height:var(--lh-medium);
-    overflow:hidden;
+    background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:14px; line-height:1.5;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
   }
-  ::-webkit-scrollbar{ width:8px; height:8px; }
-  ::-webkit-scrollbar-thumb{ background:var(--gray-30); border-radius:var(--rounder-pill); }
-  ::-webkit-scrollbar-track{ background:var(--gray-5); }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb{ background:#cfcfc9; border-radius:8px; border:2px solid var(--paper); }
+  ::-webkit-scrollbar-track{ background:transparent; }
 
-  @keyframes viewIn{ from{ opacity:0; transform:scale(.98) translateY(6px);} }
-  @keyframes hintFloat{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(5px);} }
-
-  /* ============================================================
-     SHELL — trilho de capítulos + coluna principal (mesma dinâmica
-     do Observatório do CadÚnico: 1 giro de scroll = 1 tela)
-     ============================================================ */
-  .shell{ display:flex; height:100dvh; }
-
-  .rail{ width:72px; flex:0 0 72px; display:flex; align-items:center; justify-content:center; }
-  .rail-track{ position:relative; display:flex; flex-direction:column; gap:14px; }
-  .rail-track::before{
-    content:''; position:absolute; left:50%; top:20px; bottom:20px; width:2px;
-    transform:translateX(-50%); background:var(--gray-10);
+  .viz-root{
+    max-width:1180px; margin:0 auto; padding:0 40px 72px;
+    background:var(--paper);
   }
-  .rail-dot{
-    position:relative; z-index:1; width:40px; height:40px; border-radius:50%;
-    background:var(--pure-0); border:1px solid var(--gray-10); color:var(--gray-50);
-    font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;
-    transition:color .1s var(--ease), border-color .1s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
+  .viz-root :focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+  .mono{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+
+  /* ===== Masthead ===== */
+  .top-rule{ height:5px; background:var(--brand); margin:0 -40px; }
+  header.mast{ display:flex; align-items:center; gap:26px; padding:28px 0 18px; flex-wrap:wrap; }
+  header.mast img.brasao{ height:66px; width:auto; display:block; }
+  .mast .div{ width:1px; align-self:stretch; background:var(--line); }
+  .mast .m-txt{ flex:1 1 340px; min-width:0; }
+  .kicker{
+    font-family:var(--mono); font-size:11px; font-weight:600;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--brand);
   }
-  .rail-dot:hover{ border-color:var(--brand-primary); color:var(--brand-primary); }
-  .rail-dot:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
-  .rail-dot.ativo{ background:var(--brand-primary); border-color:var(--brand-primary); color:#fff; box-shadow:0 0 0 4px var(--brand-primary-a16); }
-  .rail-tip{
-    position:absolute; left:calc(100% + 12px); top:50%; transform:translate(-4px,-50%);
-    background:var(--gray-90); color:#fff; font-size:12px; font-weight:500; white-space:nowrap;
-    padding:6px 12px; border-radius:var(--rounder-sm); opacity:0; visibility:hidden; pointer-events:none;
-    z-index:60; transition:opacity .15s var(--ease), transform .15s var(--ease), visibility .15s;
+  .mast h1{
+    font-family:var(--serif); font-weight:600; font-size:33px; line-height:1.05;
+    letter-spacing:-.015em; margin:6px 0 6px; color:var(--ink);
   }
-  .rail-tip b{ font-weight:700; color:var(--gray-30); margin-right:6px; font-variant-numeric:tabular-nums; }
-  .rail-dot:hover .rail-tip, .rail-dot:focus-visible .rail-tip{ opacity:1; visibility:visible; transform:translate(0,-50%); }
-
-  .main{ flex:1; min-width:0; display:flex; flex-direction:column; position:relative; }
-
-  .progresso{ height:3px; flex:0 0 3px; background:var(--gray-5); position:relative; z-index:5; }
-  .progresso i{ position:absolute; inset:0 auto 0 0; width:0; background:var(--brand-primary); transition:width .7s var(--ease); }
-
-  .topbar{ height:var(--topbar-h); flex:0 0 var(--topbar-h); display:flex; align-items:center; gap:14px; padding:0 24px 0 28px; border-bottom:1px solid var(--gray-10); }
-  .tb-brand{ margin-right:auto; display:flex; align-items:center; gap:12px; }
-  .tb-brand img{ height:38px; width:auto; display:block; }
-  .tb-credito{ display:flex; flex-direction:column; justify-content:center; line-height:1.25; font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--gray-50); }
-  .tb-credito b{ display:flex; align-items:center; gap:6px; font-size:16px; font-weight:800; letter-spacing:-.01em; text-transform:none; color:var(--gray-90); }
-  .tb-credito b i{ font-size:16px; color:var(--brand-secondary); }
-  .tb-ref{ font-size:12px; color:var(--gray-60); text-align:right; }
-  .tb-ref strong{ color:var(--gray-80); font-weight:700; }
-  .tb-fs{
-    width:32px; height:32px; border:0; border-radius:var(--rounder-sm); background:transparent;
-    color:var(--gray-50); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;
-    transition:background .1s var(--ease), color .1s var(--ease);
+  .mast h1 .h1-sub{ display:block; font-size:20px; font-weight:500; color:var(--brand-deep); letter-spacing:0; }
+  .mast .org{ font-size:12.5px; color:var(--ink-2); }
+  .colophon{ display:grid; grid-template-columns:auto auto; gap:3px 16px; align-self:flex-start; padding-top:4px; }
+  .colophon dt{ font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); text-align:right; align-self:center; }
+  .colophon dd{ margin:0; font-family:var(--mono); font-size:12px; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .mast-foot{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:16px;
+    border-top:2px solid var(--ink); border-bottom:1px solid var(--line);
+    padding:5px 0 6px; margin-bottom:30px;
   }
-  .tb-fs:hover{ background:var(--gray-4); color:var(--gray-80); }
-  .tb-fs:focus-visible{ outline:none; box-shadow:0 0 0 2px var(--focus); }
+  .mast-foot .tag{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); }
 
-  /* ===== Deck — telas empilhadas; 1 scroll = 1 tela ===== */
-  .deck{ flex:1; min-height:0; overflow:hidden; position:relative; }
-  .deck-track{ height:100%; transition:transform .7s var(--ease); will-change:transform; }
-  @media (prefers-reduced-motion:reduce){ .deck-track{ transition:none; } .progresso i{ transition:none; } }
+  /* ===== Lede / síntese ===== */
+  .lead{ display:grid; grid-template-columns:1.2fr 1fr; gap:40px; margin-bottom:40px; }
+  .lead .abstract{ font-family:var(--serif); font-size:16.5px; line-height:1.62; color:var(--ink); }
+  .lead .abstract .drop{ float:left; font-family:var(--serif); font-weight:600; font-size:54px; line-height:.78; padding:6px 12px 0 0; color:var(--brand); }
+  .lead .abstract b{ font-weight:600; }
+  .findings{ display:flex; flex-direction:column; gap:14px; }
+  .find{ display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:baseline; padding-bottom:14px; border-bottom:1px solid var(--line-2); }
+  .find:last-child{ border-bottom:none; padding-bottom:0; }
+  .find .fig{ font-family:var(--mono); font-size:23px; font-weight:500; color:var(--brand); line-height:1; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .find .txt{ font-size:12.5px; line-height:1.42; color:var(--ink-2); }
+  .find .txt b{ color:var(--ink); font-weight:600; }
 
-  .tela{ height:100%; padding:20px 32px 26px; display:flex; flex-direction:column; overflow:hidden; }
-
-  /* ===== Cabeçalho de seção editorial (eyebrow + régua fina) ===== */
-  .opi-sec-head{ margin:0 0 14px; flex:none; }
-  .opi-sec-head-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-  .opi-eyebrow{ font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--gray-50); }
-  .opi-sec-rule{ height:0; border-top:1px solid var(--gray-10); margin-top:8px; }
-  .opi-sec-meta{ font-size:var(--fs-up-01); color:var(--gray-90); font-weight:700; margin-top:6px; }
-
-  .opi-sec-head-actions{ display:flex; align-items:center; gap:8px; }
-  .opi-semana-select{
-    font-family:var(--font-family); font-size:13px; font-weight:600;
-    color:var(--brand-primary); background:var(--pure-0);
-    border:1px solid var(--gray-20); border-radius:var(--rounder-sm);
-    padding:5px 10px; cursor:pointer;
+  /* ===== Cabeçalhos de seção ===== */
+  .block{ margin-bottom:44px; }
+  .sec-hd{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; border-bottom:1px solid var(--ink); padding-bottom:9px; margin-bottom:16px; flex-wrap:wrap; }
+  .sec-eyebrow{ display:flex; align-items:baseline; gap:12px; margin:0 0 3px; }
+  .sec-eyebrow .num{ font-family:var(--mono); font-size:12px; font-weight:500; color:var(--brand); letter-spacing:.05em; }
+  .sec-eyebrow .lbl{ font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-3); }
+  .sec-title{ font-family:var(--serif); font-weight:600; font-size:20px; letter-spacing:-.01em; color:var(--ink); margin:0; }
+  .sec-hd-r{ display:flex; align-items:center; gap:14px; padding-bottom:2px; }
+  .sec-meta{ font-family:var(--mono); font-size:10.5px; color:var(--ink-3); letter-spacing:.04em; white-space:nowrap; }
+  .wk-select{
+    font-family:var(--mono); font-size:12px; font-weight:500; color:var(--brand);
+    background:var(--card); border:1px solid var(--line); border-radius:6px;
+    padding:6px 10px; cursor:pointer;
   }
-  .opi-semana-select:focus{ outline:2px solid var(--focus); outline-offset:1px; }
   #rotuloSemanaImpressa{ display:none; }
 
-  /* ===== Cards KPI (stat-tile elevado — identidade própria da Operação
-     Inverno, distinta do hairline plano do Observatório/Comida Boa) ===== */
-  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:14px; flex:none; }
-  .kpi-card{
-    background:var(--pure-0); border-radius:16px;
-    padding:16px 18px; box-shadow:var(--shadow-sm);
-    display:flex; flex-direction:column; align-items:flex-start;
-  }
-  .kpi-head{ display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:12px; }
-  .kpi-icon-wrap{
-    width:38px; height:38px; border-radius:50%; flex:none;
-    display:flex; align-items:center; justify-content:center;
-    background:var(--brand-primary-a08); color:var(--brand-primary);
-  }
-  .kpi-icon-wrap i{ font-size:19px; }
-  .kpi-card.warning .kpi-icon-wrap{ background:rgba(92,74,0,.1); color:var(--feedback-warning-text); }
-  .kpi-card.info .kpi-icon-wrap{ background:rgba(21,91,203,.1); color:var(--feedback-info); }
-  .kpi-card.success .kpi-icon-wrap{ background:rgba(22,136,33,.1); color:var(--feedback-success); }
-
-  .kpi-delta{
-    display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:700;
-    padding:3px 9px; border-radius:var(--rounder-pill); font-variant-numeric:tabular-nums;
-  }
+  /* ===== KPIs (grade emoldurada, hairline em todas as direções) ===== */
+  .kpis{ display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .kpi{ background:var(--card); padding:15px 16px 16px; }
+  .kpi .lab{ display:flex; align-items:flex-start; gap:8px; min-height:2.6em; font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); }
+  .kpi .lab .tick{ width:14px; height:3px; border-radius:2px; flex:none; margin-top:5px; }
+  .kpi .lab .fa-solid{ font-size:11px; color:var(--ink-3); cursor:help; }
+  .kpi .val{ font-family:var(--mono); font-size:27px; font-weight:500; margin-top:11px; letter-spacing:-.01em; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1.05; }
+  .kpi-delta{ display:inline-flex; align-items:center; gap:4px; font-family:var(--mono); font-size:11px; font-weight:500; padding:2px 7px; border-radius:3px; margin-top:9px; font-variant-numeric:tabular-nums; }
   .kpi-delta:empty{ display:none; }
-  .kpi-delta.up{ background:rgba(22,136,33,.12); color:var(--feedback-success); }
-  .kpi-delta.down{ background:rgba(229,34,7,.12); color:var(--feedback-danger); }
+  .kpi-delta.up{ color:var(--pos); background:rgba(18,122,30,.10); }
+  .kpi-delta.down{ color:var(--neg); background:rgba(196,43,28,.09); }
+  .kpi .sub{ font-size:10.5px; color:var(--ink-3); margin-top:7px; line-height:1.4; }
+  .kpi .sub b{ font-family:var(--mono); color:var(--ink-2); font-weight:600; }
 
-  .kpi-value{ font-family:var(--font-family); font-size:28px; font-weight:800; color:var(--gray-90); line-height:var(--lh-low); font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
-  .kpi-title{ font-size:11px; color:var(--gray-50); font-weight:700; text-transform:uppercase; letter-spacing:.09em; margin-top:5px; }
-  .kpi-caption{ font-size:11px; color:var(--gray-50); margin-top:6px; }
-  .kpi-extra{
-    align-self:stretch; margin-top:10px;
-    padding-top:8px; border-top:1px solid var(--gray-10);
-    display:flex; align-items:center; gap:6px;
-  }
-  .kpi-contexto{ font-size:12px; color:var(--gray-60); }
-  .kpi-contexto b{ color:var(--brand-primary); }
+  /* ===== Cards de gráfico ===== */
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
+  .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:18px; }
+  .chart-card{ background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px 14px; display:flex; flex-direction:column; min-width:0; }
+  .chart-hd{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line-2); padding-bottom:9px; margin-bottom:6px; }
+  .chart-hd .t{ font-family:var(--serif); font-weight:600; font-size:15px; color:var(--ink); letter-spacing:-.005em; }
+  .chart-hd .m{ font-family:var(--mono); font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); text-align:right; white-space:nowrap; }
+  .chart-note{ font-size:11px; color:var(--ink-3); margin:2px 0 6px; }
+  .chart-body{ position:relative; width:100%; }
+  .grid2 .chart-body{ height:300px; }
+  .grid3 .chart-body{ height:238px; }
+  .anel-legenda{ display:flex; flex-wrap:wrap; gap:6px 14px; margin:4px 0 8px; }
+  .anel-legenda span{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--ink-2); }
+  .anel-legenda i{ width:12px; height:3px; border-radius:2px; flex:none; }
 
-  /* ===== Gráficos ===== */
-  .grafico-linha{ display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:16px; margin-top:16px; flex:1; min-height:0; }
-  .grafico-linha--3{ grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); }
-  .grafico{
-    background:var(--pure-0); border-radius:16px;
-    padding:14px 16px; box-shadow:var(--shadow-sm);
-    display:flex; flex-direction:column; min-height:0;
-  }
-  .grafico-head{ display:flex; align-items:center; gap:8px; margin-bottom:2px; flex:none; }
-  .grafico-head i{ font-size:15px; color:var(--brand-primary); flex:none; }
-  .grafico h3{ font-size:11px; font-weight:700; color:var(--brand-primary); margin:0; text-transform:uppercase; letter-spacing:.09em; }
-  .grafico .nota{ font-size:11px; color:var(--gray-60); margin:0 0 8px 23px; flex:none; }
-  .grafico .corpo{ position:relative; flex:1; min-height:0; }
-  .anel-legenda{ display:flex; gap:14px; margin:0 0 6px 23px; flex:none; }
-  .anel-legenda span{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--gray-60); }
-  .anel-legenda i{ width:8px; height:8px; border-radius:50%; flex:none; }
+  /* ===== Notas de leitura ===== */
+  .notes{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+  .note{ background:var(--paper-2); border:1px solid var(--line); border-left:3px solid var(--brand); border-radius:6px; padding:10px 15px; font-size:13px; color:var(--ink-2); line-height:1.5; }
+  .note b{ color:var(--ink); font-weight:600; }
+  .note:has(> span:empty){ display:none; }
 
-  /* ===== Nota de leitura (insight) ===== */
-  .insight-grupo{ display:flex; flex-direction:column; gap:8px; margin-top:14px; flex:none; }
-  .insight{
-    background:var(--gray-2); border:1px solid var(--gray-10); border-left:4px solid var(--brand-primary);
-    border-radius:var(--rounder-sm); padding:9px 14px;
-    font-size:13px; color:var(--gray-70); line-height:var(--lh-medium);
-    display:flex; gap:10px; align-items:center;
-  }
-  .insight i{ font-size:15px; color:var(--brand-primary); flex:none; }
-  .insight b{ color:var(--brand-primary); font-weight:600; }
+  /* ===== Nota técnica (leitura qualitativa, injetada de arquivo externo) ===== */
+  .nota-tecnica{ background:var(--paper-2); border:1px solid var(--line); border-left:3px solid var(--brand); border-radius:8px; padding:22px 26px; font-family:var(--sans); font-size:14px; line-height:1.68; color:var(--ink-2); }
+  .nota-tecnica > * + *{ margin-top:12px; }
+  .nota-tecnica strong{ color:var(--ink); font-weight:600; }
+  .nota-tecnica h3{ font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:22px; padding-bottom:6px; border-bottom:1px solid var(--line-2); }
+  .nota-tecnica h3:first-child{ margin-top:0; }
+  .nota-tecnica ul{ list-style:none; padding:0; margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+  .nota-tecnica li{ position:relative; padding-left:18px; }
+  .nota-tecnica li::before{ content:''; position:absolute; left:2px; top:10px; width:6px; height:6px; border-radius:1px; background:var(--brand); }
 
-  /* ===== Dica de navegação por scroll ===== */
-  .scroll-hint{
-    position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:10;
-    display:flex; align-items:center; gap:8px; font-size:11px; font-weight:600; letter-spacing:.04em;
-    text-transform:uppercase; color:var(--gray-50); background:var(--pure-0); border:1px solid var(--gray-10);
-    border-radius:var(--rounder-pill); padding:6px 14px; box-shadow:var(--shadow-sm);
-    transition:opacity .4s var(--ease); pointer-events:none;
-  }
-  .scroll-hint i{ animation:hintFloat 1.6s var(--ease) infinite; color:var(--brand-primary); }
-  .scroll-hint.oculta{ opacity:0; }
+  /* ===== Conexão com a rede (cruzamento com a base municipal) ===== */
+  .conexao-split{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-2); border:1px solid var(--line-2); border-radius:6px; overflow:hidden; margin-top:6px; }
+  @media (max-width:560px){ .conexao-split{ grid-template-columns:1fr; } }
+  .conexao-split .cx{ background:var(--card); padding:16px 8px 12px; text-align:center; }
+  .conexao-split .cx-val{ font-family:var(--mono); font-size:30px; font-weight:500; color:var(--ink); line-height:1; font-variant-numeric:tabular-nums; }
+  .conexao-split .cx-pct{ font-family:var(--mono); font-size:13px; font-weight:600; color:var(--brand); margin-top:5px; }
+  .conexao-split .cx.destaque .cx-pct{ color:var(--gold); }
+  .conexao-split .cx-lab{ font-size:11px; color:var(--ink-3); margin-top:7px; line-height:1.35; }
+  #sec-beneficios .chart-body{ height:300px; }
 
-  @media (max-width:1120px){
-    .tela{ height:auto; min-height:100%; padding-left:28px; }
-    .deck{ overflow-y:auto; }
-    .deck-track{ transform:none !important; }
+  /* ===== Rodapé ===== */
+  .foot{ font-size:11px; line-height:1.6; color:var(--ink-3); margin-top:48px; padding-top:16px; border-top:2px solid var(--ink); display:grid; grid-template-columns:1fr auto; gap:24px; align-items:end; }
+  .foot .sig{ text-align:right; }
+  .foot .sig .nm{ font-family:var(--serif); font-size:13px; color:var(--ink); font-weight:600; }
+
+  @media (max-width:900px){
+    .lead{ grid-template-columns:1fr; gap:26px; }
+    .kpis{ grid-template-columns:repeat(3,1fr); }
+    .grid2, .grid3{ grid-template-columns:1fr; }
+    .colophon{ display:none; }
   }
-  @media (max-width:860px){
-    .rail{ display:none; }
-    .kpi-grid{ grid-template-columns:repeat(2,1fr); }
+  @media (max-width:560px){
+    .viz-root{ padding:0 20px 56px; }
+    .top-rule, .mast-foot{ margin-left:-20px; margin-right:-20px; }
+    .kpis{ grid-template-columns:repeat(2,1fr); }
+    .mast h1{ font-size:26px; }
+    .foot{ grid-template-columns:1fr; }
+    .foot .sig{ text-align:left; }
+  }
+
+  @media print{
+    body{ background:#fff; }
+    .viz-root{ max-width:none; padding:0 10mm 12mm; }
+    .top-rule{ margin:0; }
+    .block, .chart-card, .kpis, .lead, .find{ break-inside:avoid; }
+    .wk-select{ display:none; }
   }
 </style>
 </head>
 <body>
 
-<div class='shell'>
+<div class='viz-root' id='app'>
+  <div class='top-rule'></div>
 
-  <nav class='rail' aria-label='Telas do relatório'>
-    <div class='rail-track' id='railTrack'></div>
-  </nav>
+  <header class='mast'>
+    <img class='brasao' src='Design/brasao.png' alt='Prefeitura de Araucária'>
+    <div class='div'></div>
+    <div class='m-txt'>
+      <div class='kicker'>Vigilância Socioassistencial · Araucária-PR</div>
+      <h1>Relatório Semanal de Atendimentos<span class='h1-sub'>Operação Inverno</span></h1>
+      <div class='org'>Secretaria Municipal de Assistência Social — Casa de Passagem</div>
+    </div>
+    <dl class='colophon'>
+      <dt>Boletim</dt><dd id='colofNumero'>—</dd>
+      <dt>Período</dt><dd id='colofPeriodo'>—</dd>
+      <dt>Emissão</dt><dd id='dataEmissao'>—</dd>
+    </dl>
+  </header>
+  <div class='mast-foot'>
+    <span class='tag'>Documento técnico · uso interno</span>
+    <span class='tag'>Prefeitura Municipal de Araucária</span>
+  </div>
 
-  <div class='main'>
+  <div class='lead'>
+    <p class='abstract'>
+      <span class='drop'>A</span> Operação Inverno mantém, na Casa de Passagem, o acolhimento
+      e o atendimento à população em situação de rua durante o período de frio intenso. Este
+      boletim consolida o volume de atendimentos, o perfil das pessoas acolhidas e a ocupação
+      de pernoites — subsídio para a gestão da rede de proteção social e para o
+      redirecionamento das equipes na ponta.
+    </p>
+    <div class='findings'>
+      <div class='find'><span class='fig' id='findTotal'>—</span><span class='txt'><b>atendimentos</b> acumulados desde o início da operação.</span></div>
+      <div class='find'><span class='fig' id='findPessoas'>—</span><span class='txt'><b>pessoas únicas</b> acolhidas no período de referência.</span></div>
+      <div class='find'><span class='fig' id='findDias'>—</span><span class='txt'>dias corridos de operação até a data do boletim.</span></div>
+    </div>
+  </div>
 
-    <div class='progresso' role='presentation'><i id='progFill'></i></div>
-
-    <header class='topbar'>
-      <div class='tb-brand'>
-        <img src="Design/brasao.png" alt="Prefeitura de Araucária">
-        <span class='tb-credito'>Vigilância Socioassistencial<b><i class='ph-thin ph-snowflake' aria-hidden='true'></i>Operação Inverno</b></span>
+  <section class='block' aria-label='Semana'>
+    <div class='sec-hd'>
+      <div>
+        <div class='sec-eyebrow'><span class='num'>01</span><span class='lbl'>Semana</span></div>
+        <h2 class='sec-title'>Panorama da semana</h2>
       </div>
-      <span class='tb-ref'>Atualizado em<br><strong id='dataEmissao'></strong></span>
-      <button class='tb-fs' id='btnFs' aria-label='Tela cheia' title='Tela cheia (F11)'>
-        <i class='fa-solid fa-expand'></i>
-      </button>
-    </header>
+      <div class='sec-hd-r'>
+        <select id='seletorSemana' class='wk-select' aria-label='Selecionar semana'></select>
+        <span class='sec-meta' id='tituloSemanaAtual'></span>
+      </div>
+    </div>
+    <span id='rotuloSemanaImpressa'></span>
 
-    <div class='deck' id='deck'>
-      <div class='deck-track' id='deckTrack'>
+    <div class='kpis'>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--brand)'></span>Atendimentos</div>
+              <div class='val' id='valTotalSemana'></div>
+              <span class='kpi-delta' id='deltaTotalSemana'></span>
+              <div class='sub' id='captionTotalSemana'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--ink-3)'></span>Pessoas únicas</div>
+              <div class='val' id='valPessoasUnicasSemana'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--pos)'></span>Público inédito <i class='fa-solid fa-circle-info' title='Pessoas que nao participaram de nenhum dia da Operacao Inverno do ano anterior (2025).'></i></div>
+              <div class='val' id='valNovasPessoasSemana'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--blue)'></span>Público recorrente <i class='fa-solid fa-circle-info' title='Pessoas que ja participaram de algum dia da Operacao Inverno do ano anterior (2025).'></i></div>
+              <div class='val' id='valPessoasAntigasSemana'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--gold)'></span>Média diária</div>
+              <div class='val' id='valMediaSemana'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--brand-deep)'></span><span id='rotuloPernoites'>Pernoites</span></div>
+              <div class='val' id='valPernoites'></div>
+              <div class='sub'><b id='valPessoasPernoite'></b> pessoas · <b id='tagMediaPernoite'></b>/pess.</div>
+            </div>
+    </div>
 
-        <section class='tela' id='tela-0' role='region' aria-label='Semana atual'>
-
-          <div class='opi-sec-head'>
-            <div class='opi-sec-head-row'>
-              <span class='opi-eyebrow'>Selecione o período</span>
-              <div class='opi-sec-head-actions'>
-                <select id='seletorSemana' class='opi-semana-select' aria-label='Selecionar semana'></select>
-                <span id='rotuloSemanaImpressa'></span>
-              </div>
-            </div>
-            <div class='opi-sec-rule'></div>
-            <div class='opi-sec-meta' id='tituloSemanaAtual'></div>
-          </div>
-
-          <div class='kpi-grid'>
-            <div class='kpi-card'>
-              <div class='kpi-head'>
-                <span class='kpi-icon-wrap'><i class='ph-thin ph-users' aria-hidden='true'></i></span>
-                <span class='kpi-delta' id='deltaTotalSemana'></span>
-              </div>
-              <div class='kpi-value' id='valTotalSemana'></div>
-              <div class='kpi-title'>Atendimentos</div>
-              <div class='kpi-caption' id='captionTotalSemana'></div>
-            </div>
-            <div class='kpi-card'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-fingerprint' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valPessoasUnicasSemana'></div>
-              <div class='kpi-title'>Pessoas Únicas</div>
-            </div>
-            <div class='kpi-card success'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-user-plus' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valNovasPessoasSemana'></div>
-              <div class='kpi-title'>Público Inédito <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que não participaram em nenhum dia da operação inverno do ano anterior (2025).'></i></div>
-            </div>
-            <div class='kpi-card info'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-clock-clockwise' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valPessoasAntigasSemana'></div>
-              <div class='kpi-title'>Público Recorrente <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que já participaram em algum dia da operação inverno do ano anterior (2025).'></i></div>
-            </div>
-            <div class='kpi-card'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-gauge' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valMediaSemana'></div>
-              <div class='kpi-title'>Média diária</div>
-            </div>
-            <div class='kpi-card'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-bed' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valPernoites'></div>
-              <div class='kpi-title' id='rotuloPernoites'>Pernoites</div>
-              <div class='kpi-extra'>
-                <div class='kpi-contexto'><b id='valPessoasPernoite'></b> pessoas · <b id='tagMediaPernoite'></b>/pess.</div>
-              </div>
-            </div>
-          </div>
-
-          <div class='grafico-linha'>
-            <div class='grafico'>
-              <div class='grafico-head'>
-                <i class='ph-thin ph-chart-bar' aria-hidden='true'></i>
-                <h3>Comparativo Semanal</h3>
-              </div>
-              <div class='nota'>Semanas Anteriores</div>
-              <div class='corpo'><canvas id='chartComparativoSemanas'></canvas></div>
-            </div>
-            <div class='grafico'>
-              <div class='grafico-head'>
-                <i class='ph-thin ph-trend-up' aria-hidden='true'></i>
-                <h3>Tendência Diária</h3>
-              </div>
-              <div class='nota'>Atendimentos e Pernoites na Semana</div>
-              <div class='corpo'><canvas id='chartTendenciaDiaria'></canvas></div>
-            </div>
-          </div>
-
-          <div class='insight-grupo'>
-            <div class='insight'>
-              <i class='ph-thin ph-lightbulb' aria-hidden='true'></i>
-              <span id='textoInsightSemanal'></span>
-            </div>
-            <div class='insight'>
-              <i class='ph-thin ph-bed' aria-hidden='true'></i>
-              <span id='textoPernoitesFrequencia'>Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.</span>
-            </div>
-          </div>
-
-        </section>
-
-        <section class='tela' id='tela-1' role='region' aria-label='Base total'>
-
-          <div class='opi-sec-head'>
-            <div class='opi-sec-head-row'>
-              <span class='opi-eyebrow'>Acumulado desde o início da operação</span>
-            </div>
-            <div class='opi-sec-rule'></div>
-            <div class='opi-sec-meta' id='tituloAcumulado'></div>
-          </div>
-
-          <div class='kpi-grid'>
-            <div class='kpi-card'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-users' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valTotalAcumulado'></div>
-              <div class='kpi-title'>Atend. Total</div>
-            </div>
-            <div class='kpi-card'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-fingerprint' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valPessoasUnicasAcumulado'></div>
-              <div class='kpi-title'>Pessoas Únicas</div>
-            </div>
-            <div class='kpi-card success'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-user-plus' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valNovasPessoas'></div>
-              <div class='kpi-title'>Público Inédito <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que não participaram em nenhum dia da operação inverno do ano anterior (2025).'></i></div>
-            </div>
-            <div class='kpi-card info'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-clock-clockwise' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valPessoasAntigas'></div>
-              <div class='kpi-title'>Público Recorrente <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='O valor representa pessoas que já participaram em algum dia da operação inverno do ano anterior (2025).'></i></div>
-            </div>
-            <div class='kpi-card'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-bed' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valPessoasComPernoiteTotal'></div>
-              <div class='kpi-title'>Pess. c/ Pernoite</div>
-            </div>
-            <div class='kpi-card'>
-              <div class='kpi-head'><span class='kpi-icon-wrap'><i class='ph-thin ph-gauge' aria-hidden='true'></i></span></div>
-              <div class='kpi-value' id='valMediaGeral'></div>
-              <div class='kpi-title'>Média Diária</div>
-            </div>
-          </div>
-
-          <div class='grafico-linha grafico-linha--3'>
-            <div class='grafico'>
-              <div class='grafico-head'>
-                <i class='ph-thin ph-chart-bar' aria-hidden='true'></i>
-                <h3>Faixa Etária</h3>
-              </div>
-              <div class='nota'>Total Acumulado</div>
-              <div class='corpo'><canvas id='chartFaixaEtaria'></canvas></div>
-            </div>
-            <div class='grafico'>
-              <div class='grafico-head'>
-                <i class='ph-thin ph-chart-donut' aria-hidden='true'></i>
-                <h3>Sexo &amp; Pernoite</h3>
-              </div>
-              <div class='nota'>Anel externo: sexo · Anel interno: com pernoite</div>
-              <div class='anel-legenda' id='legendaSexo'></div>
-              <div class='corpo'><canvas id='chartSexo'></canvas></div>
-            </div>
-            <div class='grafico'>
-              <div class='grafico-head'>
-                <i class='ph-thin ph-users' aria-hidden='true'></i>
-                <h3>Raça/Cor</h3>
-              </div>
-              <div class='nota'>Total Acumulado</div>
-              <div class='corpo'><canvas id='chartRaca'></canvas></div>
-            </div>
-          </div>
-
-          <div class='insight-grupo'>
-            <div class='insight'>
-              <i class='ph-thin ph-lightbulb' aria-hidden='true'></i>
-              <span id='textoInsightTotal'></span>
-            </div>
-            <div class='insight'>
-              <i class='ph-thin ph-bed' aria-hidden='true'></i>
-              <span>No total, <b id='total1Noite'></b> pessoas pernoitaram 1 noite e <b id='totalMais2Noites'></b> pernoitaram mais de 2 noites.</span>
-            </div>
-          </div>
-
-        </section>
-
-        <section class='tela' id='tela-2' role='region' aria-label='Detalhamento do atendimento'>
-
-          <div class='opi-sec-head'>
-            <div class='opi-sec-head-row'>
-              <span class='opi-eyebrow'>Perfil do atendimento · acumulado desde o início da operação</span>
-            </div>
-            <div class='opi-sec-rule'></div>
-            <div class='opi-sec-meta' id='tituloDetalhamento'></div>
-          </div>
-
-          <div class='grafico-linha grafico-linha--3'>
-            <div class='grafico'>
-              <div class='grafico-head'>
-                <i class='ph-thin ph-clipboard-text' aria-hidden='true'></i>
-                <h3>Motivos de Atendimento</h3>
-              </div>
-              <div class='nota'>Excluído o motivo-guarda-chuva da operação · top 5</div>
-              <div class='corpo'><canvas id='chartMotivos'></canvas></div>
-            </div>
-            <div class='grafico'>
-              <div class='grafico-head'>
-                <i class='ph-thin ph-user-focus' aria-hidden='true'></i>
-                <h3>Atendimentos por Profissional</h3>
-              </div>
-              <div class='nota'>Top 8 · um atendimento pode envolver mais de um profissional</div>
-              <div class='corpo'><canvas id='chartProfissionais'></canvas></div>
-            </div>
-            <div class='grafico'>
-              <div class='grafico-head'>
-                <i class='ph-thin ph-clock-afternoon' aria-hidden='true'></i>
-                <h3>Horário dos Atendimentos</h3>
-              </div>
-              <div class='nota'>Distribuição por hora do dia</div>
-              <div class='corpo'><canvas id='chartHorario'></canvas></div>
-            </div>
-          </div>
-
-          <div class='insight-grupo'>
-            <div class='insight'>
-              <i class='ph-thin ph-lightbulb' aria-hidden='true'></i>
-              <span id='textoInsightDetalhamento'></span>
-            </div>
-          </div>
-
-        </section>
-
+    <div class='grid2'>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Comparativo semanal</span><span class='m'>Semanas anteriores</span></div>
+        <div class='chart-body'><canvas id='chartComparativoSemanas'></canvas></div>
+      </div>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Tendência diária</span><span class='m'>Atendimentos e pernoites</span></div>
+        <div class='chart-body'><canvas id='chartTendenciaDiaria'></canvas></div>
       </div>
     </div>
 
-    <div class='scroll-hint' id='scrollHint'><i class='fa-solid fa-chevron-down' aria-hidden='true'></i> Role para navegar</div>
+    <div class='notes'>
+      <div class='note'><span id='textoInsightSemanal'></span></div>
+      <div class='note'><span id='textoPernoitesFrequencia'>Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.</span></div>
+    </div>
+  </section>
 
-  </div>
+  <section class='block' aria-label='Acumulado'>
+    <div class='sec-hd'>
+      <div>
+        <div class='sec-eyebrow'><span class='num'>02</span><span class='lbl'>Acumulado</span></div>
+        <h2 class='sec-title'>Perfil acumulado da operação</h2>
+      </div>
+      <div class='sec-hd-r'><span class='sec-meta' id='tituloAcumulado'></span></div>
+    </div>
+
+    <div class='kpis'>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--brand)'></span>Atend. total</div>
+              <div class='val' id='valTotalAcumulado'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--ink-3)'></span>Pessoas únicas</div>
+              <div class='val' id='valPessoasUnicasAcumulado'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--pos)'></span>Público inédito <i class='fa-solid fa-circle-info' title='Pessoas que nao participaram de nenhum dia da Operacao Inverno do ano anterior (2025).'></i></div>
+              <div class='val' id='valNovasPessoas'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--blue)'></span>Público recorrente <i class='fa-solid fa-circle-info' title='Pessoas que ja participaram de algum dia da Operacao Inverno do ano anterior (2025).'></i></div>
+              <div class='val' id='valPessoasAntigas'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--brand-deep)'></span>Pess. c/ pernoite</div>
+              <div class='val' id='valPessoasComPernoiteTotal'></div>
+            </div>
+            <div class='kpi'>
+              <div class='lab'><span class='tick' style='background:var(--gold)'></span>Média diária</div>
+              <div class='val' id='valMediaGeral'></div>
+            </div>
+    </div>
+
+    <div class='grid3'>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Faixa etária</span><span class='m'>Total</span></div>
+        <div class='chart-body'><canvas id='chartFaixaEtaria'></canvas></div>
+      </div>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Sexo &amp; pernoite</span><span class='m'>Anéis</span></div>
+        <div class='anel-legenda' id='legendaSexo'></div>
+        <div class='chart-body'><canvas id='chartSexo'></canvas></div>
+      </div>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Raça/Cor</span><span class='m'>Total</span></div>
+        <div class='chart-body'><canvas id='chartRaca'></canvas></div>
+      </div>
+    </div>
+
+    <div class='notes'>
+      <div class='note'><span id='textoInsightTotal'></span></div>
+      <div class='note'><span>No total, <b id='total1Noite'></b> pessoas pernoitaram 1 noite e <b id='totalMais2Noites'></b> pernoitaram mais de 2 noites.</span></div>
+    </div>
+  </section>
+
+  <section class='block' aria-label='Detalhamento do atendimento'>
+    <div class='sec-hd'>
+      <div>
+        <div class='sec-eyebrow'><span class='num'>03</span><span class='lbl'>Atendimento</span></div>
+        <h2 class='sec-title'>Detalhamento do atendimento</h2>
+      </div>
+      <div class='sec-hd-r'><span class='sec-meta' id='tituloDetalhamento'></span></div>
+    </div>
+
+    <div class='grid3'>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Motivos de atendimento</span><span class='m'>Top 5</span></div>
+        <div class='chart-note'>Exclui o motivo guarda-chuva da operação.</div>
+        <div class='chart-body'><canvas id='chartMotivos'></canvas></div>
+      </div>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Por profissional</span><span class='m'>Top 8</span></div>
+        <div class='chart-note'>Um atendimento pode envolver mais de um profissional.</div>
+        <div class='chart-body'><canvas id='chartProfissionais'></canvas></div>
+      </div>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Horário</span><span class='m'>Por hora</span></div>
+        <div class='chart-note'>Distribuição ao longo do dia.</div>
+        <div class='chart-body'><canvas id='chartHorario'></canvas></div>
+      </div>
+    </div>
+
+    <div class='notes'>
+      <div class='note'><span id='textoInsightDetalhamento'></span></div>
+    </div>
+  </section>
+
+  <section class='block' id='sec-conexao' aria-label='Conexão com a rede'>
+    <div class='sec-hd'>
+      <div>
+        <div class='sec-eyebrow'><span class='num'>04</span><span class='lbl'>Rede</span></div>
+        <h2 class='sec-title'>Conexão com a rede socioassistencial</h2>
+      </div>
+      <div class='sec-hd-r'><span class='sec-meta' id='conexaoMeta'></span></div>
+    </div>
+    <div class='grid2'>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Vínculo com a rede</span><span class='m'>Público da operação</span></div>
+        <div class='conexao-split'>
+          <div class='cx'><div class='cx-val' id='conexaoRedeValor'></div><div class='cx-pct' id='conexaoRedePct'></div><div class='cx-lab'>vínculo com a proteção básica / rede ampliada</div></div>
+          <div class='cx'><div class='cx-val' id='conexaoPopValor'></div><div class='cx-pct' id='conexaoPopPct'></div><div class='cx-lab'>também no Centro POP (par esperado)</div></div>
+          <div class='cx destaque'><div class='cx-val' id='conexaoSoValor'></div><div class='cx-pct' id='conexaoSoPct'></div><div class='cx-lab'>sem nenhum outro vínculo no SUAS</div></div>
+        </div>
+      </div>
+      <div class='chart-card'>
+        <div class='chart-hd'><span class='t'>Onde a rede já atende</span><span class='m'>Pessoas por unidade</span></div>
+        <div class='chart-body'><canvas id='chartConexaoRede'></canvas></div>
+      </div>
+    </div>
+    <div class='notes'>
+      <div class='note'><span id='textoConexaoRede'></span></div>
+    </div>
+  </section>
+
+  <section class='block' id='sec-beneficios' aria-label='Apoio material'>
+    <div class='sec-hd'>
+      <div>
+        <div class='sec-eyebrow'><span class='num'>05</span><span class='lbl'>Apoio material</span></div>
+        <h2 class='sec-title'>Benefícios e itens entregues</h2>
+      </div>
+      <div class='sec-hd-r'><span class='sec-meta' id='benefMeta'></span></div>
+    </div>
+    <div class='chart-card'>
+      <div class='chart-hd'><span class='t'>Itens e benefícios entregues</span><span class='m'>Dispensações no período</span></div>
+      <div class='chart-body'><canvas id='chartBeneficios'></canvas></div>
+    </div>
+    <div class='notes'><div class='note'><span id='textoBeneficios'></span></div></div>
+  </section>
+
+  
+  <section class='block' aria-label='Nota técnica'>
+    <div class='sec-hd'>
+      <div>
+        <div class='sec-eyebrow'><span class='num'>06</span><span class='lbl'>Nota técnica</span></div>
+        <h2 class='sec-title'>Leitura técnica</h2>
+      </div>
+      <div class='sec-hd-r'><span class='sec-meta'>Vigilância Socioassistencial</span></div>
+    </div>
+    <div class='nota-tecnica'><h3>Panorama da semana</h3>
+<p>Na Semana 6 (27/07 a 02/08/2026) a Operação Inverno registrou cerca de <strong>285 atendimentos</strong>, aproximadamente <strong>19% acima da média</strong> das semanas anteriores. A curva semanal se mantém em patamar alto desde a Semana 3, sem sinal de arrefecimento da demanda enquanto durar o frio. A maior parte do público da semana é <strong>inédita</strong> em relação à operação de 2025 — pessoas que ainda não haviam passado pela Casa de Passagem —, o que indica que a porta de entrada segue ativa e que novas pessoas continuam chegando à situação de rua ou ao serviço.</p>
+<h3>Perfil das pessoas atendidas</h3>
+<p>No acumulado da operação o público é majoritariamente <strong>masculino (89,7%)</strong>, concentrado na faixa de <strong>30 a 44 anos (54,8%)</strong> e com predominância de raça/cor <strong>branca (49,3%)</strong>. É o perfil recorrente da população adulta em situação de rua. A concentração na fase produtiva reforça que a resposta não pode ser só abrigamento: cabe articular ACESSUAS Trabalho e a rede de qualificação/geração de renda, além do acesso a documentação e benefícios.</p>
+<h3>Pernoites e uso do serviço</h3>
+<p>Os atendimentos se concentram no período <strong>noturno, com pico entre 19h e 23h</strong>, coerente com o abrigamento. O motivo mais frequente é, de longe, o <strong>pernoite na Casa de Passagem</strong>, seguido de <strong>Escuta</strong> e <strong>Orientação Social</strong> — a operação funciona como abrigo noturno com escuta qualificada acoplada. O dimensionamento de equipe e de vagas deve priorizar esse turno.</p>
+<h3>Território e CadÚnico</h3>
+<p>O cruzamento com o CadÚnico (por nome — ver ressalva) localiza a maior parte do público conhecido em <strong>Porto das Laranjeiras</strong> e no <strong>Centro</strong>: territórios a priorizar na abordagem de rua. No CadÚnico do município há <strong>404 pessoas marcadas em situação de rua</strong>, contra as alcançadas pela operação no período — a diferença sugere público a (re)vincular, ainda que os dois números não sejam diretamente comparáveis (registro no CadÚnico não é o mesmo que necessidade de abrigamento no inverno).</p>
+<h3>Ressalvas metodológicas</h3>
+<ul><li>A partir da <strong>Semana 3</strong> os registros de pernoite estão subnotificados por falha de comunicação. Os pernoites exibidos refletem apenas o que foi efetivamente registrado e <strong>subestimam a ocupação real</strong> — ler o indicador de pernoite dessas semanas com cautela.</li><li>A classificação <strong>inédito/recorrente</strong> compara o público de 2026 com o de 2025 por identificador de pessoa (não por nome), o que evita erro de homônimo.</li><li>Categorias vazias ou &quot;Não Informado&quot; são omitidas dos gráficos e não alteram os totais oficiais.</li><li>O cruzamento com o CadÚnico é feito por <strong>nome</strong> (a base da operação não traz NIS/CPF), com cobertura de cerca de 40%. Leituras de território e de situação de rua daí derivadas são <strong>estimativas</strong>, sujeitas a erro de homônimo — usar como indício, não como cadastro.</li></ul>
+<h3>Encaminhamentos para a rede</h3>
+<ul><li>Manter <strong>busca ativa</strong> e acompanhamento do público inédito, que é a maior fatia da semana — é o momento do vínculo inicial e da inserção no CadÚnico.</li><li>Reforçar junto à equipe da Casa de Passagem a <strong>correção do registro de pernoites</strong>, para recuperar a série a partir da Semana 3.</li><li>Articular com <strong>Centro POP, CREAS e o CRAS de referência</strong> o seguimento dos casos que extrapolam o abrigamento (documentação, benefícios, saúde e trabalho).</li></ul></div>
+  </section>
+  
+
+  <footer class='foot'>
+    <div>Fonte: registros de Atendimentos Individuais filtrados por Operação Inverno. Elaboração: Vigilância Socioassistencial de Araucária. Categorias vazias ou não informadas são omitidas dos gráficos e não alteram os totais oficiais.</div>
+    <div class='sig'>
+      <div class='nm'>Vigilância Socioassistencial</div>
+      <div>Prefeitura de Araucária · <span id='dataEmissaoFoot'></span></div>
+    </div>
+  </footer>
 </div>
 
 <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
@@ -2398,6 +2348,42 @@ const dados = {
     "21h": 224,
     "22h": 173,
     "23h": 227
+  },
+  "conexaoRede": {
+    "disponivel": true,
+    "totalPublico": 155,
+    "comRedeAmpliada": 31,
+    "comCentroPop": 132,
+    "soOperacao": 20,
+    "porUnidade": {
+      "CRAS Centro": 10,
+      "Plantão Social": 9,
+      "CRAS Industrial": 8,
+      "CRAS Fazenda Velha": 4,
+      "Cram - Centro de Referência de Atendimento à Mulher em Situação de Violência": 4,
+      "CRAS Califórnia": 3,
+      "Uai - Famílias": 3,
+      "Acolhimento Familiar": 2,
+      "CREAS - Centro de Referência Especializado de Assistência Social": 2,
+      "Secretaria de Assistência Social de Araucária": 2,
+      "Cadastro Único": 1,
+      "CRAS Thomaz Coelho": 1
+    }
+  },
+  "beneficios": {
+    "disponivel": true,
+    "pessoas": 84,
+    "totalItens": 160,
+    "porBeneficio": {
+      "Cobertor": 85,
+      "Triar": 22,
+      "2ª Via Certidão de Nascimento [fora do Município]": 21,
+      "Rc - Prato Cheio Item i": 13,
+      "2ª Via Certidão de Nascimento": 8,
+      "2ª Via Certidão de Casamento [fora do Município]": 5,
+      "Documentação - 2ª Via Rg": 4,
+      "Benefício Eventual para Moradia": 2
+    }
   }
 };
 
@@ -2408,10 +2394,10 @@ if (dados.faixaEtaria) {
   Object.keys(dados.faixaEtaria).forEach(k => { if (!dados.faixaEtaria[k]) delete dados.faixaEtaria[k]; });
 }
 
-const paleta = ["#007044", "#005484", "#FDB92E", "#ED3237", "#34B778", "#0098DA", "#757575"];
+const paleta = ["#007044", "#155bcb", "#a9740a", "#6d3aa8", "#127a1e", "#0098DA", "#6b6b66"];
 Chart.register(ChartDataLabels);
-Chart.defaults.font.family = "Rawline, Raleway, sans-serif";
-Chart.defaults.color = "#4d4d4d";
+Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+Chart.defaults.color = "#3a3a38";
 
 function animarNumero(element, target, formatFn, duration=500) {
   let start = null;
@@ -2435,6 +2421,12 @@ function soma(obj){ return Object.values(obj).reduce((a,b)=>a+b,0); }
 const hoje = new Date();
 document.getElementById("dataEmissao").textContent = hoje.toLocaleDateString("pt-BR");
 document.getElementById("tituloAcumulado").textContent = `${dados.periodoOperacao.inicio} – ${dados.periodoOperacao.fimReferencia}`;
+document.getElementById("colofNumero").textContent = dados.identificacao.numero;
+document.getElementById("colofPeriodo").textContent = `${dados.periodoOperacao.inicio} – ${dados.periodoOperacao.fimReferencia}`;
+document.getElementById("findTotal").textContent = fmt(dados.totalAcumulado);
+document.getElementById("findPessoas").textContent = fmt(dados.pessoasUnicasAcumulado);
+document.getElementById("findDias").textContent = dados.periodoOperacao.diasCorridos;
+document.getElementById("dataEmissaoFoot").textContent = hoje.toLocaleDateString("pt-BR");
 
 
 const mediaUltimasSemanas = dados.ultimasSemanas.length > 0 ? (soma(Object.fromEntries(dados.ultimasSemanas.map((s,i)=>[i,s.total]))) / dados.ultimasSemanas.length) : 0;
@@ -2559,27 +2551,16 @@ function renderizarSemana(n){
   const rotuloPernoites = document.getElementById("rotuloPernoites");
   const textoPernoitesFrequencia = document.getElementById("textoPernoitesFrequencia");
 
-  if (n >= 3) {
-    pernoitesTotal = totalSemana;
-    pessoasComPernoite = totalSemana;
-    mediaPorPessoa = 1.0;
-    porDiaPernoites = s.porDia;
-    umaNoite = totalSemana;
-    maisDeDuasNoites = 0;
-
-    if (rotuloPernoites) {
-      rotuloPernoites.innerHTML = "Pernoites <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='Devido a uma falha de comunicação, os registros de pernoites a partir da semana 3 estão incorretos. A quantidade exibida é baseada no total de atendimentos.'></i>";
-    }
-    if (textoPernoitesFrequencia) {
-      textoPernoitesFrequencia.innerHTML = "Dados sobre frequência de noites por pessoa indisponíveis devido à falha de registro nesta semana.";
-    }
-  } else {
-    if (rotuloPernoites) {
-      rotuloPernoites.innerHTML = "Pernoites";
-    }
-    if (textoPernoitesFrequencia) {
-      textoPernoitesFrequencia.innerHTML = "Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.";
-    }
+  // A partir da semana 3 há falha de comunicação conhecida nos registros de
+  // pernoite. Exibimos os pernoites COMO REGISTRADOS (sem inferir a partir do
+  // total de atendimentos) e apenas sinalizamos a ressalva no rótulo do KPI.
+  if (rotuloPernoites) {
+    rotuloPernoites.innerHTML = (n >= 3)
+      ? "Pernoites <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='Devido a uma falha de comunicação, os registros de pernoites a partir da semana 3 estão incorretos.'></i>"
+      : "Pernoites";
+  }
+  if (textoPernoitesFrequencia) {
+    textoPernoitesFrequencia.innerHTML = "Na semana, <b id='semana1Noite'></b> pessoas pernoitaram 1 noite e <b id='semanaMais2Noites'></b> pernoitaram mais de 2 noites.";
   }
 
   animarNumero(document.getElementById("valTotalSemana"), totalSemana, fmt);
@@ -3033,96 +3014,87 @@ if(document.getElementById("chartHorario")) {
     : "Dados de motivos, profissionais e horário não disponíveis para este período.";
 })();
 
-/* ================================================================
-   NAVEGAÇÃO POR SCROLL — 1 giro = 1 tela (mesma dinâmica do
-   Observatório do CadÚnico: deck com trilho de bolinhas, barra de
-   progresso, roda do mouse, toque e teclado)
-   ================================================================ */
-const CAPITULOS = [
-  { titulo: 'Semana Atual', icone: 'fa-calendar-week' },
-  { titulo: 'Base Total', icone: 'fa-layer-group' },
-  { titulo: 'Detalhamento', icone: 'fa-clipboard-list' }
-];
+// ===== Conexão com a rede (cruzamento com a base municipal) =====
+(() => {
+  const c = dados.conexaoRede;
+  const sec = document.getElementById("sec-conexao");
+  if (!c || !c.disponivel) { if (sec) sec.style.display = "none"; return; }
 
-let idxAtual = 0, travado = false, jaScrollou = false;
-const REDUZ_MOVIMENTO = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const modoMobile = () => matchMedia('(max-width:1120px)').matches;
+  const total = c.totalPublico || 1;
+  const pct = (v) => dec((v || 0) / total * 100, 0) + "%";
+  document.getElementById("conexaoMeta").textContent = `base municipal · ${fmt(total)} pessoas`;
+  document.getElementById("conexaoRedeValor").textContent = fmt(c.comRedeAmpliada || 0);
+  document.getElementById("conexaoRedePct").textContent = pct(c.comRedeAmpliada);
+  document.getElementById("conexaoPopValor").textContent = fmt(c.comCentroPop || 0);
+  document.getElementById("conexaoPopPct").textContent = pct(c.comCentroPop);
+  document.getElementById("conexaoSoValor").textContent = fmt(c.soOperacao || 0);
+  document.getElementById("conexaoSoPct").textContent = pct(c.soOperacao);
 
-function montarNav() {
-  const trilho = document.getElementById('railTrack');
-  CAPITULOS.forEach((cap, i) => {
-    const num = String(i + 1).padStart(2, '0');
-    const b = document.createElement('button');
-    b.className = 'rail-dot' + (i === 0 ? ' ativo' : '');
-    b.setAttribute('aria-label', `Tela ${num} — ${cap.titulo}`);
-    b.innerHTML = `<i class="fa-solid ${cap.icone}" aria-hidden="true"></i>
-       <span class="rail-tip" role="presentation"><b>${num}</b>${cap.titulo}</span>`;
-    b.addEventListener('click', () => irPara(i));
-    trilho.appendChild(b);
-  });
-}
-
-function irPara(i) {
-  const alvo = Math.max(0, Math.min(CAPITULOS.length - 1, i));
-  if (alvo === idxAtual) return;
-  idxAtual = alvo;
-
-  if (modoMobile()) {
-    document.getElementById('tela-' + alvo).scrollIntoView({ behavior: REDUZ_MOVIMENTO ? 'auto' : 'smooth' });
-  } else {
-    document.getElementById('deckTrack').style.transform = `translateY(-${alvo * 100}%)`;
+  const ent = Object.entries(c.porUnidade || {}).slice(0, 8);
+  if (document.getElementById("chartConexaoRede") && ent.length) {
+    new Chart(document.getElementById("chartConexaoRede"), {
+      type: "bar",
+      data: {
+        labels: ent.map(([k]) => truncar(k, 28)),
+        datasets: [{ data: ent.map(([, v]) => v), backgroundColor: paleta[0], borderRadius: 4, maxBarThickness: 20 }]
+      },
+      options: {
+        indexAxis: "y", responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { title: (itens) => ent[itens[0].dataIndex][0] } },
+          datalabels: { anchor: "end", align: "end", font: { size: 10, weight: "bold" }, formatter: Math.round }
+        },
+        scales: {
+          x: { grid: { color: "#ededea" }, border: { display: false }, beginAtZero: true, grace: "15%", ticks: { precision: 0 } },
+          y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 } } }
+        }
+      }
+    });
   }
 
-  document.querySelectorAll('.rail-dot').forEach((b, k) => b.classList.toggle('ativo', k === alvo));
-  document.getElementById('progFill').style.width = (alvo / (CAPITULOS.length - 1)) * 100 + '%';
-  document.getElementById('scrollHint').classList.toggle('oculta', jaScrollou && alvo > 0 || alvo === CAPITULOS.length - 1);
+  const pctSo = dec((c.soOperacao || 0) / total * 100, 0);
+  const pctPop = dec((c.comCentroPop || 0) / total * 100, 0);
+  document.getElementById("textoConexaoRede").innerHTML =
+    `<b>${pctPop}% do público</b> também é atendido pelo Centro POP — o pareamento esperado do serviço especializado para população em situação de rua. O vínculo com a proteção básica (CRAS, CadÚnico) é bem menor, e <b>${fmt(c.soOperacao || 0)} pessoas (${pctSo}%)</b> não aparecem em nenhum outro serviço do SUAS: é a prioridade mais direta de <b>busca ativa</b>. Base municipal cruzada: janeiro a agosto de 2026.`;
+})();
 
-  travado = true;
-  setTimeout(() => travado = false, REDUZ_MOVIMENTO ? 150 : 780);
-}
+// ===== Apoio material (dispensações: cobertor, documentação, Prato Cheio) =====
+(() => {
+  const b = dados.beneficios;
+  const sec = document.getElementById("sec-beneficios");
+  if (!b || !b.disponivel) { if (sec) sec.style.display = "none"; return; }
 
-document.getElementById('deck').addEventListener('wheel', e => {
-  if (modoMobile()) return;
-  e.preventDefault();
-  if (travado || Math.abs(e.deltaY) < 18) return;
-  jaScrollou = true;
-  irPara(idxAtual + (e.deltaY > 0 ? 1 : -1));
-}, { passive: false });
+  document.getElementById("benefMeta").textContent =
+    `${fmt(b.pessoas || 0)} pessoas · ${fmt(b.totalItens || 0)} entregas`;
 
-/* Toque (tablets) */
-let toqueY = null;
-document.getElementById('deck').addEventListener('touchstart', e => { toqueY = e.touches[0].clientY; }, { passive: true });
-document.getElementById('deck').addEventListener('touchend', e => {
-  if (modoMobile() || toqueY === null) return;
-  const dy = toqueY - e.changedTouches[0].clientY;
-  toqueY = null;
-  if (Math.abs(dy) < 60 || travado) return;
-  jaScrollou = true;
-  irPara(idxAtual + (dy > 0 ? 1 : -1));
-});
+  const ent = Object.entries(b.porBeneficio || {}).slice(0, 8);
+  if (document.getElementById("chartBeneficios") && ent.length) {
+    new Chart(document.getElementById("chartBeneficios"), {
+      type: "bar",
+      data: {
+        labels: ent.map(([k]) => truncar(k, 34)),
+        datasets: [{ data: ent.map(([, v]) => v), backgroundColor: paleta[2], borderRadius: 4, maxBarThickness: 20 }]
+      },
+      options: {
+        indexAxis: "y", responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { title: (itens) => ent[itens[0].dataIndex][0] } },
+          datalabels: { anchor: "end", align: "end", font: { size: 10, weight: "bold" }, formatter: Math.round }
+        },
+        scales: {
+          x: { grid: { color: "#ededea" }, border: { display: false }, beginAtZero: true, grace: "15%", ticks: { precision: 0 } },
+          y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10 } } }
+        }
+      }
+    });
+  }
 
-/* Teclado */
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'SELECT') return;
-  const prox = { 'ArrowDown': 1, 'PageDown': 1, ' ': 1, 'ArrowUp': -1, 'PageUp': -1 }[e.key];
-  if (prox) { e.preventDefault(); jaScrollou = true; irPara(idxAtual + prox); }
-  else if (e.key === 'Home') { e.preventDefault(); irPara(0); }
-  else if (e.key === 'End') { e.preventDefault(); irPara(CAPITULOS.length - 1); }
-});
+  document.getElementById("textoBeneficios").innerHTML =
+    `<b>${fmt(b.pessoas || 0)} pessoas</b> do público da operação receberam apoio material no período — com destaque para <b>cobertores</b> (proteção contra o frio), <b>documentação</b> (2ª via de certidões e RG) e o <b>Cartão Prato Cheio</b>.`;
+})();
 
-/* Tela cheia */
-const btnFs = document.getElementById('btnFs');
-btnFs.addEventListener('click', () => {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else document.documentElement.requestFullscreen();
-});
-document.addEventListener('fullscreenchange', () => {
-  const cheia = !!document.fullscreenElement;
-  btnFs.querySelector('i').className = 'fa-solid ' + (cheia ? 'fa-compress' : 'fa-expand');
-  btnFs.setAttribute('aria-label', cheia ? 'Sair da tela cheia' : 'Tela cheia');
-});
-
-montarNav();
 </script>
 </body>
 </html>
