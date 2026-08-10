@@ -1,0 +1,235 @@
+/* =========================================================================
+   Boletim Cadastro Único — Araucária/PR
+   Tokens e componentes conforme o Design System "Editorial Acolhedor"
+   (C:\Users\...\TRABALHO\DESIGN_SYSTEM\DESIGN.md — v2.0).
+   Fontes servidas via Google Fonts (Spectral, IBM Plex Sans, IBM Plex Mono);
+   o boletim é distribuído com acesso à internet, como já ocorre com as
+   ilustrações do boletim PSB (hospedadas via GitHub Pages).
+   ========================================================================= */
+
+/* Documento fixo: uso desktop, tema claro único (sem alternância). */
+
+/* ---- 1. PRIMITIVOS ------------------------------------------------------ */
+:root {
+  --green-80: #00492c; --green-60: #007044; --green-05: #eaf8f0;
+  --navy: #103858;
+  --n-99: #fafaf9; --n-97: #f5f5f3; --n-94: #ededea; --n-88: #e2e2dd;
+  --n-78: #c9c9c2; --n-55: #6b6b66; --n-38: #3a3a38; --n-16: #1a1a17;
+  --gold: #c2850c;
+
+  --font-serif: 'Spectral', Georgia, 'Times New Roman', serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --fs-eyebrow: 11px; --fs-label: 12px; --fs-caption: 13px; --fs-body: 15px;
+  --fs-body-lg: 17px; --fs-h4: 20px; --fs-h3: 24px; --fs-h2: 30px; --fs-h1: 40px;
+
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+  --sp-8: 32px; --sp-10: 40px; --sp-12: 48px; --sp-16: 64px;
+
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-pill: 999px;
+  --hair: 1px;
+
+  --dur-instant: .1s; --dur-fast: .2s; --dur-surface: .32s;
+  --ease-out: cubic-bezier(.22,.61,.36,1);
+
+  /* Documento só é aberto em desktop/notebook — larga o suficiente para
+     preencher bem uma tela de 13" a 27", sem virar parede de texto num
+     monitor ultrawide. */
+  --content-max: 1600px;
+
+  /* ---- 2. SEMÂNTICOS — TEMA CLARO (único) -------------------------------- */
+  --paper: var(--n-99);
+  --surface: #ffffff;
+  --surface-2: var(--n-97);
+  --surface-3: var(--n-94);
+
+  --ink: var(--n-16);
+  --ink-2: var(--n-38);
+  --ink-3: var(--n-55);
+
+  --hairline: var(--n-88);
+  --hairline-strong: var(--n-78);
+  --rule: var(--n-16);
+
+  --primary: var(--green-60);
+  --primary-strong: var(--green-80);
+  --primary-soft: var(--green-05);
+  --on-primary: #ffffff;
+  --brand-ink: var(--navy);
+  --focus: var(--gold);
+
+  --success: #127a1e; --success-bg: #e6f4e6;
+  --warning: #8a5a00; --warning-bg: #fbf0cc;
+  --danger: #c42b1c;  --danger-bg: #fbe4e0;
+  --info: #155bcb;    --info-bg: #eaf1fd;
+
+  --chart-grid: rgba(26,26,23,.08);
+  color-scheme: light;
+}
+
+/* ---- 3. RESET / BASE ---------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--dur-surface) var(--ease-out), color var(--dur-surface) var(--ease-out);
+}
+h1, h2, h3, h4 { font-family: var(--font-serif); font-weight: 600; letter-spacing: -.015em; color: var(--ink); margin: 0; }
+p { margin: 0 0 var(--sp-3); }
+.mono, code { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+a { color: var(--primary); }
+img { max-width: 100%; }
+::-webkit-scrollbar { height: 10px; width: 10px; }
+::-webkit-scrollbar-thumb { background: var(--hairline-strong); border-radius: 99px; }
+
+.skip-link {
+  position: absolute; left: -999px; top: 0; background: var(--primary); color: var(--on-primary);
+  padding: 10px 16px; border-radius: var(--radius-sm); z-index: 100;
+}
+.skip-link:focus { left: var(--sp-4); top: var(--sp-4); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* ---- 4. LAYOUT ------------------------------------------------------ */
+.masthead-bar { height: 4px; background: var(--primary); }
+.wrap { max-width: var(--content-max); margin: 0 auto; padding: 0 var(--sp-8) var(--sp-16); }
+
+.appbar {
+  display: flex; align-items: center; justify-content: center; gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-8); background: var(--surface); border-bottom: var(--hair) solid var(--hairline);
+  flex-wrap: wrap; position: sticky; top: 0; z-index: 10;
+}
+.appbar-left { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.appbar-left img { height: 40px; width: auto; }
+.brand-name { font-family: var(--font-serif); font-size: 16px; font-weight: 600; color: var(--brand-ink); line-height: 1.2; }
+.brand-sub { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); margin-top: 2px; }
+
+.hero { padding: var(--sp-10) 0 var(--sp-8); border-bottom: var(--hair) solid var(--hairline); }
+.hero-grid { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-12); }
+.hero-conteudo { flex: 1 1 640px; min-width: 0; }
+.hero-ilustracao {
+  /* max-width + max-height (com width/height auto) mantêm a proporção da
+     imagem sem deixar que ela imponha a altura da seção inteira — antes,
+     com só largura fixa, a ilustração ficava mais alta que o texto e
+     esticava o hero, sobrando um vão enorme antes da próxima seção. */
+  flex: 0 0 auto; width: auto; height: auto; max-width: 240px; max-height: 160px; opacity: .95;
+  pointer-events: none; user-select: none;
+}
+.hero .eyebrow { margin-bottom: var(--sp-2); }
+.hero h1 { font-size: var(--fs-h1); }
+.hero .lead { font-family: var(--font-serif); font-style: italic; font-size: var(--fs-body-lg); color: var(--ink-2); margin-top: var(--sp-3); }
+
+.eyebrow {
+  font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 600; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--primary); display: block;
+}
+
+.section { padding: var(--sp-12) 0; border-bottom: var(--hair) solid var(--hairline); }
+.section:last-of-type { border-bottom: 0; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-4); border-top: 1.5px solid var(--rule); padding-top: var(--sp-3); margin-bottom: var(--sp-6); }
+.section-head h2 { font-size: var(--fs-h2); }
+.section-count { font-family: var(--font-mono); font-size: var(--fs-label); color: var(--ink-3); white-space: nowrap; }
+.section-note { font-family: var(--font-serif); font-style: italic; color: var(--ink-2); margin-bottom: var(--sp-5); }
+
+.grid { display: grid; gap: var(--sp-5); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* ---- 5. CARDS / KPI ------------------------------------------------- */
+.card { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-5); }
+
+.kpi-card { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-4) var(--sp-5); }
+.kpi-eb { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.kpi-val { font-family: var(--font-mono); font-size: 38px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); margin: 10px 0 4px; font-variant-numeric: tabular-nums; line-height: 1; }
+.kpi-foot { font-size: 12px; color: var(--ink-3); }
+
+.chart-card { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-6); }
+.chart-card h3 { font-size: var(--fs-h4); margin-bottom: var(--sp-1); }
+.chart-card .chart-sub { font-size: 13px; color: var(--ink-3); margin-bottom: var(--sp-4); }
+/* Altura fixa e independente da largura do card — com maintainAspectRatio:
+   false, o Chart.js usa a altura deste contêiner, não da tela. Evita que
+   gráficos fiquem gigantes só porque a página é larga. */
+.chart-card .chart-area { position: relative; height: 320px; }
+.chart-card .chart-area--alto { height: 420px; }
+.chart-foot { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-top: var(--sp-3); }
+
+/* ---- 6. TABELA -------------------------------------------------------- */
+.dtable-wrap { border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); overflow-x: auto; background: var(--surface); }
+.dtable { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+.dtable th { text-align: left; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1.5px solid var(--rule); white-space: nowrap; }
+.dtable td { padding: var(--sp-3) var(--sp-4); border-bottom: var(--hair) solid var(--hairline); color: var(--ink-2); }
+.dtable tbody tr:last-child td { border-bottom: 0; }
+.dtable tbody tr:hover { background: var(--surface-2); }
+.dtable .num { font-family: var(--font-mono); text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+.dtable th.num { text-align: right; }
+.dtable .name { color: var(--ink); font-weight: 500; }
+
+/* ---- 7. BADGES / MENSAGENS -------------------------------------------- */
+.badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: var(--radius-sm); border: var(--hair) solid; }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.badge.ok { color: var(--success); border-color: var(--success); background: var(--success-bg); }
+.badge.ok .dot { background: var(--success); }
+.badge.warn { color: var(--warning); border-color: var(--warning); background: var(--warning-bg); }
+.badge.warn .dot { background: var(--warning); }
+.badge.err { color: var(--danger); border-color: var(--danger); background: var(--danger-bg); }
+.badge.err .dot { background: var(--danger); }
+.badge.neutral { color: var(--ink-3); border-color: var(--hairline-strong); background: var(--surface-2); }
+
+.msg { display: flex; gap: var(--sp-3); border: var(--hair) solid; border-radius: var(--radius-md); padding: var(--sp-4); margin-bottom: 0; font-size: 14px; }
+.msg b { display: block; margin-bottom: 2px; font-weight: 600; color: var(--ink); }
+.msg.warn { background: var(--warning-bg); border-color: var(--warning); color: var(--ink-2); }
+.msg.info { background: var(--info-bg); border-color: var(--info); color: var(--ink-2); }
+
+/* ---- 8. AVISOS (acordeão compacto) -------------------------------------- */
+.avisos-toggle {
+  display: flex; align-items: center; gap: var(--sp-2); width: 100%; text-align: left;
+  background: var(--warning-bg); border: var(--hair) solid var(--warning); border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4); cursor: pointer; font-family: var(--font-sans); font-size: 14px;
+  font-weight: 600; color: var(--ink); transition: filter var(--dur-fast) var(--ease-out);
+}
+.avisos-toggle:hover { filter: brightness(.97); }
+.avisos-toggle-icone { color: var(--warning); flex: none; }
+.avisos-toggle-texto { flex: 1; }
+.avisos-toggle-chevron { color: var(--ink-3); flex: none; transition: transform var(--dur-fast) var(--ease-out); }
+.avisos-toggle[aria-expanded="true"] .avisos-toggle-chevron { transform: rotate(180deg); }
+.avisos-lista {
+  display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-surface) var(--ease-out);
+}
+.avisos-lista.aberto { grid-template-rows: 1fr; margin-top: var(--sp-3); }
+.avisos-lista-inner { overflow: hidden; display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* ---- 9. ANIMAÇÕES DE ENTRADA -------------------------------------------- */
+/* Uma única declaração de transition para tudo que pode ganhar a classe
+   .reveal (via JS) ou receber hover — duas regras de "transition" separadas
+   nos mesmos elementos se anulam (a última do CSS vence por inteiro, não
+   soma), então isso precisa ficar consolidado aqui. */
+.reveal, .kpi-card, .chart-card {
+  transition: opacity .5s var(--ease-out), transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.reveal { opacity: 0; transform: translateY(18px); }
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+
+.kpi-card:hover, .chart-card:hover {
+  transform: translateY(-3px); border-color: var(--hairline-strong);
+  box-shadow: 0 10px 24px -12px rgba(16,56,88,.18);
+}
+
+/* ---- 10. RODAPÉ ---------------------------------------------------------- */
+.footer { padding: var(--sp-10) 0 var(--sp-6); text-align: center; }
+.footer-ilustracao { width: 96px; opacity: .5; margin: 0 auto var(--sp-3); display: block; }
+.footer p { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); }
