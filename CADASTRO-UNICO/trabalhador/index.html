@@ -33,8 +33,8 @@
         <h1>Cadastro Único em Araucária</h1>
         
         <p class="lead">Devolutiva de dados do Cadastro Único para a equipe: como está o fluxo de atendimento no
-          1º semestre de 2026, quem estamos atendendo e onde a agenda está com mais gente faltando ou esperando —
-          informação para apoiar o trabalho no dia a dia, não para fiscalizar ninguém.</p>
+          1º semestre de 2026, quem estamos atendendo e onde a agenda está com mais gente faltando ou esperando.
+          É informação para apoiar o trabalho no dia a dia, não para fiscalizar ninguém.</p>
         
         <p class="kpi-foot" style="margin-top:12px">Emitido em 10 de agosto de 2026 · Fonte: exportações do sistema
           Cadastro Único (IPM) e histórico do totem de atendimento da unidade central.</p>
@@ -52,20 +52,25 @@
       </div>
       <span class="section-count">Janeiro a junho de 2026</span>
     </div>
-    <p class="section-note">R. Fernando Suckow, 200 — Centro, Araucária/PR. É o único espaço do município que
-      efetivamente realiza inclusão e atualização do Cadastro Único — os CRAS não executam esses procedimentos,
+    <p class="section-note">R. Fernando Suckow, 200, Centro, Araucária/PR. É o único espaço do município que
+      efetivamente realiza inclusão e atualização do Cadastro Único. Os CRAS não executam esses procedimentos,
       só encaminham (agendam) famílias para serem atendidas aqui, como mostra a Seção 2.</p>
 
-    <div class="grid grid-4" style="margin-bottom:var(--sp-6)">
+    <div class="grid grid-5" style="margin-bottom:var(--sp-6)">
       <div class="kpi-card">
         <div class="kpi-eb">Atendimentos no semestre</div>
         <div class="kpi-val"><span class="kpi-num" data-valor="4708" data-casas="0">0</span></div>
         <div class="kpi-foot">Atendimentos individuais registrados</div>
       </div>
       <div class="kpi-card">
+        <div class="kpi-eb">Pessoas únicas atendidas</div>
+        <div class="kpi-val"><span class="kpi-num" data-valor="3904" data-casas="0">0</span></div>
+        <div class="kpi-foot">Pessoas distintas no período</div>
+      </div>
+      <div class="kpi-card">
         <div class="kpi-eb">Comparecimento</div>
-        <div class="kpi-val"><span class="kpi-num" data-valor="9.7" data-casas="1">0</span>%</div>
-        <div class="kpi-foot">Entre agendamentos com situação definida</div>
+        <div class="kpi-val kpi-val--suave"><span class="kpi-num" data-valor="9.7" data-casas="1">0</span>%</div>
+        <div class="kpi-foot">70,5% da agenda sem baixa no sistema</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-eb">Espera média (totem)</div>
@@ -94,7 +99,7 @@
       <div class="kpi-card">
         <div class="kpi-eb">Visitas domiciliares realizadas</div>
         <div class="kpi-val"><span class="kpi-num" data-valor="569" data-casas="0">0</span></div>
-        <div class="kpi-foot">Atualização ou inclusão feita em domicílio — soma dentro dos totais acima, não é adicional</div>
+        <div class="kpi-foot">Atualização ou inclusão feita em domicílio, já somada nos totais acima; não é adicional</div>
       </div>
     </div>
 
@@ -105,23 +110,29 @@
         <div class="chart-area"><canvas id="grafico-volume-mensal"></canvas></div>
       </div>
       <div class="chart-card">
-        <h3>Comparecimento a agendamentos</h3>
-        <p class="chart-sub">Atendido × Ausente, entre agendamentos com situação definida (exclui Pendente).</p>
-        <div class="chart-area"><canvas id="grafico-comparecimento"></canvas></div>
+        <h3>Pessoas únicas atendidas por mês</h3>
+        <p class="chart-sub">Pessoas distintas atendidas em cada mês.</p>
+        <div class="chart-area"><canvas id="grafico-pessoas-unicas-mensal"></canvas></div>
       </div>
     </div>
 
     <div class="grid grid-2" style="margin-bottom:var(--sp-4)">
       <div class="chart-card">
+        <h3>Comparecimento a agendamentos</h3>
+        <p class="chart-sub">Situação registrada dos agendamentos com data no período.</p>
+        <div class="chart-area"><canvas id="grafico-comparecimento"></canvas></div>
+      </div>
+      <div class="chart-card">
         <h3>Perfil por sexo</h3>
         <p class="chart-sub">Uma contagem por atendimento realizado no semestre.</p>
         <div class="chart-area"><canvas id="grafico-sexo"></canvas></div>
       </div>
-      <div class="chart-card">
-        <h3>Perfil por faixa etária</h3>
-        <p class="chart-sub">Uma contagem por atendimento realizado no semestre.</p>
-        <div class="chart-area"><canvas id="grafico-faixa-etaria"></canvas></div>
-      </div>
+    </div>
+
+    <div class="chart-card" style="margin-bottom:var(--sp-4)">
+      <h3>Perfil por faixa etária</h3>
+      <p class="chart-sub">Uma contagem por atendimento realizado no semestre.</p>
+      <div class="chart-area"><canvas id="grafico-faixa-etaria"></canvas></div>
     </div>
 
     <div class="chart-card" style="margin-bottom:var(--sp-8)">
@@ -187,7 +198,7 @@
       <span class="section-count">Abril a junho de 2026 · dado parcial</span>
     </div>
     <p class="section-note"><b>Importante:</b> os CRAS não realizam inclusão, atualização ou visita domiciliar do
-      Cadastro Único — só <b>encaminham</b> (agendam) as famílias, que são efetivamente atendidas na Central
+      Cadastro Único: só <b>encaminham</b> (agendam) as famílias, que são efetivamente atendidas na Central
       (Seção 1). Os números abaixo são volume de encaminhamento por unidade de origem, não de atendimento
       realizado ali. A rede também ainda não tem um sistema de agenda equivalente ao da Central: o log disponível
       não registra situação de comparecimento e só cobre parte do semestre.</p>
@@ -294,8 +305,8 @@
       <span class="section-count">Situação em 10 de agosto de 2026</span>
     </div>
     <p class="section-note">Fotografia do que já está cadastrado, para dar tamanho ao que os números de
-      encaminhamento acima representam. Cadastro desatualizado = sem reentrevista há mais de 24 meses, prazo
-      oficial do CadÚnico — é a demanda de atualização que ainda nem virou agendamento pendente (Seção 3).</p>
+      encaminhamento acima representam. Cadastro desatualizado é o que está sem reentrevista há mais de 24 meses,
+      prazo oficial do CadÚnico. É a demanda de atualização que ainda nem virou agendamento pendente (Seção 3).</p>
 
     <div class="grid grid-2" style="margin-bottom:var(--sp-6)">
       <div class="kpi-card">
@@ -387,7 +398,7 @@
       </div>
       <span class="section-count">Situação em 10 de agosto de 2026</span>
     </div>
-    <p class="section-note">Como só a Central executa, todo encaminhamento da rede vira fila lá — esta seção mostra
+    <p class="section-note">Como só a Central executa, todo encaminhamento da rede vira fila lá. Esta seção mostra
       o que ainda está represado hoje: agendamentos já marcados para uma data futura e visitas domiciliares ainda
       não realizadas, com o tempo real de espera desde o encaminhamento.</p>
 
@@ -412,7 +423,7 @@
 
     <div class="chart-card" style="margin-bottom:var(--sp-6)">
       <h3>Agendamentos pendentes por mês previsto</h3>
-      <p class="chart-sub">Quantos agendamentos já marcados caem em cada mês futuro — o tamanho da fila mês a mês.</p>
+      <p class="chart-sub">Quantos agendamentos já marcados caem em cada mês futuro: o tamanho da fila mês a mês.</p>
       <div class="chart-area"><canvas id="grafico-pendentes-mes"></canvas></div>
     </div>
 
@@ -426,7 +437,7 @@
       <div class="kpi-card">
         <div class="kpi-eb">Espera média até hoje</div>
         <div class="kpi-val"><span class="kpi-num" data-valor="27.8" data-casas="1">0</span> dias</div>
-        <div class="kpi-foot">Desde a solicitação — a visita não tem data futura marcada</div>
+        <div class="kpi-foot">Desde a solicitação: a visita não tem data futura marcada</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-eb">Espera máxima</div>
@@ -515,22 +526,22 @@
 
     <div>
       <p class="kpi-foot" style="margin-bottom:var(--sp-5)">Elaborada a partir do cruzamento dos dados
-        apresentados nas Seções 1 a 3 deste boletim. Não substitui análise de gestão nem decisão administrativa —
-        organiza o que os números, lidos em conjunto, já indicam sobre o serviço.</p>
+        apresentados nas Seções 1 a 3 deste boletim. Não substitui análise de gestão nem decisão administrativa.
+        Apenas organiza o que os números, lidos em conjunto, já indicam sobre o serviço.</p>
 
       <h3 style="font-size:var(--fs-h4);margin-bottom:var(--sp-2)">1. Estrutura da oferta: um único ponto de execução</h3>
-      <p>A rede de CRAS não executa inclusão, atualização nem visita domiciliar do Cadastro Único — só encaminha.
+      <p>A rede de CRAS não executa inclusão, atualização nem visita domiciliar do Cadastro Único: só encaminha.
         Toda a capacidade de resposta do município para essas três frentes está concentrada na Central (R.
         Fernando Suckow, 200). No 1º semestre de 2026, a Central realizou 2.755
         atualizações e 773 inclusões, enquanto a rede de CRAS
         encaminhou 1.831 famílias no mesmo período (dado parcial, abr-jun).
-        Esse desenho — oferta concentrada, demanda pulverizada em 8 territórios — é estrutural, não conjuntural:
+        Esse desenho, de oferta concentrada e demanda pulverizada em 8 territórios, é estrutural, não conjuntural:
         qualquer aumento de encaminhamento pela rede pressiona diretamente a fila da Central, sem válvula de
         escape territorial.</p>
 
       <h3 style="font-size:var(--fs-h4);margin-bottom:var(--sp-2)">2. Confiabilidade do dado de comparecimento</h3>
       <p>A taxa de comparecimento de 9,7% apresentada na Seção 1 é calculada só sobre
-        agendamentos com situação definida — e esses são minoria. 1.704 agendamentos
+        agendamentos com situação definida, e esses são minoria. 1.704 agendamentos
         da Central (70,5% do total) nunca foram
         baixados no sistema para Atendido ou Ausente. Isso não é um problema de comparecimento do usuário: é uma
         lacuna de registro por parte da equipe. Enquanto essa baixa não for rotina, qualquer taxa de comparecimento
@@ -539,30 +550,30 @@
 
       <h3 style="font-size:var(--fs-h4);margin-bottom:var(--sp-2)">3. Fila e represamento na Central</h3>
       <p>No totem, 560 senhas do período parcial (abr-jun) ficaram
-        paradas em TRIAGEM — mais do que as 542 que chegaram a
+        paradas em TRIAGEM, mais do que as 542 que chegaram a
         CONCLUÍDO. Isso sinaliza evasão da fila (pessoa desiste de esperar), falha de chamada ou senha aberta sem
         baixa; qualquer que seja a causa dominante, o dado como está hoje subestima o volume real de gente que
         passou pela recepção. Já a fila de agendamentos já marcados (Seção 3) soma 1.752
         famílias, com espera média de 73,4 dias entre o
-        encaminhamento e a data marcada — e casos já agendados para 201
+        encaminhamento e a data marcada, com casos já agendados para 201
         dias à frente, ou seja, mais de seis meses de espera para uma inclusão ou atualização já solicitada.
         
         CRAS Industrial e CRAS Costeira são as unidades que mais alimentam essa fila
         hoje (316 e 314
-        agendamentos pendentes, respectivamente) — são o ponto de partida natural se a gestão optar por priorizar
+        agendamentos pendentes, respectivamente). São o ponto de partida natural se a gestão optar por priorizar
         território na hora de abrir capacidade extra de atendimento.</p>
 
       <h3 style="font-size:var(--fs-h4);margin-bottom:var(--sp-2)">4. Demanda represada que ainda nem entrou na fila</h3>
       <p>A fila formal de 1.752 agendamentos pendentes (Seção 3) é só a
         ponta visível. A base do Observatório do Cadastro Único mostra 3.302
         famílias (13,9% do total cadastrado) sem reentrevista há mais
-        de 24 meses — o prazo oficial do CadÚnico. São famílias que já deveriam estar em processo de atualização e
+        de 24 meses, o prazo oficial do CadÚnico. São famílias que já deveriam estar em processo de atualização e
         ainda não geraram nenhum agendamento: demanda represada que a fila atual não captura, e que tende a
         alimentar a fila de amanhã se não houver busca ativa territorial planejada.</p>
 
       <h3 style="font-size:var(--fs-h4);margin-bottom:var(--sp-2)">5. Leitura de gestão</h3>
       <p>Três frentes de ação distintas emergem deste conjunto de dados, e nenhuma delas se resolve com as outras
-        duas: (1) correição operacional do registro de situação dos agendamentos na Central — sem isso, nenhum
+        duas: (1) correição operacional do registro de situação dos agendamentos na Central, sem a qual nenhum
         indicador de comparecimento é confiável; (2) ampliação ou reorganização da capacidade de atendimento
         presencial da Central, hoje o único gargalo de execução do Cadastro Único no município; e (3) planejamento
         de busca ativa nos territórios com maior volume de cadastro desatualizado, antes que essa demanda vire fila
@@ -692,6 +703,12 @@ Chart.defaults.color = TEMA.ink3;
 // a transição visual. `animation: false` direto no gráfico já causou, em
 // algumas versões do Chart.js, tooltip nunca aparecer — melhor evitar.
 Chart.defaults.animation = REDUZ_MOVIMENTO ? { duration: 0 } : { duration: 700, easing: "easeOutQuart" };
+// Chart.js 4.4.x lança "this._fn is not a function" ao interpolar a transição
+// de cor no hover dos arcos da rosca, e o erro trava toda a interatividade
+// (tooltip e clique na legenda param de responder). Desligar apenas a animação
+// de cor elimina o crash sem afetar tooltip, hoverOffset nem a animação de
+// entrada dos gráficos.
+Chart.defaults.animations.colors = false;
 
 function corBarras(n) {
   var cores = [];
@@ -711,10 +728,19 @@ var RESUMO_DATALABEL = {
   font: { family: "'IBM Plex Mono', monospace", size: 11, weight: "600" }
 };
 
+// Estilo escuro compartilhado do tooltip, para barras e roscas terem a mesma
+// aparência ao passar o cursor.
+var TOOLTIP_ESCURO = {
+  backgroundColor: "rgba(26,26,23,0.9)",
+  titleFont: { family: "'IBM Plex Sans', sans-serif", size: 13, weight: "600" },
+  bodyFont: { family: "'IBM Plex Sans', sans-serif", size: 13 },
+  padding: 12,
+  cornerRadius: 8,
+  usePointStyle: true
+};
+
 // Altura vem do contêiner .chart-area (CSS, tamanho fixo) via
-// maintainAspectRatio:false — não da largura do card. Tooltip fica no
-// padrão do Chart.js (mesma configuração que já funciona no boletim PSB:
-// nenhuma opção customizada de tooltip/interaction é necessária).
+// maintainAspectRatio:false — não da largura do card.
 function graficoBarra(id, dados, horizontal) {
   var ctx = document.getElementById(id);
   if (!ctx) return;
@@ -737,8 +763,20 @@ function graficoBarra(id, dados, horizontal) {
       maintainAspectRatio: false,
       locale: "pt-BR",
       layout: horizontal ? { padding: { right: 40 } } : {},
+      // mode "index"/intersect:false: o tooltip aparece ao passar o cursor em
+      // qualquer ponto da linha da categoria, não só exatamente sobre a barra.
+      // Sem isso, nas barras finas horizontais o tooltip quase nunca dispara.
+      interaction: { mode: "index", intersect: false },
       plugins: {
         legend: { display: false },
+        tooltip: Object.assign({}, TOOLTIP_ESCURO, {
+          callbacks: {
+            label: function (context) {
+              var rotulo = context.dataset.label ? context.dataset.label + ": " : "";
+              return rotulo + formatarNumeroChart(context.parsed[horizontal ? "x" : "y"]);
+            }
+          }
+        }),
         datalabels: Object.assign({}, RESUMO_DATALABEL, {
           anchor: "end",
           align: horizontal ? "right" : "top",
@@ -780,11 +818,7 @@ function graficoDoughnut(id, dados) {
       locale: "pt-BR",
       plugins: {
         legend: { position: "bottom", labels: { color: TEMA.ink3, font: { family: "'IBM Plex Sans', sans-serif" } } },
-        tooltip: {
-          backgroundColor: "rgba(26,26,23,0.9)",
-          padding: 12,
-          cornerRadius: 8,
-          usePointStyle: true,
+        tooltip: Object.assign({}, TOOLTIP_ESCURO, {
           callbacks: {
             label: function (context) {
               var total = context.dataset.data.reduce(function (a, b) { return a + b; }, 0);
@@ -792,7 +826,7 @@ function graficoDoughnut(id, dados) {
               return context.label + ": " + formatarNumeroChart(context.parsed) + " (" + pct.toString().replace(".", ",") + "%)";
             }
           }
-        },
+        }),
         datalabels: {
           color: "#ffffff",
           font: { family: "'IBM Plex Mono', monospace", size: 11, weight: "600" },
@@ -813,8 +847,9 @@ function graficoDoughnut(id, dados) {
 }
 
 graficoBarra("grafico-volume-mensal", {"labels": ["Janeiro/2026", "Fevereiro/2026", "Março/2026", "Abril/2026", "Maio/2026", "Junho/2026"], "datasets": [{"label": "Atendimentos", "data": [612, 873, 716, 887, 805, 815]}]});
+graficoBarra("grafico-pessoas-unicas-mensal", {"labels": ["Janeiro/2026", "Fevereiro/2026", "Março/2026", "Abril/2026", "Maio/2026", "Junho/2026"], "datasets": [{"label": "Pessoas únicas", "data": [573, 805, 610, 750, 763, 743]}]});
 graficoBarra("grafico-pendentes-mes", {"labels": ["Agosto/2026", "Setembro/2026", "Outubro/2026", "Novembro/2026", "Janeiro/2027"], "datasets": [{"label": "Agendamentos pendentes", "data": [514, 700, 533, 4, 1]}]});
-graficoDoughnut("grafico-comparecimento", {"labels": ["Atendido", "Ausente"], "data": [69, 643]});
+graficoDoughnut("grafico-comparecimento", {"labels": ["Atendido", "Ausente", "Sem baixa no sistema"], "data": [69, 643, 1704]});
 graficoDoughnut("grafico-sexo", {"labels": ["Feminino", "Masculino"], "data": [3887, 821]});
 graficoBarra("grafico-faixa-etaria", {"labels": ["0 a 17 anos", "18 a 29 anos", "30 a 44 anos", "45 a 59 anos", "60 anos ou mais"], "datasets": [{"label": "Pessoas", "data": [11, 729, 1638, 1158, 1172]}]});
 graficoBarra("grafico-motivos", {"labels": ["Alteração No Cadastro Único", "Inclusão No Cadastro Único", "Atualização em Domicílio", "Busca Ativa do Cadastro Único", "Contato Telefônico", "Atendimento/orientações Equipe Técnica Bolsa Familia", "Recepção / Procura Espontânea / Orientações", "Inclusão em Domicílio"], "datasets": [{"label": "Atendimentos", "data": [2286, 673, 469, 445, 317, 252, 184, 100]}]}, true);
