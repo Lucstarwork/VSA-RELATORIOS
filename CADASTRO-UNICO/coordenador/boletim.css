@@ -145,13 +145,17 @@ img { max-width: 100%; }
 .grid-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-5 { grid-template-columns: repeat(5, 1fr); }
 
 /* ---- 5. CARDS / KPI ------------------------------------------------- */
 .card { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-5); }
 
-.kpi-card { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-4) var(--sp-5); }
+.kpi-card { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-3) var(--sp-4); }
 .kpi-eb { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
-.kpi-val { font-family: var(--font-mono); font-size: 38px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); margin: 10px 0 4px; font-variant-numeric: tabular-nums; line-height: 1; }
+.kpi-val { font-family: var(--font-mono); font-size: 30px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); margin: 6px 0 3px; font-variant-numeric: tabular-nums; line-height: 1; }
+/* Número esmaecido: sinaliza indicador de baixa confiança, que não deve ser
+   lido como métrica firme. */
+.kpi-val--suave { color: var(--ink-3); }
 .kpi-foot { font-size: 12px; color: var(--ink-3); }
 
 .chart-card { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-6); }
