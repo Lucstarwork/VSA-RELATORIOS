@@ -3,27 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Total da população — Vigilância Socioassistencial</title>
+<title>Territorialização &amp; Vulnerabilidade Social — Vigilância Socioassistencial</title>
 <link rel="stylesheet" href="assets/design_system.css">
 <style>
   html,body{height:100%;margin:0;overflow:hidden;background:var(--paper)}
-  .shell{display:flex;flex-direction:column;height:100%}
+  .shell{display:flex;flex-direction:column;height:100%;overflow:hidden}
   .appbar-wrap{flex:0 0 auto;padding:var(--sp-3) var(--sp-4) 0}
   .brand-name{font-size:15px}
   .crumbs-row{flex:0 0 auto;padding:var(--sp-2) var(--sp-4) 0;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}
   .visao-switch{padding:0;gap:10px;font-size:13px;color:var(--ink-2);font-weight:500}
   #conteudo{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+
+  /* --- Linha de KPI (só no painel por CRAS -- é o resumo executivo do
+     território, não faz sentido repetir no painel por bairro). --- */
+  .painel-cras-shell{display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
+  .kpi-row{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-3);padding:var(--sp-2) var(--sp-4) 0}
+  .kpi-card{padding:14px 16px}
+  .kpi-val{font-size:26px;margin:6px 0 2px}
+  .kpi-foot{font-size:11.5px}
+
   .painel{flex:1 1 auto;display:flex;gap:var(--sp-4);padding:var(--sp-2) var(--sp-4) var(--sp-4);overflow:hidden;min-height:0}
   .mapa-card{flex:1 1 55%;padding:0;display:flex;flex-direction:column;overflow:hidden}
   .mapa-card iframe{width:100%;flex:1;border:0;display:block;border-radius:var(--radius-md)}
   .tabela-card{flex:1 1 45%;padding:0;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-  /* A tabela de CRAS tem 6 colunas -- precisa de mais largura que a de
+  /* A tabela de CRAS tem 14 colunas -- precisa de mais largura que a de
      bairro (2 colunas) pra não estourar em scroll horizontal. */
-  #painel-cras .mapa-card{flex:1 1 58%}
-  #painel-cras .tabela-card{flex:1 1 42%}
-  .tabela-head{padding:var(--sp-3) var(--sp-5) 0}
+  #painel-cras .mapa-card{flex:1 1 46%}
+  #painel-cras .tabela-card{flex:1 1 54%}
+  .tabela-head{padding:var(--sp-3) var(--sp-5) 0;display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-3)}
   .tabela-eb{font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
   .tabela-titulo{font-family:var(--font-serif);font-size:17px;font-weight:600;margin:2px 0 0}
+  .tabela-nota{font-size:12px;color:var(--ink-3);max-width:280px;text-align:right}
   .dtable-wrap{flex:1 1 auto;overflow:auto;margin:var(--sp-3) var(--sp-5);border-radius:var(--radius-md)}
   .dtable{font-size:13px}
   .dtable th,.dtable td{padding:7px 10px;white-space:nowrap}
@@ -31,10 +41,41 @@
      colados na direita (fica mais legível com colunas largas). */
   .dtable .num,.dtable th.num{text-align:center}
   .dtable th[data-sort]{cursor:pointer;user-select:none}
-  .dtable th[data-sort] i{font-size:12px;margin-left:4px;color:var(--ink-3);transition:transform var(--dur-fast)}
-  .dtable th.sort-desc i{transform:rotate(180deg)}
-  .dtable th.sort-asc i,.dtable th.sort-desc i{color:var(--primary)}
+  .dtable th[data-sort] i.ph-caret-down{font-size:12px;margin-left:4px;color:var(--ink-3);transition:transform var(--dur-fast)}
+  .dtable th.sort-desc i.ph-caret-down{transform:rotate(180deg)}
+  .dtable th.sort-asc i.ph-caret-down,.dtable th.sort-desc i.ph-caret-down{color:var(--primary)}
   .contador{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);padding:0 var(--sp-5) var(--sp-3);flex:0 0 auto}
+
+  /* Ponto de cor no cabeçalho -- liga a coluna à camada equivalente no mapa
+     (mesma cor, ver COR_RAMPA_PCT em gerar_populacao.py). */
+  .th-dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px;vertical-align:middle}
+
+  /* Barrinha de proporção nas colunas percentuais -- leitura mais rápida
+     que só o número cru numa tabela deste tamanho (8 linhas x 8 %). */
+  .barcell{display:inline-flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+  .bar-track{position:relative;display:inline-block;width:46px;height:6px;border-radius:var(--radius-pill);background:var(--surface-3);overflow:hidden;flex:0 0 auto}
+  .bar-fill{position:absolute;inset:0 auto 0 0;height:100%;border-radius:var(--radius-pill)}
+  .bar-num{min-width:38px;text-align:right}
+
+  /* Selo de prioridade do IVS reaproveita .badge/.dot do design system
+     (ok/warn/err) -- só adiciona o numeral do índice ao lado, já que aqui
+     ele também é a chave de ordenação da coluna. */
+  .ivs-num{font-family:var(--font-mono);font-weight:600;margin-right:6px}
+
+  /* Acordeão "Como o IVS é calculado" -- clique = linha inteira, seta
+     reflete o estado (padrão de Collapse/Accordion do Design Guide §3). */
+  .ivs-info{flex:0 0 auto;margin:0 var(--sp-5);border-top:var(--hair) solid var(--hairline)}
+  .ivs-info-toggle{width:100%;display:flex;align-items:center;gap:8px;padding:10px 2px;background:none;border:0;cursor:pointer;text-align:left;font-family:var(--font-sans);font-size:12.5px;font-weight:500;color:var(--ink-2)}
+  .ivs-info-toggle:hover{color:var(--ink)}
+  .ivs-info-toggle i.ph-info{color:var(--primary);font-size:15px}
+  .ivs-info-toggle span{flex:1 1 auto}
+  .ivs-info-caret{font-size:12px;color:var(--ink-3);transition:transform var(--dur-fast)}
+  .ivs-info-toggle[aria-expanded="true"] .ivs-info-caret{transform:rotate(180deg)}
+  .ivs-info-body{padding:0 2px 14px;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+  .ivs-info-body p{margin:0 0 8px}
+  .ivs-info-body p:last-child{margin-bottom:0}
+  .ivs-info-body code{font-family:var(--font-mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:var(--radius-sm)}
+  .ivs-formula{font-family:var(--font-mono);font-size:12px;background:var(--surface-2);padding:8px 10px;border-radius:var(--radius-sm);color:var(--ink)}
 </style>
 </head>
 <body>
@@ -46,7 +87,7 @@
         <img class="brand-crest" src="https://lucstarwork.github.io/VSA-RELATORIOS/BOLETINS-PSB/2026/1o%20SEMESTRE/assets/brasao-simples.png" alt="Brasão de Araucária">
         <div>
           <div class="brand-name">Vigilância Socioassistencial</div>
-          <div class="brand-sub">TERRITÓRIO &amp; POPULAÇÃO</div>
+          <div class="brand-sub">TERRITORIALIZAÇÃO &amp; VULNERABILIDADE SOCIAL</div>
         </div>
       </div>
     </header>
@@ -56,7 +97,7 @@
     <span class="crumbs">
       <span>Territorização</span>
       <i class="ph ph-caret-right sep" aria-hidden="true"></i>
-      <span class="cur" id="breadcrumb-atual" aria-current="page">Total da população por CRAS</span>
+      <span class="cur" id="breadcrumb-atual" aria-current="page">Índice de Vulnerabilidade Social por CRAS</span>
     </span>
     <label class="opt-row visao-switch">
       <input type="checkbox" id="switchVisao" checked>
@@ -108,37 +149,85 @@
     </div>
   </div>
 
-  <div class="painel" id="painel-cras">
-    <div class="card mapa-card"><iframe src="mapa_populacao_cras.html" title="Mapa de população por CRAS"></iframe></div>
+  <div class="painel-cras-shell" id="painel-cras">
+  <div class="kpi-row">
+    <div class="card kpi-card">
+      <div class="kpi-eb"><span class="dot"></span> Território prioritário</div>
+      <div class="kpi-val" style="font-size:22px">CRAS Centro</div>
+      <div class="kpi-foot">IVS 63,3 de 100 -- maior risco relativo entre os 8 territórios</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-eb"><span class="dot"></span> População no Cadastro Único</div>
+      <div class="kpi-val">58.252</div>
+      <div class="kpi-foot">Cobertura de 21,2% da população geral estimada</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-eb"><span class="dot"></span> Extrema pobreza</div>
+      <div class="kpi-val">16.622</div>
+      <div class="kpi-foot">Pessoas em família com renda per capita até R$ 218, nos 8 territórios</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-eb"><span class="dot"></span> Atendimentos no período</div>
+      <div class="kpi-val">35.446</div>
+      <div class="kpi-foot">Volume total registrado pelas equipes de CRAS</div>
+    </div>
+  </div>
+  <div class="painel">
+    <div class="card mapa-card"><iframe src="mapa_populacao_cras.html" title="Mapa de território de CRAS -- IVS e indicadores"></iframe></div>
     <div class="card tabela-card">
       <div class="tabela-head">
-        <div class="tabela-eb">Territorização</div>
-        <h2 class="tabela-titulo">População por CRAS</h2>
+        <div>
+          <div class="tabela-eb">Territorização</div>
+          <h2 class="tabela-titulo">Territórios de CRAS -- risco, serviço e IVS</h2>
+        </div>
+        <div class="tabela-nota">Ordenado por prioridade (IVS). Clique num cabeçalho pra reordenar por outro indicador.</div>
+      </div>
+      <div class="ivs-info">
+        <button class="ivs-info-toggle" id="ivsInfoToggle" aria-expanded="false" aria-controls="ivsInfoBody">
+          <i class="ph ph-info"></i>
+          <span>Como o IVS é calculado?</span>
+          <i class="ph ph-caret-down ivs-info-caret"></i>
+        </button>
+        <div class="ivs-info-body" id="ivsInfoBody" hidden>
+          <p>O <strong>Índice de Vulnerabilidade Social (IVS)</strong> é a média simples (peso igual) de 6 indicadores de risco do Cadastro Único, cada um recalculado numa escala de 0 a 100 dentro dos 8 territórios de CRAS -- 100 é sempre o território com o valor mais alto naquele indicador hoje, 0 o mais baixo, não um limiar técnico fixo.</p>
+          <p class="ivs-formula">IVS = média( norm(Extrema pobreza), norm(Bolsa Família), norm(Deficiência), norm(Tarifa Social), norm(Moradia precária), norm(Situação de rua) )</p>
+          <p>onde <code>norm(x) = (x − mínimo) ÷ (máximo − mínimo) × 100</code>, calculado entre os 8 territórios para cada indicador.</p>
+          <p>Peso igual entre os 6 indicadores por não haver, até o momento, validação técnica da equipe da Vigilância pra pesar um risco mais que outro. É um índice relativo ao município e aos territórios de hoje -- não comparável a outros municípios ou a versões futuras com territórios diferentes; serve só para ordenar prioridade de atenção entre os 8 territórios de CRAS atuais.</p>
+        </div>
       </div>
       <div class="dtable-wrap">
         <table class="dtable" id="tabela-cras">
           <thead><tr>
             <th data-sort="text">CRAS</th>
-            <th class="num" data-sort="num" data-sort-dir="desc">Pop. geral<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num" data-sort-dir="desc">IVS<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num">Pop. geral<i class="ph ph-caret-down"></i></th>
             <th class="num" data-sort="num">CadÚnico<i class="ph ph-caret-down"></i></th>
-            <th class="num" data-sort="num">Cobertura<i class="ph ph-caret-down"></i></th>
-            <th class="num" data-sort="num">Extrema pobreza<i class="ph ph-caret-down"></i></th>
-            <th class="num" data-sort="num">Bolsa Família<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num"><span class="th-dot" style="background:#00281a"></span>Cobertura<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num"><span class="th-dot" style="background:#5c0f04"></span>Extrema pobreza<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num"><span class="th-dot" style="background:#3d2600"></span>Bolsa Família<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num"><span class="th-dot" style="background:#053b42"></span>Deficiência<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num"><span class="th-dot" style="background:#4d2400"></span>Tarifa Social<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num"><span class="th-dot" style="background:#4a0e2c"></span>BPC<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num"><span class="th-dot" style="background:#3d2413"></span>Moradia precária<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num"><span class="th-dot" style="background:#28350f"></span>PAIF<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num">Situação de rua<i class="ph ph-caret-down"></i></th>
+            <th class="num" data-sort="num">Atendimentos<i class="ph ph-caret-down"></i></th>
           </tr></thead>
           <tbody>
-          <tr><td>Boqueirão</td><td class="num" data-order="19605">19.605</td><td class="num" data-order="4946">4.946</td><td class="num" data-order="25.2">25,2%</td><td class="num" data-order="28.6">28,6%</td><td class="num" data-order="34.3">34,3%</td></tr>
-<tr><td>Centro</td><td class="num" data-order="47038">47.038</td><td class="num" data-order="11018">11.018</td><td class="num" data-order="23.4">23,4%</td><td class="num" data-order="27.3">27,3%</td><td class="num" data-order="32.9">32,9%</td></tr>
-<tr><td>Costeira</td><td class="num" data-order="62071">62.071</td><td class="num" data-order="8170">8.170</td><td class="num" data-order="13.2">13,2%</td><td class="num" data-order="26.1">26,1%</td><td class="num" data-order="32.4">32,4%</td></tr>
-<tr><td>Fazenda Velha</td><td class="num" data-order="25456">25.456</td><td class="num" data-order="4230">4.230</td><td class="num" data-order="16.6">16,6%</td><td class="num" data-order="23.8">23,8%</td><td class="num" data-order="29.9">29,9%</td></tr>
-<tr><td>Thomaz Coelho</td><td class="num" data-order="12219">12.219</td><td class="num" data-order="2520">2.520</td><td class="num" data-order="20.6">20,6%</td><td class="num" data-order="21.5">21,5%</td><td class="num" data-order="26.5">26,5%</td></tr>
-<tr><td>Tupy</td><td class="num" data-order="37031">37.031</td><td class="num" data-order="8980">8.980</td><td class="num" data-order="24.2">24,2%</td><td class="num" data-order="25.5">25,5%</td><td class="num" data-order="31.9">31,9%</td></tr>
-<tr><td>Califórnia</td><td class="num" data-order="30099">30.099</td><td class="num" data-order="7552">7.552</td><td class="num" data-order="25.1">25,1%</td><td class="num" data-order="40.3">40,3%</td><td class="num" data-order="47.2">47,2%</td></tr>
-<tr><td>Industrial</td><td class="num" data-order="41891">41.891</td><td class="num" data-order="10836">10.836</td><td class="num" data-order="25.9">25,9%</td><td class="num" data-order="29.4">29,4%</td><td class="num" data-order="36.5">36,5%</td></tr>
+          <tr><td>Centro</td><td class="num" data-order="63.3"><span class="ivs-num">63,3</span><span class="badge warn" title="Prioridade média de atenção da Vigilância"><span class="dot"></span>Média</span></td><td class="num" data-order="47038">47.038</td><td class="num" data-order="11018">11.018</td><td class="num" data-order="23.4"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:23%;background:#00281a"></span></span><span class="bar-num">23,4%</span></span></td><td class="num" data-order="27.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:27%;background:#5c0f04"></span></span><span class="bar-num">27,3%</span></span></td><td class="num" data-order="32.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:33%;background:#3d2600"></span></span><span class="bar-num">32,9%</span></span></td><td class="num" data-order="15.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:16%;background:#053b42"></span></span><span class="bar-num">15,9%</span></span></td><td class="num" data-order="17.8"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:18%;background:#4d2400"></span></span><span class="bar-num">17,8%</span></span></td><td class="num" data-order="10.7"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:11%;background:#4a0e2c"></span></span><span class="bar-num">10,7%</span></span></td><td class="num" data-order="41.1"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:41%;background:#3d2413"></span></span><span class="bar-num">41,1%</span></span></td><td class="num" data-order="1.4"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:1%;background:#28350f"></span></span><span class="bar-num">1,4%</span></span></td><td class="num" data-order="5.4">5,4</td><td class="num" data-order="6006">6.006</td></tr>
+<tr><td>Califórnia</td><td class="num" data-order="52.7"><span class="ivs-num">52,7</span><span class="badge warn" title="Prioridade média de atenção da Vigilância"><span class="dot"></span>Média</span></td><td class="num" data-order="30099">30.099</td><td class="num" data-order="7552">7.552</td><td class="num" data-order="25.1"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:25%;background:#00281a"></span></span><span class="bar-num">25,1%</span></span></td><td class="num" data-order="40.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:40%;background:#5c0f04"></span></span><span class="bar-num">40,3%</span></span></td><td class="num" data-order="47.2"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:47%;background:#3d2600"></span></span><span class="bar-num">47,2%</span></span></td><td class="num" data-order="12.6"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:13%;background:#053b42"></span></span><span class="bar-num">12,6%</span></span></td><td class="num" data-order="6.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:7%;background:#4d2400"></span></span><span class="bar-num">6,9%</span></span></td><td class="num" data-order="9.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:10%;background:#4a0e2c"></span></span><span class="bar-num">9,9%</span></span></td><td class="num" data-order="57.0"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:57%;background:#3d2413"></span></span><span class="bar-num">57,0%</span></span></td><td class="num" data-order="1.8"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:2%;background:#28350f"></span></span><span class="bar-num">1,8%</span></span></td><td class="num" data-order="0.0">0,0</td><td class="num" data-order="4400">4.400</td></tr>
+<tr><td>Boqueirão</td><td class="num" data-order="46.0"><span class="ivs-num">46,0</span><span class="badge warn" title="Prioridade média de atenção da Vigilância"><span class="dot"></span>Média</span></td><td class="num" data-order="19605">19.605</td><td class="num" data-order="4946">4.946</td><td class="num" data-order="25.2"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:25%;background:#00281a"></span></span><span class="bar-num">25,2%</span></span></td><td class="num" data-order="28.6"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:29%;background:#5c0f04"></span></span><span class="bar-num">28,6%</span></span></td><td class="num" data-order="34.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:34%;background:#3d2600"></span></span><span class="bar-num">34,3%</span></span></td><td class="num" data-order="12.5"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:12%;background:#053b42"></span></span><span class="bar-num">12,5%</span></span></td><td class="num" data-order="18.0"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:18%;background:#4d2400"></span></span><span class="bar-num">18,0%</span></span></td><td class="num" data-order="7.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:8%;background:#4a0e2c"></span></span><span class="bar-num">7,9%</span></span></td><td class="num" data-order="15.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:16%;background:#3d2413"></span></span><span class="bar-num">15,9%</span></span></td><td class="num" data-order="3.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:3%;background:#28350f"></span></span><span class="bar-num">3,3%</span></span></td><td class="num" data-order="6.1">6,1</td><td class="num" data-order="4833">4.833</td></tr>
+<tr><td>Costeira</td><td class="num" data-order="44.8"><span class="ivs-num">44,8</span><span class="badge warn" title="Prioridade média de atenção da Vigilância"><span class="dot"></span>Média</span></td><td class="num" data-order="62071">62.071</td><td class="num" data-order="8170">8.170</td><td class="num" data-order="13.2"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:13%;background:#00281a"></span></span><span class="bar-num">13,2%</span></span></td><td class="num" data-order="26.1"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:26%;background:#5c0f04"></span></span><span class="bar-num">26,1%</span></span></td><td class="num" data-order="32.4"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:32%;background:#3d2600"></span></span><span class="bar-num">32,4%</span></span></td><td class="num" data-order="15.2"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:15%;background:#053b42"></span></span><span class="bar-num">15,2%</span></span></td><td class="num" data-order="22.7"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:23%;background:#4d2400"></span></span><span class="bar-num">22,7%</span></span></td><td class="num" data-order="10.0"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:10%;background:#4a0e2c"></span></span><span class="bar-num">10,0%</span></span></td><td class="num" data-order="7.7"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:8%;background:#3d2413"></span></span><span class="bar-num">7,7%</span></span></td><td class="num" data-order="1.7"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:2%;background:#28350f"></span></span><span class="bar-num">1,7%</span></span></td><td class="num" data-order="2.4">2,4</td><td class="num" data-order="4300">4.300</td></tr>
+<tr><td>Tupy</td><td class="num" data-order="40.7"><span class="ivs-num">40,7</span><span class="badge warn" title="Prioridade média de atenção da Vigilância"><span class="dot"></span>Média</span></td><td class="num" data-order="37031">37.031</td><td class="num" data-order="8980">8.980</td><td class="num" data-order="24.2"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:24%;background:#00281a"></span></span><span class="bar-num">24,2%</span></span></td><td class="num" data-order="25.5"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:26%;background:#5c0f04"></span></span><span class="bar-num">25,5%</span></span></td><td class="num" data-order="31.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:32%;background:#3d2600"></span></span><span class="bar-num">31,9%</span></span></td><td class="num" data-order="16.2"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:16%;background:#053b42"></span></span><span class="bar-num">16,2%</span></span></td><td class="num" data-order="20.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:20%;background:#4d2400"></span></span><span class="bar-num">20,3%</span></span></td><td class="num" data-order="9.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:9%;background:#4a0e2c"></span></span><span class="bar-num">9,3%</span></span></td><td class="num" data-order="13.7"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:14%;background:#3d2413"></span></span><span class="bar-num">13,7%</span></span></td><td class="num" data-order="7.4"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:7%;background:#28350f"></span></span><span class="bar-num">7,4%</span></span></td><td class="num" data-order="0.0">0,0</td><td class="num" data-order="3124">3.124</td></tr>
+<tr><td>Industrial</td><td class="num" data-order="36.4"><span class="ivs-num">36,4</span><span class="badge warn" title="Prioridade média de atenção da Vigilância"><span class="dot"></span>Média</span></td><td class="num" data-order="41891">41.891</td><td class="num" data-order="10836">10.836</td><td class="num" data-order="25.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:26%;background:#00281a"></span></span><span class="bar-num">25,9%</span></span></td><td class="num" data-order="29.4"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:29%;background:#5c0f04"></span></span><span class="bar-num">29,4%</span></span></td><td class="num" data-order="36.5"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:36%;background:#3d2600"></span></span><span class="bar-num">36,5%</span></span></td><td class="num" data-order="12.8"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:13%;background:#053b42"></span></span><span class="bar-num">12,8%</span></span></td><td class="num" data-order="13.7"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:14%;background:#4d2400"></span></span><span class="bar-num">13,7%</span></span></td><td class="num" data-order="8.2"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:8%;background:#4a0e2c"></span></span><span class="bar-num">8,2%</span></span></td><td class="num" data-order="32.0"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:32%;background:#3d2413"></span></span><span class="bar-num">32,0%</span></span></td><td class="num" data-order="9.5"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:10%;background:#28350f"></span></span><span class="bar-num">9,5%</span></span></td><td class="num" data-order="0.9">0,9</td><td class="num" data-order="7361">7.361</td></tr>
+<tr><td>Fazenda Velha</td><td class="num" data-order="31.4"><span class="ivs-num">31,4</span><span class="badge ok" title="Prioridade baixa de atenção da Vigilância"><span class="dot"></span>Baixa</span></td><td class="num" data-order="25456">25.456</td><td class="num" data-order="4230">4.230</td><td class="num" data-order="16.6"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:17%;background:#00281a"></span></span><span class="bar-num">16,6%</span></span></td><td class="num" data-order="23.8"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:24%;background:#5c0f04"></span></span><span class="bar-num">23,8%</span></span></td><td class="num" data-order="29.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:30%;background:#3d2600"></span></span><span class="bar-num">29,9%</span></span></td><td class="num" data-order="13.8"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:14%;background:#053b42"></span></span><span class="bar-num">13,8%</span></span></td><td class="num" data-order="12.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:13%;background:#4d2400"></span></span><span class="bar-num">12,9%</span></span></td><td class="num" data-order="11.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:11%;background:#4a0e2c"></span></span><span class="bar-num">11,3%</span></span></td><td class="num" data-order="8.0"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:8%;background:#3d2413"></span></span><span class="bar-num">8,0%</span></span></td><td class="num" data-order="3.0"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:3%;background:#28350f"></span></span><span class="bar-num">3,0%</span></span></td><td class="num" data-order="4.7">4,7</td><td class="num" data-order="4012">4.012</td></tr>
+<tr><td>Thomaz Coelho</td><td class="num" data-order="18.4"><span class="ivs-num">18,4</span><span class="badge ok" title="Prioridade baixa de atenção da Vigilância"><span class="dot"></span>Baixa</span></td><td class="num" data-order="12219">12.219</td><td class="num" data-order="2520">2.520</td><td class="num" data-order="20.6"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:21%;background:#00281a"></span></span><span class="bar-num">20,6%</span></span></td><td class="num" data-order="21.5"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:22%;background:#5c0f04"></span></span><span class="bar-num">21,5%</span></span></td><td class="num" data-order="26.5"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:26%;background:#3d2600"></span></span><span class="bar-num">26,5%</span></span></td><td class="num" data-order="11.9"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:12%;background:#053b42"></span></span><span class="bar-num">11,9%</span></span></td><td class="num" data-order="18.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:18%;background:#4d2400"></span></span><span class="bar-num">18,3%</span></span></td><td class="num" data-order="9.3"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:9%;background:#4a0e2c"></span></span><span class="bar-num">9,3%</span></span></td><td class="num" data-order="26.7"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:27%;background:#3d2413"></span></span><span class="bar-num">26,7%</span></span></td><td class="num" data-order="1.7"><span class="barcell"><span class="bar-track"><span class="bar-fill" style="width:2%;background:#28350f"></span></span><span class="bar-num">1,7%</span></span></td><td class="num" data-order="0.0">0,0</td><td class="num" data-order="1410">1.410</td></tr>
           </tbody>
         </table>
       </div>
       <div class="contador" data-contador-de="tabela-cras"></div>
     </div>
+  </div>
   </div>
   </main>
 </div>
@@ -151,7 +240,7 @@ function aplicarVisao(mostrarCras) {
   document.getElementById('painel-bairro').style.display = mostrarCras ? 'none' : '';
   document.getElementById('switchLabel').textContent = mostrarCras ? 'Por CRAS' : 'Por bairro';
   document.getElementById('breadcrumb-atual').textContent =
-    mostrarCras ? 'Total da população por CRAS' : 'Total da população por bairro';
+    mostrarCras ? 'Índice de Vulnerabilidade Social por CRAS' : 'Total da população por bairro';
 
   var painelAtivo = mostrarCras ? 'painel-cras' : 'painel-bairro';
   var iframeAtivo = document.querySelector('#' + painelAtivo + ' iframe');
@@ -167,6 +256,15 @@ function aplicarVisao(mostrarCras) {
 }
 switchVisao.addEventListener('change', function () { aplicarVisao(switchVisao.checked); });
 
+/* ---- Acordeão "Como o IVS é calculado" ---- */
+var ivsInfoToggle = document.getElementById('ivsInfoToggle');
+var ivsInfoBody = document.getElementById('ivsInfoBody');
+ivsInfoToggle.addEventListener('click', function () {
+  var aberto = ivsInfoToggle.getAttribute('aria-expanded') === 'true';
+  ivsInfoToggle.setAttribute('aria-expanded', String(!aberto));
+  ivsInfoBody.hidden = aberto;
+});
+
 /* ---- Tabela: ordenação por coluna + busca (substitui DataTables por algo
    leve e alinhado ao componente .dtable do Design System) ---- */
 function ativarTabela(idTabela) {
@@ -178,36 +276,47 @@ function ativarTabela(idTabela) {
     contador.textContent = 'Exibindo ' + corpo.querySelectorAll('tr').length + ' registros';
   }
 
+  // aplicarOrdenacao recebe a direção final desejada diretamente (não
+  // inverte nada) -- o clique calcula o toggle e chama com o resultado; a
+  // ordenação inicial chama com a direção já marcada no HTML, sem passar
+  // por nenhum toggle. Antes disso tudo passava por th.click(), que lia
+  // data-sort-dir="desc" do HTML como se já estivesse ordenado em "desc" e
+  // invertia pra "asc" -- a tabela abria com a prioridade mais baixa
+  // primeiro, o oposto do pedido.
+  function aplicarOrdenacao(th, direcao) {
+    var tipo = th.dataset.sort;
+    var indice = Array.prototype.indexOf.call(th.parentElement.children, th);
+
+    tabela.querySelectorAll('th').forEach(function (outro) {
+      if (outro !== th) { outro.classList.remove('sort-asc', 'sort-desc'); delete outro.dataset.sortDir; }
+    });
+    th.dataset.sortDir = direcao;
+    th.classList.toggle('sort-asc', direcao === 'asc');
+    th.classList.toggle('sort-desc', direcao === 'desc');
+
+    var linhas = Array.prototype.slice.call(corpo.querySelectorAll('tr'));
+    linhas.sort(function (a, b) {
+      var celA = a.children[indice], celB = b.children[indice];
+      var valA = tipo === 'num' ? parseFloat(celA.dataset.order) : celA.textContent.trim().toLowerCase();
+      var valB = tipo === 'num' ? parseFloat(celB.dataset.order) : celB.textContent.trim().toLowerCase();
+      if (valA < valB) return direcao === 'asc' ? -1 : 1;
+      if (valA > valB) return direcao === 'asc' ? 1 : -1;
+      return 0;
+    });
+    linhas.forEach(function (linha) { corpo.appendChild(linha); });
+  }
+
   tabela.querySelectorAll('th[data-sort]').forEach(function (th) {
     th.addEventListener('click', function () {
-      var tipo = th.dataset.sort;
-      var indice = Array.prototype.indexOf.call(th.parentElement.children, th);
       var atual = th.dataset.sortDir === 'asc' ? 'asc' : (th.dataset.sortDir === 'desc' ? 'desc' : null);
-      var proximo = atual === 'desc' ? 'asc' : 'desc';
-
-      tabela.querySelectorAll('th').forEach(function (outro) {
-        if (outro !== th) { outro.classList.remove('sort-asc', 'sort-desc'); delete outro.dataset.sortDir; }
-      });
-      th.dataset.sortDir = proximo;
-      th.classList.toggle('sort-asc', proximo === 'asc');
-      th.classList.toggle('sort-desc', proximo === 'desc');
-
-      var linhas = Array.prototype.slice.call(corpo.querySelectorAll('tr'));
-      linhas.sort(function (a, b) {
-        var celA = a.children[indice], celB = b.children[indice];
-        var valA = tipo === 'num' ? parseFloat(celA.dataset.order) : celA.textContent.trim().toLowerCase();
-        var valB = tipo === 'num' ? parseFloat(celB.dataset.order) : celB.textContent.trim().toLowerCase();
-        if (valA < valB) return proximo === 'asc' ? -1 : 1;
-        if (valA > valB) return proximo === 'asc' ? 1 : -1;
-        return 0;
-      });
-      linhas.forEach(function (linha) { corpo.appendChild(linha); });
+      aplicarOrdenacao(th, atual === 'desc' ? 'asc' : 'desc');
     });
   });
 
-  // Ordenação inicial: coluna com data-sort-dir já marcada no HTML.
+  // Ordenação inicial: coluna com data-sort-dir já marcada no HTML, aplicada
+  // direto (sem toggle).
   var thInicial = tabela.querySelector('th[data-sort-dir]');
-  if (thInicial) thInicial.click();
+  if (thInicial) aplicarOrdenacao(thInicial, thInicial.dataset.sortDir);
   atualizarContador();
 }
 ativarTabela('tabela-populacao');
