@@ -5,39 +5,139 @@
 <meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>Relatório Semanal de Atendimentos — Operação Inverno — Araucária</title>
-<link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet'>
+
+<!-- Tema resolvido antes da 1a pintura (sem flash). Herda a escolha do Hub pela
+     mesma chave localStorage 'hub_tema'; sem valor salvo, segue a preferência do SO. -->
+<script>
+  (function(){
+    try{
+      var t = localStorage.getItem('hub_tema');
+      if (t !== 'dark' && t !== 'light')
+        t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    }catch(e){ document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+
 <link rel='preconnect' href='https://fonts.googleapis.com'>
 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
 <link href='https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
+<!-- Ícones Phosphor (peso regular) — Design System v2.0. Substitui o Font Awesome. -->
+<link rel='stylesheet' href='https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css'>
 <style>
+  /* =====================================================================
+     Design System — Vigilância Socioassistencial v2.0
+     Tokens copiados de KIWI/kiwi/design/DESIGN.md §1 (primitivos + semânticos
+     claro + semânticos escuro). Fonte da verdade: design_system_preview.html.
+     ===================================================================== */
+
+  /* ---- 1. PRIMITIVOS (valores crus, agnósticos de tema) ---- */
   :root{
-    --brand:#007044; --brand-deep:#00492c; --blue:#155bcb; --gold:#a9740a;
-    --focus:#c2850c;
-    --ink:#1a1a17; --ink-2:#3a3a38; --ink-3:#6b6b66;
-    --line:#e2e2dd; --line-2:#ededea;
-    --paper:#fafaf9; --paper-2:#f5f5f3; --card:#ffffff; --grid:#ededea;
-    --pos:#127a1e; --neg:#c42b1c;
-    --serif:"Spectral", Georgia, "Times New Roman", serif;
-    --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --green-90:#00281a; --green-80:#00492c; --green-70:#005a37;
+    --green-60:#007044; --green-50:#0a8a56; --green-40:#3aa877; --green-30:#7ed9a3;
+    --navy:#103858; --navy-deep:#0c2a43;
+    --n-99:#fafaf9; --n-97:#f5f5f3; --n-94:#ededea; --n-88:#e2e2dd;
+    --n-78:#c9c9c2; --n-55:#6b6b66; --n-38:#3a3a38; --n-16:#1a1a17;
+    --g-08:#0e0e0e; --g-12:#171717; --g-16:#1f1f1f; --g-22:#282828;
+    --g-ink:#ededec; --g-ink2:#b4b4b0; --g-ink3:#8a8a85;
+    --gold:#c2850c; --gold-light:#e0a63b;
+
+    --font-serif:'Spectral', Georgia, 'Times New Roman', serif;
+    --font-sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
+    --sp-8:32px; --sp-10:40px; --sp-12:48px; --sp-16:64px;
+
+    --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-pill:999px;
+
+    --dur-instant:.1s; --dur-fast:.2s; --dur-surface:.32s;
+    --ease-out:cubic-bezier(.22,.61,.36,1);
+    --ease-emphasis:cubic-bezier(.2,0,0,1);
+    --focus-w:3px;
   }
+
+  /* ---- 2. SEMÂNTICOS — TEMA CLARO ---- */
+  :root, [data-theme="light"]{
+    --paper:var(--n-99); --surface:#ffffff; --surface-2:var(--n-97); --surface-3:var(--n-94);
+    --ink:var(--n-16); --ink-2:var(--n-38); --ink-3:var(--n-55);
+    --hairline:var(--n-88); --hairline-strong:var(--n-78); --rule:var(--n-16);
+    --primary:var(--green-60); --primary-strong:var(--green-80); --primary-soft:#eaf5ef;
+    --on-primary:#ffffff; --brand-ink:var(--navy); --focus:var(--gold);
+    --success:#127a1e; --warning:#8a5a00; --danger:#c42b1c; --info:#155bcb;
+    --shadow-float:0 4px 16px -4px rgba(20,20,18,.16), 0 1px 3px rgba(20,20,18,.08);
+    color-scheme:light;
+  }
+
+  /* ---- 2b. SEMÂNTICOS — TEMA ESCURO (grafite neutro, sem tingimento) ---- */
+  [data-theme="dark"]{
+    --paper:var(--g-08); --surface:var(--g-12); --surface-2:var(--g-16); --surface-3:var(--g-22);
+    --ink:var(--g-ink); --ink-2:var(--g-ink2); --ink-3:var(--g-ink3);
+    --hairline:rgba(255,255,255,.11); --hairline-strong:rgba(255,255,255,.22); --rule:var(--g-ink);
+    --primary:#54cf93; --primary-strong:#7edca9; --primary-soft:rgba(84,207,147,.12);
+    --on-primary:#052b18; --brand-ink:var(--g-ink); --focus:var(--gold-light);
+    --success:#5fd07a; --warning:#f0c24a; --danger:#ff9b8e; --info:#8fb6ff;
+    --shadow-float:0 8px 28px -6px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+
+  /* ---- 3. Apelidos de compatibilidade: os nomes locais deste template
+     resolvem para tokens semânticos do DS. O markup do corpo (var(--brand)
+     nas fitas dos KPIs etc.) continua válido e passa a render o valor do DS. ---- */
+  :root{
+    --brand:var(--primary); --brand-deep:var(--primary-strong);
+    --blue:var(--info); --pos:var(--success); --neg:var(--danger);
+    --line:var(--hairline); --line-2:var(--hairline);
+    --paper-2:var(--surface-2); --card:var(--surface); --grid:var(--hairline);
+    --serif:var(--font-serif); --sans:var(--font-sans); --mono:var(--font-mono);
+  }
+
   *{ box-sizing:border-box; margin:0; padding:0; }
   ::selection{ background:rgba(0,112,68,.16); }
-  html{ scroll-behavior:smooth; }
+  html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent; }
   body{
     background:var(--paper); color:var(--ink);
     font-family:var(--sans); font-size:14px; line-height:1.5;
     -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
   }
+  /* A troca de tema não anima o resto da interface (DESIGN.md §6). */
+  .theme-switching, .theme-switching *{ transition:none !important; }
+
   ::-webkit-scrollbar{ width:10px; height:10px; }
-  ::-webkit-scrollbar-thumb{ background:#cfcfc9; border-radius:8px; border:2px solid var(--paper); }
+  ::-webkit-scrollbar-thumb{ background:var(--hairline-strong); border-radius:var(--radius-md); border:2px solid var(--paper); }
   ::-webkit-scrollbar-track{ background:transparent; }
 
+  .skip-link{
+    position:absolute; left:-9999px; top:0; z-index:20;
+    background:var(--surface); color:var(--primary); font-family:var(--mono);
+    font-size:12px; padding:10px 16px; border:1px solid var(--hairline); border-radius:var(--radius-sm);
+  }
+  .skip-link:focus{ left:16px; top:16px; }
+
+  /* Controle utilitário: alterna claro/escuro. Fora da impressão. */
+  .theme-toggle{
+    position:absolute; top:16px; right:40px; z-index:15;
+    width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center;
+    background:var(--surface); color:var(--ink-2);
+    border:1px solid var(--hairline); border-radius:var(--radius-md);
+    cursor:pointer; font-size:17px; line-height:1;
+    transition:color var(--dur-instant), border-color var(--dur-instant);
+  }
+  @media (hover:hover){ .theme-toggle:hover{ color:var(--primary); border-color:var(--primary-soft); } }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration:.01ms !important; animation-iteration-count:1 !important;
+      transition-duration:.01ms !important; scroll-behavior:auto !important;
+    }
+  }
+
   .viz-root{
+    position:relative;
     max-width:1400px; margin:0 auto; padding:0 40px 72px;
     background:var(--paper);
   }
-  .viz-root :focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+  .viz-root :focus-visible{ outline:var(--focus-w) solid var(--focus); outline-offset:2px; }
   .mono{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
 
   /* ===== Masthead ===== */
@@ -80,7 +180,8 @@
 
   /* ===== Cabeçalhos de seção ===== */
   .block{ margin-bottom:44px; }
-  .sec-hd{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; border-bottom:1px solid var(--ink); padding-bottom:9px; margin-bottom:16px; flex-wrap:wrap; }
+  /* Régua editorial (DESIGN.md §5): eyebrow + título + borda superior de fechamento. */
+  .sec-hd{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; border-top:1.5px solid var(--rule); padding-top:9px; margin-bottom:16px; flex-wrap:wrap; }
   .sec-eyebrow{ display:flex; align-items:baseline; gap:12px; margin:0 0 3px; }
   .sec-eyebrow .num{ font-family:var(--mono); font-size:12px; font-weight:500; color:var(--brand); letter-spacing:.05em; }
   .sec-eyebrow .lbl{ font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-3); }
@@ -89,22 +190,22 @@
   .sec-meta{ font-family:var(--mono); font-size:10.5px; color:var(--ink-3); letter-spacing:.04em; white-space:nowrap; }
   .wk-select{
     font-family:var(--mono); font-size:12px; font-weight:500; color:var(--brand);
-    background:var(--card); border:1px solid var(--line); border-radius:6px;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius-sm);
     padding:6px 10px; cursor:pointer;
   }
   #rotuloSemanaImpressa{ display:none; }
 
   /* ===== KPIs (grade emoldurada, hairline em todas as direções) ===== */
-  .kpis{ display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .kpis{ display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius-md); overflow:hidden; }
   .kpi{ background:var(--card); padding:16px 12px 18px; display:flex; flex-direction:column; align-items:center; text-align:center; }
   .kpi .lab{ display:flex; align-items:center; justify-content:center; gap:7px; min-height:2.2em; font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-2); }
   .kpi .lab .tick{ width:16px; height:3px; border-radius:2px; flex:none; }
-  .kpi .lab .fa-solid{ font-size:10px; color:var(--ink-3); cursor:help; }
+  .kpi .lab .ph{ font-size:12px; color:var(--ink-3); cursor:help; }
   /* Bloco valor+detalhe centralizado no espaço abaixo do rótulo — mantém os
      números alinhados entre cards e sem sobra vazia no rodapé do card. */
   .kpi-corpo{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
   .kpi .val{ font-family:var(--mono); font-size:36px; font-weight:600; letter-spacing:-.02em; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1; }
-  .kpi-delta{ display:inline-flex; align-items:center; gap:4px; font-family:var(--mono); font-size:11px; font-weight:500; padding:2px 8px; border-radius:3px; margin-top:9px; font-variant-numeric:tabular-nums; }
+  .kpi-delta{ display:inline-flex; align-items:center; gap:4px; font-family:var(--mono); font-size:11px; font-weight:500; padding:2px 8px; border-radius:var(--radius-sm); margin-top:9px; font-variant-numeric:tabular-nums; }
   .kpi-delta:empty{ display:none; }
   .kpi-delta.up{ color:var(--pos); background:rgba(18,122,30,.10); }
   .kpi-delta.down{ color:var(--neg); background:rgba(196,43,28,.09); }
@@ -115,38 +216,29 @@
   /* ===== Cards de gráfico ===== */
   .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
   .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:18px; }
-  .chart-card{ background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px 14px; display:flex; flex-direction:column; min-width:0; }
+  .chart-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md); padding:16px 18px 14px; display:flex; flex-direction:column; min-width:0; }
   .chart-hd{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line-2); padding-bottom:9px; margin-bottom:6px; }
   .chart-hd .t{ font-family:var(--serif); font-weight:600; font-size:15px; color:var(--ink); letter-spacing:-.005em; }
   .chart-hd .m{ font-family:var(--mono); font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); text-align:right; white-space:nowrap; }
   .chart-note{ font-size:11px; color:var(--ink-3); margin:2px 0 6px; }
   .chart-body{ position:relative; width:100%; }
-  .grid2 .chart-body{ height:300px; }
-  .grid3 .chart-body{ height:238px; }
+  .grid2 .chart-body{ height:314px; }
+  .grid3 .chart-body{ height:266px; }
   .chart-full{ margin-top:18px; }
-  .chart-full .chart-body{ height:260px; }
-  .anel-legenda{ display:flex; flex-wrap:wrap; gap:6px 14px; margin:4px 0 8px; }
-  .anel-legenda span{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--ink-2); }
-  .anel-legenda i{ width:12px; height:3px; border-radius:2px; flex:none; }
+  .chart-full .chart-body{ height:300px; }
+  .anel-legenda{ display:flex; flex-wrap:wrap; gap:6px 16px; margin:4px 0 10px; }
+  .anel-legenda span{ display:flex; align-items:center; gap:7px; font-size:11px; color:var(--ink-2); }
+  .anel-legenda span b{ font-family:var(--mono); font-weight:600; color:var(--ink); }
+  .anel-legenda i{ width:10px; height:10px; border-radius:var(--radius-sm); flex:none; }
 
   /* ===== Notas de leitura ===== */
   .notes{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
-  .note{ background:var(--paper-2); border:1px solid var(--line); border-left:3px solid var(--brand); border-radius:6px; padding:10px 15px; font-size:13px; color:var(--ink-2); line-height:1.5; }
+  .note{ background:var(--paper-2); border:1px solid var(--line); border-left:2px solid var(--brand); border-radius:var(--radius-sm); padding:10px 15px; font-size:13px; color:var(--ink-2); line-height:1.5; }
   .note b{ color:var(--ink); font-weight:600; }
   .note:has(> span:empty){ display:none; }
 
-  /* ===== Nota técnica (leitura qualitativa, injetada de arquivo externo) ===== */
-  .nota-tecnica{ background:var(--paper-2); border:1px solid var(--line); border-left:3px solid var(--brand); border-radius:8px; padding:22px 26px; font-family:var(--sans); font-size:14px; line-height:1.68; color:var(--ink-2); }
-  .nota-tecnica > * + *{ margin-top:12px; }
-  .nota-tecnica strong{ color:var(--ink); font-weight:600; }
-  .nota-tecnica h3{ font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:22px; padding-bottom:6px; border-bottom:1px solid var(--line-2); }
-  .nota-tecnica h3:first-child{ margin-top:0; }
-  .nota-tecnica ul{ list-style:none; padding:0; margin-top:10px; display:flex; flex-direction:column; gap:8px; }
-  .nota-tecnica li{ position:relative; padding-left:18px; }
-  .nota-tecnica li::before{ content:''; position:absolute; left:2px; top:10px; width:6px; height:6px; border-radius:1px; background:var(--brand); }
-
   /* ===== Conexão com a rede (cruzamento com a base municipal) ===== */
-  .conexao-split{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-2); border:1px solid var(--line-2); border-radius:6px; overflow:hidden; margin-top:6px; }
+  .conexao-split{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-2); border:1px solid var(--line-2); border-radius:var(--radius-sm); overflow:hidden; margin-top:6px; }
   @media (max-width:560px){ .conexao-split{ grid-template-columns:1fr; } }
   .conexao-split .cx{ background:var(--card); padding:16px 8px 12px; text-align:center; }
   .conexao-split .cx-val{ font-family:var(--mono); font-size:30px; font-weight:500; color:var(--ink); line-height:1; font-variant-numeric:tabular-nums; }
@@ -164,7 +256,7 @@
   .comp-row .cr-lab{ text-align:left; font-size:12.5px; color:var(--ink-2); }
   .comp-row .cr-ant{ font-family:var(--mono); font-size:14px; color:var(--ink-3); font-variant-numeric:tabular-nums; }
   .comp-row .cr-atual{ font-family:var(--mono); font-size:18px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
-  .cr-delta{ justify-self:end; font-family:var(--mono); font-size:11px; font-weight:500; padding:2px 7px; border-radius:3px; color:var(--ink-2); background:var(--paper-2); border:1px solid var(--line); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .cr-delta{ justify-self:end; font-family:var(--mono); font-size:11px; font-weight:500; padding:2px 7px; border-radius:var(--radius-sm); color:var(--ink-2); background:var(--paper-2); border:1px solid var(--line); font-variant-numeric:tabular-nums; white-space:nowrap; }
 
   /* ===== Rodapé ===== */
   .foot{ font-size:11px; line-height:1.6; color:var(--ink-3); margin-top:48px; padding-top:16px; border-top:2px solid var(--ink); display:grid; grid-template-columns:1fr auto; gap:24px; align-items:end; }
@@ -179,6 +271,7 @@
   }
   @media (max-width:560px){
     .viz-root{ padding:0 20px 56px; }
+    .theme-toggle{ right:20px; }
     .top-rule, .mast-foot{ margin-left:-20px; margin-right:-20px; }
     .kpis{ grid-template-columns:repeat(2,1fr); }
     .mast h1{ font-size:26px; }
@@ -187,21 +280,33 @@
   }
 
   @media print{
+    /* O boletim impresso/PDF é sempre a versão clara editorial, qualquer que
+       seja o tema herdado do Hub. */
+    [data-theme="dark"]{
+      --paper:#fafaf9; --surface:#ffffff; --surface-2:#f5f5f3; --surface-3:#ededea;
+      --ink:#1a1a17; --ink-2:#3a3a38; --ink-3:#6b6b66;
+      --hairline:#e2e2dd; --hairline-strong:#c9c9c2; --rule:#1a1a17;
+      --primary:#007044; --primary-strong:#00492c; --primary-soft:#eaf5ef;
+      --brand-ink:#103858; --success:#127a1e; --warning:#8a5a00; --danger:#c42b1c; --info:#155bcb;
+    }
     body{ background:#fff; }
     .viz-root{ max-width:none; padding:0 10mm 12mm; }
     .top-rule{ margin:0; }
     .block, .chart-card, .kpis, .lead, .find{ break-inside:avoid; }
-    .wk-select{ display:none; }
+    .wk-select, .theme-toggle, .skip-link{ display:none; }
   }
 </style>
 </head>
 <body>
 
+<a class='skip-link' href='#conteudo'>Pular para o conteúdo</a>
+
 <div class='viz-root' id='app'>
+  <button id='alternarTema' class='theme-toggle' type='button' aria-label='Ativar tema escuro' aria-pressed='false'><i class='ph ph-moon'></i></button>
   <div class='top-rule'></div>
 
   <header class='mast'>
-    <img class='brasao' src='Design/brasao.png' alt='Prefeitura de Araucária'>
+    <img class='brasao' src='https://lucstarwork.github.io/VSA-RELATORIOS/BOLETINS-PSB/2026/1o%20SEMESTRE/assets/brasao-simples.png' alt='Prefeitura de Araucária'>
     <div class='div'></div>
     <div class='m-txt'>
       <div class='kicker'>Vigilância Socioassistencial · Araucária-PR</div>
@@ -219,7 +324,7 @@
     <span class='tag'>Prefeitura Municipal de Araucária</span>
   </div>
 
-  <div class='lead'>
+  <div class='lead' id='conteudo'>
     <p class='abstract'>
       <span class='drop'>A</span> Operação Inverno mantém, na Casa de Passagem, o acolhimento
       e o atendimento à população em situação de rua durante o período de frio intenso. Este
@@ -265,11 +370,11 @@
               </div>
             </div>
             <div class='kpi'>
-              <div class='lab'><span class='tick' style='background:var(--pos)'></span>Público inédito <i class='fa-solid fa-circle-info' title='Pessoas que nao participaram de nenhum dia da Operacao Inverno do ano anterior (2025).'></i></div>
+              <div class='lab'><span class='tick' style='background:var(--pos)'></span>Público inédito <i class='ph ph-info' aria-hidden='true' title='Pessoas que nao participaram de nenhum dia da Operacao Inverno do ano anterior (2025).'></i></div>
               <div class='kpi-corpo'><div class='val' id='valNovasPessoasSemana'></div></div>
             </div>
             <div class='kpi'>
-              <div class='lab'><span class='tick' style='background:var(--blue)'></span>Público recorrente <i class='fa-solid fa-circle-info' title='Pessoas que ja participaram de algum dia da Operacao Inverno do ano anterior (2025).'></i></div>
+              <div class='lab'><span class='tick' style='background:var(--blue)'></span>Público recorrente <i class='ph ph-info' aria-hidden='true' title='Pessoas que ja participaram de algum dia da Operacao Inverno do ano anterior (2025).'></i></div>
               <div class='kpi-corpo'><div class='val' id='valPessoasAntigasSemana'></div></div>
             </div>
             <div class='kpi'>
@@ -328,11 +433,11 @@
               <div class='kpi-corpo'><div class='val' id='valPessoasUnicasAcumulado'></div></div>
             </div>
             <div class='kpi'>
-              <div class='lab'><span class='tick' style='background:var(--pos)'></span>Público inédito <i class='fa-solid fa-circle-info' title='Pessoas que nao participaram de nenhum dia da Operacao Inverno do ano anterior (2025).'></i></div>
+              <div class='lab'><span class='tick' style='background:var(--pos)'></span>Público inédito <i class='ph ph-info' aria-hidden='true' title='Pessoas que nao participaram de nenhum dia da Operacao Inverno do ano anterior (2025).'></i></div>
               <div class='kpi-corpo'><div class='val' id='valNovasPessoas'></div></div>
             </div>
             <div class='kpi'>
-              <div class='lab'><span class='tick' style='background:var(--blue)'></span>Público recorrente <i class='fa-solid fa-circle-info' title='Pessoas que ja participaram de algum dia da Operacao Inverno do ano anterior (2025).'></i></div>
+              <div class='lab'><span class='tick' style='background:var(--blue)'></span>Público recorrente <i class='ph ph-info' aria-hidden='true' title='Pessoas que ja participaram de algum dia da Operacao Inverno do ano anterior (2025).'></i></div>
               <div class='kpi-corpo'><div class='val' id='valPessoasAntigas'></div></div>
             </div>
             <div class='kpi'>
@@ -467,44 +572,6 @@
     <div class='notes'><div class='note'><span id='textoBeneficios'></span></div></div>
   </section>
 
-  
-  <section class='block' aria-label='Nota técnica'>
-    <div class='sec-hd'>
-      <div>
-        <div class='sec-eyebrow'><span class='num'>07</span><span class='lbl'>Nota técnica</span></div>
-        <h2 class='sec-title'>Leitura técnica</h2>
-      </div>
-      <div class='sec-hd-r'><span class='sec-meta'>Vigilância Socioassistencial</span></div>
-    </div>
-    <div class='nota-tecnica'><h3>Panorama da semana</h3>
-<p>Na Semana 9 (17/08 a 23/08/2026) a Operação Inverno registrou <strong>267 atendimentos</strong>, <strong>5,1% acima da média</strong> das oito semanas anteriores (254) — mas <strong>13,0% abaixo da Semana 8</strong> (307), o maior recuo semana a semana da temporada até agora, depois de três semanas seguidas de alta. Não é sinal de arrefecimento da demanda: o público segue crescendo (83 pessoas atendidas na semana, 68 delas — 81,9% — inéditas em relação a 2025), então a queda de atendimentos com público estável aponta para menos recorrência por pessoa dentro da própria semana, não para menos gente precisando do serviço.</p>
-<h3>Leitura ano a ano (2025 × 2026)</h3>
-<p>Comparado o <strong>mesmo intervalo de 63 dias</strong> das duas temporadas, 2026 alcançou <strong>215 pessoas únicas contra 241 em 2025 (−10,8%)</strong>, com o volume de atendimentos praticamente equilibrado (<strong>2.299 contra 2.358, −2,5%</strong>). O hiato em relação a 2025 segue fechando semana a semana — era −16% na Semana 7, −12,1% na Semana 8, agora −10,8% —, e a recorrência por pessoa continua subindo: em média <strong>10,7 atendimentos por pessoa</strong> neste ano, contra 9,8 no anterior no mesmo recorte.</p>
-<p>Do público de 2026, <strong>39 pessoas (18,1%) já haviam passado pela operação em 2025</strong> e <strong>176 são inéditas</strong>. A temporada 2025 fechou com <strong>259 pessoas em 92 dias</strong>; 2026 está no <strong>63º dia</strong> e já alcançou <strong>83,0% desse total</strong> — restam apenas cerca de <strong>13 dias</strong> até o encerramento previsto em 05/09/2026, contra uma temporada 2026 cerca de 16 dias mais curta que a anterior. Em ritmo atual, é plausível que 2026 alcance ou supere o número final de pessoas de 2025 antes mesmo de fechar — a leitura de fechamento de temporada deixa de ser hipotética e passa a ser questão de poucas semanas.</p>
-<h3>Perfil das pessoas atendidas</h3>
-<p>No acumulado o público é majoritariamente <strong>masculino (87,9%)</strong>, concentrado na faixa de <strong>30 a 44 anos (52,6%)</strong> e com predominância de raça/cor <strong>branca (41,9%)</strong>, seguida de parda (33,5%), não informado (15,8%) e preta (8,8%). É o perfil recorrente da população adulta em situação de rua atendida pelo Serviço Especializado para Pessoas em Situação de Rua.</p>
-<p>Em relação a 2025, no mesmo recorte de dias, o público segue <strong>mais jovem</strong> — idade média de <strong>36,5 anos contra 38,32</strong> —, mas o deslocamento etário mudou de formato nesta semana: a faixa de <strong>18 a 29 anos praticamente estabilizou (58 contra 59, −1,7%)</strong>, revertendo o crescimento de +8% relatado na Semana 8, enquanto as faixas mais velhas seguem caindo — <strong>45 a 59 anos caiu 19,6% (41 contra 51)</strong> e <strong>60 anos ou mais caiu 70% (3 contra 10)</strong>. O rejuvenescimento do público, portanto, não vem mais do crescimento da faixa mais jovem, e sim do encolhimento mais acentuado das faixas de meia-idade e idosa — leitura que reforça a prioridade de articular <strong>ACESSUAS Trabalho</strong> e a rede de qualificação e geração de renda para quem está na fase produtiva, sem perder de vista que o público idoso remanescente, ainda que pequeno, tende a concentrar maior vulnerabilidade relativa.</p>
-<h3>Pernoites e uso do serviço</h3>
-<p>O uso do pernoite na Casa de Passagem segue como motivo mais frequente de atendimento no acumulado, seguido de Escuta e Orientação Social — a operação segue funcionando como abrigo noturno com escuta qualificada acoplada, na modalidade pernoite (17h–7h30, 20 vagas + 4 de reserva) que o Protocolo da Política de Assistência Social de Araucária abre para demanda espontânea em noites de até 9°C.</p>
-<p>A <strong>queda no volume de pernoites registrados segue se aprofundando</strong>: 178 na Semana 6, 142 na Semana 7, 77 na Semana 8 e apenas <strong>38 na Semana 9</strong> — o menor volume semanal já registrado nesta temporada entre as semanas com algum lançamento, aproximadamente metade do valor da semana anterior pela terceira semana seguida. Mais grave: os 38 pernoites da semana estão <strong>concentrados inteiramente numa única quarta-feira</strong> — os outros seis dias não têm nenhum pernoite lançado —, e as 38 pessoas aparecem todas com exatamente 1 noite, nenhuma com 2 ou mais. Esse padrão de lançamento em bloco, num único dia da semana, é incompatível com o funcionamento real de um serviço de acolhimento noturno contínuo e reforça, de forma ainda mais nítida que nas semanas anteriores, a hipótese de <strong>falha sistemática de registro</strong>, não de queda real de ocupação.</p>
-<p>Um segundo indício aponta na mesma direção: a distribuição por horário dos atendimentos da própria Semana 9 mostra 58,4% entre 19h e 22h, mas com um pico atípico às <strong>23h (31,1% dos atendimentos da semana, 83 registros)</strong> e quase nada às 22h (1 registro) — descontinuidade que sugere lançamento tardio no sistema, e não o horário real de chegada das pessoas. Recomenda-se tratar os indicadores de pernoite e de horário desta semana com a mesma cautela já aplicada desde a Semana 3.</p>
-<p>No acumulado da temporada, <strong>170 das 215 pessoas (79,1%)</strong> já pernoitaram ao menos uma vez na Casa de Passagem, e <strong>97 delas (57,1% de quem já pernoitou) ficaram mais de 2 noites</strong> — proporção estável frente à semana passada (59%), sinal de que o acumulado ainda reflete um padrão real de permanência, mesmo com a semana corrente subnotificada.</p>
-<h3>Território e CadÚnico</h3>
-<p>Refeito nesta semana o cruzamento por nome do público acumulado da operação (215 pessoas) contra a base municipal do CECAD — a mesma base usada nas leituras anteriores, sem atualização desde então (última atualização registrada em 09/07/2026). A cobertura do cruzamento ficou em <strong>35,8% (77 pessoas localizadas)</strong>, praticamente igual à cobertura da leitura anterior (36,5%).</p>
-<p>O público localizado concentra-se em <strong>Porto das Laranjeiras (37 pessoas, número idêntico ao da semana passada)</strong> e <strong>Centro (23 pessoas)</strong> — os mesmos dois territórios apontados desde o início da operação. No CadÚnico do município há <strong>397 pessoas marcadas em situação de rua</strong> (mesma base, mesmo total da leitura anterior), concentradas nos mesmos dois bairros: Centro (200) e Porto das Laranjeiras (166) somam <strong>92,2% desses 397 registros</strong> — a mesma geografia da operação, reforçando que a abordagem de rua e a busca ativa seguem mirando o território certo.</p>
-<p>O gap de (re)vinculação segue fechando: contra as 397 pessoas cadastralmente marcadas em situação de rua, a operação já alcançou efetivamente <strong>215 pessoas (54,2% desse total)</strong>, ante 49,6% na leitura da Semana 8 — um ganho de quase 5 pontos percentuais numa base que, por não ter sido atualizada, ficou parada. Entre as 77 pessoas do público da operação localizadas no CadÚnico, <strong>60 (77,9%) já estão marcadas como situação de rua na própria base</strong> — concordância praticamente idêntica à semana anterior (79%), reforçando a confiabilidade do indicador para quem foi encontrado no cruzamento.</p>
-<h3>Conexão com a rede e apoio material</h3>
-<p>Do público de 2026, <strong>155 pessoas (72,1%)</strong> também passam pelo Centro POP — o pareamento esperado, já que Centro POP e Casa de Passagem cobrem a mesma população em situação de rua dentro da Proteção Social Especial. Essa proporção <strong>segue caindo</strong> de forma consistente (82% na Semana 7, 76,6% na Semana 8, agora 72,1%): a cada semana, uma fatia maior do público novo ainda não está vinculada ao Centro POP.</p>
-<p>Fora dessa dupla, <strong>40 pessoas (18,6%)</strong> têm algum vínculo com a proteção básica ou outros serviços especializados, com destaque para CRAS Centro (13 vínculos), Plantão Social (13), CRAS Industrial (10), CRAM — Centro de Referência de Atendimento à Mulher em Situação de Violência (5) e Cadastro Único (4). O vínculo com o <strong>CREAS aparece em apenas 2 casos</strong> — o mesmo número há três semanas seguidas, mesmo com o núcleo recorrente (pessoas que já passaram pela operação em 2025) tendo crescido de 36 para 37 e agora para 39 pessoas: só <strong>5,1%</strong> desse núcleo está vinculado ao PAEFI. O aparecimento do CRAM nesta leitura também merece registro: 5 das 26 mulheres do público (19,2%) têm esse vínculo — relevante porque a própria modalidade abrigo (24h) da Casa de Passagem <strong>veta formalmente</strong> pessoas com histórico de violência doméstica, conforme o Protocolo SUAS 2024; para esse público, a via correta não é a Casa de Passagem, e sim encaminhamento a abrigo sigiloso ou ao CRAM para acompanhamento especializado.</p>
-<p><strong>53 pessoas (24,7% do público) não aparecem em nenhum outro serviço da rede municipal</strong> (nem CRAS, nem CREAS, nem Centro POP fora da própria operação) — a maior proporção da temporada até agora (era 15% na Semana 7, 20,8% na Semana 8, agora 24,7%): é o alvo mais direto e crescente de busca ativa e de inserção no CadÚnico.</p>
-<p>No apoio material, <strong>95 pessoas (44,2% do público, praticamente idêntico à semana passada)</strong> receberam algum item no período: cobertor segue o mais frequente (96 entregas), seguido de documentação civil (2ª via de certidão de nascimento — inclusive fora do município —, de casamento e de RG, 46 entregas somadas) e do Cartão Prato Cheio (14 entregas, estável). O <strong>Benefício Eventual para Moradia</strong> segue estagnado em <strong>2 casos</strong>, o mesmo número de pelo menos três leituras seguidas, enquanto o público acumulado cresceu de cerca de 180 para 215 pessoas no mesmo período — reforça a suspeita, já registrada, de baixa procura ativa desse benefício, não baixa demanda real. A estagnação ganha urgência com a Resolução CNAS 213/2025: ela veda formalmente exigir cadastro prévio no CadÚnico (art. 6º) ou vinculação a serviço socioassistencial (art. 26, parágrafo único) como condição de acesso a benefício eventual, e amplia expressamente o rol de vulnerabilidade temporária para incluir situação de rua — com prazo de adequação normativa local até <strong>28/10/2026</strong>. É janela concreta para revisar se o catálogo de benefícios eventuais de Araucária já opera dentro dessas vedações antes que a checagem se torne exigência de conformidade.</p>
-<h3>Ressalvas metodológicas</h3>
-<ul><li>A comparação com 2025 é sempre feita sobre o <strong>mesmo recorte de dias</strong> (63 dias corridos a partir do início de cada operação nesta leitura), nunca contra a temporada inteira — 2026 ainda está em curso e comparar com os 92 dias fechados de 2025 subestimaria o ano atual.</li><li><strong>Pernoites e motivos de atendimento não são comparáveis entre 2025 e 2026.</strong> A forma de registrar o motivo do atendimento mudou de uma temporada para a outra (em 2025 a maioria dos atendimentos entrava como &quot;Demanda Espontânea&quot;; em 2026, como &quot;Pernoite Casa de Passagem&quot;). Por isso a leitura ano a ano se restringe a pessoas, volume de atendimentos, perfil etário e retenção.</li><li>A partir da <strong>Semana 3</strong> os registros de pernoite estão subnotificados por falha de comunicação. A <strong>Semana 9</strong> reforça esse quadro de forma mais explícita que as anteriores: os 38 pernoites da semana estão concentrados num único dia, e quase um terço dos atendimentos da semana está registrado às 23h — padrão consistente com lançamento tardio ou em lote no sistema, não com o horário real de uso do serviço. Os indicadores de pernoite e de horário desta semana devem ser lidos com a mesma cautela das semanas anteriores.</li><li>A classificação <strong>inédito/recorrente</strong> compara o público de 2026 com o de 2025 primeiro por <strong>identificador de pessoa</strong> (mais confiável) e, só para quem não bateu por id, por <strong>semelhança de nome</strong> (90% ou mais, sem acento/caixa) — cobre o recadastro no sistema, que gera um id novo para quem já passou pela operação em 2025. Nome com mais de uma correspondência acima do limiar fica de fora da recorrência, para não arriscar falso positivo por homônimo.</li><li>Categorias vazias ou &quot;Não Informado&quot; são omitidas dos gráficos e não alteram os totais oficiais; nos percentuais de raça/cor apresentados nesta nota, &quot;Não Informado&quot; permanece no denominador (215 pessoas), para não inflar artificialmente as demais categorias.</li><li>O cruzamento com o CadÚnico é feito por <strong>nome</strong> (a base da operação não traz NIS/CPF), contra o export do CECAD municipal, com cobertura de cerca de <strong>36%</strong> do público acumulado da operação. Leituras de território e de situação de rua daí derivadas são <strong>estimativas</strong>, sujeitas a erro de homônimo — usar como indício, não como cadastro. A base do CECAD usada nesta semana é a mesma das leituras anteriores, com atualização mais recente registrada em 09/07/2026 (não houve nova atualização); o cruzamento em si foi refeito para o público atual (215 pessoas), e não apenas repetido.</li><li>Já o cruzamento de <strong>conexão com a rede</strong> e o de <strong>apoio material</strong> são feitos por <strong>identificador de pessoa</strong> (confiável, sem erro de homônimo) contra a base municipal de atendimentos e o export de dispensações — diferente, portanto, do cruzamento por nome com o CadÚnico acima. A base municipal de atendimentos usada nesse cruzamento cobre janeiro a agosto de 2026.</li><li>No apoio material, foi excluído do cômputo o registro interno &quot;Triar&quot; (sem valor associado e sem entrega de item ao público) — é procedimento administrativo de triagem, não apoio material.</li></ul>
-<h3>Encaminhamentos para a rede</h3>
-<ul><li>Priorizar as <strong>53 pessoas sem nenhum outro vínculo</strong> com a rede municipal (24,7% do público, maior proporção da temporada) para busca ativa e inserção no CadÚnico — grupo que cresceu de 15% (Semana 7) para 20,8% (Semana 8) e agora 24,7%, numa trajetória que não dá sinal de estabilizar sozinha.</li><li>Acionar o <strong>CREAS</strong> para o núcleo recorrente, agora com <strong>39 pessoas</strong> que já vieram em 2025: apenas 2 delas (5,1%) aparecem vinculadas ao PAEFI, o mesmo número há três leituras seguidas — reincidência sazonal em situação de rua é, por definição normativa, indicador de violação de direitos continuada, e não emergência pontual que se repete sem escalada de proteção.</li><li>Corrigir, com urgência renovada, o <strong>registro de pernoites e de horário de atendimento</strong> junto à equipe da Casa de Passagem: a Semana 9 concentrou todo o pernoite registrado num único dia e quase um terço dos atendimentos às 23h, um padrão de lançamento em bloco que compromete qualquer leitura de ocupação real da unidade nas próximas semanas.</li><li>Aproveitar o prazo de adequação da <strong>Resolução CNAS 213/2025</strong> (28/10/2026) para revisar o catálogo local de benefícios eventuais frente às vedações de exigência de CadÚnico prévio e de vínculo a serviço, e fazer <strong>checagem ativa de elegibilidade ao Benefício Eventual para Moradia</strong> junto ao público já identificado — o número de concessões (2) segue estagnado enquanto o público acumulado já passa de 215 pessoas.</li><li>Articular com o <strong>Serviço Especializado em Abordagem Social</strong> e o <strong>CRAS de referência</strong> o seguimento dos casos que extrapolam o abrigamento (documentação civil, saúde, trabalho); para mulheres com histórico de violência doméstica identificadas no público — vetadas formalmente do abrigo 24h da Casa de Passagem —, encaminhar ao <strong>CRAM</strong> ou a abrigo sigiloso equivalente, em vez de tratar a Casa de Passagem como única porta de saída do pernoite emergencial.</li><li>Tratar este boletim como <strong>corte parcial e próximo do fechamento</strong>: restam cerca de 13 dias até o encerramento previsto em 05/09/2026. Com 83% do público total de 2025 já alcançado e o hiato ano a ano encolhendo semana a semana, é hora de preparar, já agora, a leitura de fechamento de temporada — inclusive o desenho da transição de quem segue sem vínculo formal para a rede permanente após o fim da operação.</li></ul></div>
-  </section>
-  
-
   <footer class='foot'>
     <div>Fonte: registros de Atendimentos Individuais filtrados por Operação Inverno. Elaboração: Vigilância Socioassistencial de Araucária. Categorias vazias ou não informadas são omitidas dos gráficos e não alteram os totais oficiais.</div>
     <div class='sig'>
@@ -519,26 +586,26 @@
 <script>
 const dados = {
   "identificacao": {
-    "numero": "09/2026"
+    "numero": "10/2026"
   },
   "semanaAtual": {
-    "inicio": "17/08/2026",
-    "fim": "23/08/2026",
+    "inicio": "24/08/2026",
+    "fim": "30/08/2026",
     "porDia": {
-      "Seg": 43,
-      "Ter": 44,
-      "Qua": 41,
-      "Qui": 52,
-      "Sex": 35,
-      "Sáb": 28,
-      "Dom": 24
+      "Seg": 50,
+      "Ter": 37,
+      "Qua": 38,
+      "Qui": 35,
+      "Sex": 23,
+      "Sáb": 22,
+      "Dom": 28
     },
     "porDiaPernoites": {
       "Seg": 0,
       "Ter": 0,
-      "Qua": 38,
-      "Qui": 0,
-      "Sex": 0,
+      "Qua": 0,
+      "Qui": 33,
+      "Sex": 3,
       "Sáb": 0,
       "Dom": 0
     }
@@ -1011,14 +1078,61 @@ const dados = {
         "Sex": 28,
         "Sáb": 31
       }
+    },
+    "10": {
+      "inicio": "24/08/2026",
+      "fim": "30/08/2026",
+      "pessoasUnicas": 67,
+      "novasPessoas": 53,
+      "pessoasAntigas": 14,
+      "porDia": {
+        "Seg": 50,
+        "Ter": 37,
+        "Qua": 38,
+        "Qui": 35,
+        "Sex": 23,
+        "Sáb": 22,
+        "Dom": 28
+      },
+      "porDiaPessoasUnicas": {
+        "Seg": 44,
+        "Ter": 37,
+        "Qua": 37,
+        "Qui": 34,
+        "Sex": 21,
+        "Sáb": 22,
+        "Dom": 28
+      },
+      "porDiaPernoites": {
+        "Seg": 0,
+        "Ter": 0,
+        "Qua": 0,
+        "Qui": 33,
+        "Sex": 3,
+        "Sáb": 0,
+        "Dom": 0
+      },
+      "pernoites": {
+        "total": 36,
+        "pessoasComPernoite": 36,
+        "mediaPorPessoa": 1.0
+      },
+      "pernoitesFrequencia": {
+        "umaNoite": 36,
+        "maisDeDuasNoites": 0
+      },
+      "porDiaPessoasUnicas2025": {
+        "Dom": 39,
+        "Seg": 34,
+        "Ter": 37,
+        "Qua": 26,
+        "Qui": 30,
+        "Sex": 0,
+        "Sáb": 27
+      }
     }
   },
   "ultimasSemanas": [
-    {
-      "label": "S2",
-      "total": 169,
-      "totalAnterior": 343
-    },
     {
       "label": "S3",
       "total": 259,
@@ -1053,46 +1167,51 @@ const dados = {
       "label": "S9",
       "total": 267,
       "totalAnterior": 242
+    },
+    {
+      "label": "S10",
+      "total": 233,
+      "totalAnterior": 193
     }
   ],
   "pernoites": {
-    "total": 38,
-    "pessoasComPernoite": 38,
+    "total": 36,
+    "pessoasComPernoite": 36,
     "mediaPorPessoa": 1.0
   },
   "periodoOperacao": {
     "inicio": "22/06/2026",
-    "fimReferencia": "23/08/2026",
-    "diasCorridos": 63
+    "fimReferencia": "30/08/2026",
+    "diasCorridos": 70
   },
-  "totalAcumulado": 2299,
-  "pessoasUnicasAcumulado": 215,
-  "pessoasComPernoiteAcumulado": 170,
+  "totalAcumulado": 2532,
+  "pessoasUnicasAcumulado": 228,
+  "pessoasComPernoiteAcumulado": 181,
   "faixaEtaria": {
     "0–17": 0,
-    "18–29": 58,
-    "30–44": 113,
-    "45–59": 41,
-    "60+": 3
+    "18–29": 62,
+    "30–44": 119,
+    "45–59": 43,
+    "60+": 4
   },
   "sexo": {
-    "Masculino": 189,
+    "Masculino": 202,
     "Feminino": 26
   },
   "raca": {
-    "Branca": 90,
-    "Parda": 72,
-    "Não Informado": 34,
+    "Branca": 94,
+    "Parda": 74,
+    "Não Informado": 41,
     "Preta": 19
   },
-  "idadeMedia": 36.5,
-  "novasPessoas": 176,
-  "pessoasAntigas": 39,
+  "idadeMedia": 36.51,
+  "novasPessoas": 188,
+  "pessoasAntigas": 40,
   "pernoitesFrequencia": {
-    "semana1Noite": 38,
+    "semana1Noite": 36,
     "semanaMais2Noites": 0,
-    "total1Noite": 55,
-    "totalMais2Noites": 97
+    "total1Noite": 66,
+    "totalMais2Noites": 102
   },
   "dadosBrutosAcumulados": [
     {
@@ -1113,7 +1232,7 @@ const dados = {
       "idade": 32,
       "pernoites": 12,
       "inedito": true,
-      "totalAtendimentos": 21
+      "totalAtendimentos": 25
     },
     {
       "id": "12216",
@@ -1131,9 +1250,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 4,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 20
     },
     {
       "id": "15771",
@@ -1181,9 +1300,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 48,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 7
     },
     {
       "id": "27512",
@@ -1191,9 +1310,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 30,
-      "pernoites": 8,
+      "pernoites": 9,
       "inedito": true,
-      "totalAtendimentos": 32
+      "totalAtendimentos": 37
     },
     {
       "id": "28555",
@@ -1203,7 +1322,7 @@ const dados = {
       "idade": 45,
       "pernoites": 8,
       "inedito": true,
-      "totalAtendimentos": 30
+      "totalAtendimentos": 33
     },
     {
       "id": "50280",
@@ -1231,9 +1350,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 31,
-      "pernoites": 15,
+      "pernoites": 16,
       "inedito": true,
-      "totalAtendimentos": 41
+      "totalAtendimentos": 47
     },
     {
       "id": "71033",
@@ -1281,9 +1400,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 24,
-      "pernoites": 2,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 18
     },
     {
       "id": "83405",
@@ -1321,9 +1440,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 23,
-      "pernoites": 2,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 10
+      "totalAtendimentos": 16
     },
     {
       "id": "100791",
@@ -1403,7 +1522,7 @@ const dados = {
       "idade": 26,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 4
     },
     {
       "id": "121821",
@@ -1443,7 +1562,7 @@ const dados = {
       "idade": 45,
       "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 2
     },
     {
       "id": "128819",
@@ -1460,7 +1579,7 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "30–44",
-      "idade": 36,
+      "idade": 37,
       "pernoites": 1,
       "inedito": true,
       "totalAtendimentos": 3
@@ -1471,9 +1590,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 45,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 11
     },
     {
       "id": "133764",
@@ -1493,7 +1612,7 @@ const dados = {
       "idade": 40,
       "pernoites": 11,
       "inedito": false,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 22
     },
     {
       "id": "147155",
@@ -1523,7 +1642,7 @@ const dados = {
       "idade": 59,
       "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 18
+      "totalAtendimentos": 25
     },
     {
       "id": "163762",
@@ -1533,7 +1652,7 @@ const dados = {
       "idade": 57,
       "pernoites": 9,
       "inedito": true,
-      "totalAtendimentos": 19
+      "totalAtendimentos": 22
     },
     {
       "id": "167490",
@@ -1553,7 +1672,7 @@ const dados = {
       "idade": 56,
       "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 5
     },
     {
       "id": "168999",
@@ -1561,9 +1680,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 27,
-      "pernoites": 6,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 18
     },
     {
       "id": "171960",
@@ -1613,7 +1732,7 @@ const dados = {
       "idade": 25,
       "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 4
     },
     {
       "id": "190324",
@@ -1651,9 +1770,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 33,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 20
     },
     {
       "id": "222583",
@@ -1671,9 +1790,9 @@ const dados = {
       "raca": "Preta",
       "faixaEtaria": "30–44",
       "idade": 44,
-      "pernoites": 2,
+      "pernoites": 3,
       "inedito": false,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 8
     },
     {
       "id": "231974",
@@ -1711,9 +1830,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 38,
-      "pernoites": 8,
+      "pernoites": 9,
       "inedito": false,
-      "totalAtendimentos": 21
+      "totalAtendimentos": 24
     },
     {
       "id": "265680",
@@ -1753,7 +1872,7 @@ const dados = {
       "idade": 39,
       "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 8
+      "totalAtendimentos": 9
     },
     {
       "id": "303191",
@@ -1774,6 +1893,16 @@ const dados = {
       "pernoites": 0,
       "inedito": true,
       "totalAtendimentos": 1
+    },
+    {
+      "id": "318333",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 1,
+      "inedito": false,
+      "totalAtendimentos": 2
     },
     {
       "id": "318519",
@@ -1841,9 +1970,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 27,
-      "pernoites": 4,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 5
+      "totalAtendimentos": 10
     },
     {
       "id": "415034",
@@ -1883,7 +2012,7 @@ const dados = {
       "idade": 44,
       "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 22
+      "totalAtendimentos": 25
     },
     {
       "id": "421738",
@@ -1913,7 +2042,7 @@ const dados = {
       "idade": 44,
       "pernoites": 6,
       "inedito": false,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 17
     },
     {
       "id": "428881",
@@ -1931,9 +2060,19 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 40,
-      "pernoites": 2,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 13
+      "totalAtendimentos": 19
+    },
+    {
+      "id": "432413",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 4
     },
     {
       "id": "434712",
@@ -1941,9 +2080,9 @@ const dados = {
       "raca": "Preta",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 4,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 25
     },
     {
       "id": "443574",
@@ -1971,9 +2110,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 25,
-      "pernoites": 5,
+      "pernoites": 6,
       "inedito": false,
-      "totalAtendimentos": 17
+      "totalAtendimentos": 21
     },
     {
       "id": "455114",
@@ -1981,9 +2120,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "18–29",
       "idade": 22,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 16
     },
     {
       "id": "458751",
@@ -2003,7 +2142,7 @@ const dados = {
       "idade": 37,
       "pernoites": 5,
       "inedito": false,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 12
     },
     {
       "id": "466689",
@@ -2031,9 +2170,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 23,
-      "pernoites": 8,
+      "pernoites": 9,
       "inedito": true,
-      "totalAtendimentos": 27
+      "totalAtendimentos": 33
     },
     {
       "id": "468075",
@@ -2061,9 +2200,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 6
     },
     {
       "id": "477571",
@@ -2093,7 +2232,7 @@ const dados = {
       "idade": 38,
       "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 6
     },
     {
       "id": "488970",
@@ -2114,6 +2253,16 @@ const dados = {
       "pernoites": 7,
       "inedito": false,
       "totalAtendimentos": 14
+    },
+    {
+      "id": "489602",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
     },
     {
       "id": "489833",
@@ -2151,9 +2300,19 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 47,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 15
+    },
+    {
+      "id": "492413",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 44,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "494313",
@@ -2163,7 +2322,7 @@ const dados = {
       "idade": 34,
       "pernoites": 0,
       "inedito": false,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 2
     },
     {
       "id": "496585",
@@ -2221,9 +2380,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 34,
-      "pernoites": 5,
+      "pernoites": 6,
       "inedito": false,
-      "totalAtendimentos": 17
+      "totalAtendimentos": 21
     },
     {
       "id": "503778",
@@ -2293,7 +2452,7 @@ const dados = {
       "idade": 45,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 5
     },
     {
       "id": "508670",
@@ -2433,7 +2592,7 @@ const dados = {
       "idade": 34,
       "pernoites": 1,
       "inedito": false,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 9
     },
     {
       "id": "522331",
@@ -2453,7 +2612,7 @@ const dados = {
       "idade": 43,
       "pernoites": 2,
       "inedito": false,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 8
     },
     {
       "id": "525441",
@@ -2501,9 +2660,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 9,
+      "pernoites": 10,
       "inedito": false,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 24
     },
     {
       "id": "526835",
@@ -2543,7 +2702,7 @@ const dados = {
       "idade": 27,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 15
     },
     {
       "id": "529212",
@@ -2623,7 +2782,17 @@ const dados = {
       "idade": 23,
       "pernoites": 15,
       "inedito": true,
-      "totalAtendimentos": 39
+      "totalAtendimentos": 45
+    },
+    {
+      "id": "533609",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 43,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
     },
     {
       "id": "534612",
@@ -2631,9 +2800,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 40,
-      "pernoites": 2,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 18
     },
     {
       "id": "534937",
@@ -2641,9 +2810,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 5,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 18
     },
     {
       "id": "534939",
@@ -2743,7 +2912,7 @@ const dados = {
       "idade": 49,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 5
     },
     {
       "id": "539141",
@@ -2759,8 +2928,8 @@ const dados = {
       "id": "539462",
       "sexo": "Feminino",
       "raca": "Branca",
-      "faixaEtaria": "30–44",
-      "idade": 44,
+      "faixaEtaria": "45–59",
+      "idade": 45,
       "pernoites": 2,
       "inedito": true,
       "totalAtendimentos": 2
@@ -2771,9 +2940,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 43,
-      "pernoites": 5,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 22
     },
     {
       "id": "540278",
@@ -2791,9 +2960,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 19,
-      "pernoites": 9,
+      "pernoites": 10,
       "inedito": true,
-      "totalAtendimentos": 15
+      "totalAtendimentos": 20
     },
     {
       "id": "540511",
@@ -2816,6 +2985,16 @@ const dados = {
       "totalAtendimentos": 2
     },
     {
+      "id": "540799",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "60+",
+      "idade": 68,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
       "id": "540840",
       "sexo": "Masculino",
       "raca": "Preta",
@@ -2831,9 +3010,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "45–59",
       "idade": 45,
-      "pernoites": 10,
+      "pernoites": 11,
       "inedito": true,
-      "totalAtendimentos": 25
+      "totalAtendimentos": 29
     },
     {
       "id": "541031",
@@ -2911,9 +3090,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 12,
+      "pernoites": 13,
       "inedito": true,
-      "totalAtendimentos": 42
+      "totalAtendimentos": 48
     },
     {
       "id": "541381",
@@ -2921,9 +3100,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 29,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 12
     },
     {
       "id": "541399",
@@ -3020,10 +3199,10 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Não Informado",
       "faixaEtaria": "18–29",
-      "idade": 27,
+      "idade": 28,
       "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 11
+      "totalAtendimentos": 14
     },
     {
       "id": "541977",
@@ -3153,7 +3332,27 @@ const dados = {
       "idade": 57,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "542665",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "45–59",
+      "idade": 50,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "542666",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 6
     },
     {
       "id": "542784",
@@ -3171,9 +3370,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "45–59",
       "idade": 52,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 1
+      "totalAtendimentos": 4
     },
     {
       "id": "542945",
@@ -3183,7 +3382,7 @@ const dados = {
       "idade": 29,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 8
     },
     {
       "id": "542969",
@@ -3203,7 +3402,7 @@ const dados = {
       "idade": 43,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 5
+      "totalAtendimentos": 7
     },
     {
       "id": "543040",
@@ -3244,12 +3443,62 @@ const dados = {
       "pernoites": 0,
       "inedito": true,
       "totalAtendimentos": 1
+    },
+    {
+      "id": "543257",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "18–29",
+      "idade": 27,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
+      "id": "543261",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "30–44",
+      "idade": 32,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 7
+    },
+    {
+      "id": "543267",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "543405",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "18–29",
+      "idade": 29,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
+      "id": "543407",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "18–29",
+      "idade": 27,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
     }
   ],
   "motivos": {
-    "Pernoite Casa de Passagem": 774,
-    "Escuta": 89,
-    "Orientação Social": 79,
+    "Pernoite Casa de Passagem": 810,
+    "Escuta": 98,
+    "Orientação Social": 87,
     "Demanda Espontânea": 24,
     "Contato Telefônico": 2,
     "Orientação e Encaminhamentos para a Habitação": 1,
@@ -3257,22 +3506,22 @@ const dados = {
     "Acompanhamento e Monitoramento dos Encaminhamentos Realizados": 1
   },
   "profissionais": {
-    "Gabriely Celestino Cardoso": 1625,
-    "Leandro Ferreira Schonrock": 639,
-    "Walmor Jose Ruhr": 617,
-    "Josney Garcia dos Santos": 597,
-    "Fernanda de Fatima Czerban": 583,
-    "Jefferson Vanderlei Chiarello": 551,
-    "Marcos Augusto Carvalho": 531,
-    "Claudia Portella Macedo Fuchner": 506,
-    "Eva da Silva Vieira": 494,
-    "Bernardo Paim Cunha Masson": 489,
+    "Gabriely Celestino Cardoso": 1797,
+    "Leandro Ferreira Schonrock": 697,
+    "Walmor Jose Ruhr": 676,
+    "Fernanda de Fatima Czerban": 673,
+    "Josney Garcia dos Santos": 655,
+    "Jefferson Vanderlei Chiarello": 597,
+    "Marcos Augusto Carvalho": 596,
+    "Claudia Portella Macedo Fuchner": 565,
+    "Bernardo Paim Cunha Masson": 551,
+    "Eva da Silva Vieira": 531,
+    "Alexandre Lima Costa Ferreira": 506,
     "Jhenyfer Maciel da Silva": 465,
-    "Alexandre Lima Costa Ferreira": 425,
-    "Jose Eugenio do Nascimento": 419,
-    "Deivit Cristian Ramos": 264,
-    "Jucelma Silveira Martinatto Bueno da Silva": 62,
-    "Felix da Silva Neto": 57,
+    "Jose Eugenio do Nascimento": 456,
+    "Deivit Cristian Ramos": 330,
+    "Jucelma Silveira Martinatto Bueno da Silva": 70,
+    "Felix da Silva Neto": 58,
     "Fernanda Laverde Torres": 1
   },
   "porHora": {
@@ -3282,7 +3531,7 @@ const dados = {
     "03h": 0,
     "04h": 0,
     "05h": 0,
-    "06h": 1,
+    "06h": 4,
     "07h": 0,
     "08h": 0,
     "09h": 0,
@@ -3293,22 +3542,22 @@ const dados = {
     "14h": 0,
     "15h": 2,
     "16h": 0,
-    "17h": 35,
-    "18h": 59,
-    "19h": 311,
-    "20h": 825,
-    "21h": 553,
-    "22h": 186,
+    "17h": 40,
+    "18h": 63,
+    "19h": 379,
+    "20h": 908,
+    "21h": 599,
+    "22h": 210,
     "23h": 314
   },
   "conexaoRede": {
     "disponivel": true,
-    "totalPublico": 215,
-    "comRedeAmpliada": 40,
-    "comCentroPop": 155,
-    "soOperacao": 53,
+    "totalPublico": 228,
+    "comRedeAmpliada": 41,
+    "comCentroPop": 157,
+    "soOperacao": 64,
     "porUnidade": {
-      "CRAS Centro": 13,
+      "CRAS Centro": 14,
       "Plantão Social": 13,
       "CRAS Industrial": 10,
       "Cram - Centro de Referência de Atendimento à Mulher em Situação de Violência": 5,
@@ -3326,11 +3575,11 @@ const dados = {
   },
   "beneficios": {
     "disponivel": true,
-    "pessoas": 95,
-    "totalItens": 182,
+    "pessoas": 96,
+    "totalItens": 184,
     "porBeneficio": {
       "Cobertor": 96,
-      "2ª Via Certidão de Nascimento [fora do Município]": 24,
+      "2ª Via Certidão de Nascimento [fora do Município]": 26,
       "Triar": 24,
       "Rc - Prato Cheio Item i": 14,
       "Documentação - 2ª Via Rg": 9,
@@ -3343,25 +3592,25 @@ const dados = {
     "disponivel": true,
     "anoAtual": 2026,
     "anoAnterior": 2025,
-    "diasComparados": 63,
+    "diasComparados": 70,
     "pessoas": {
-      "atual": 215,
-      "anterior": 241,
-      "delta": -10.8
+      "atual": 228,
+      "anterior": 250,
+      "delta": -8.8
     },
     "atendimentos": {
-      "atual": 2299,
-      "anterior": 2358,
-      "delta": -2.5
+      "atual": 2532,
+      "anterior": 2551,
+      "delta": -0.7
     },
     "mediaDiaria": {
-      "atual": 36.5,
-      "anterior": 37.4,
-      "delta": -2.5
+      "atual": 36.2,
+      "anterior": 36.4,
+      "delta": -0.7
     },
     "idadeMedia": {
-      "atual": 36.5,
-      "anterior": 38.32
+      "atual": 36.51,
+      "anterior": 38.23
     },
     "faixaEtaria": {
       "labels": [
@@ -3373,23 +3622,23 @@ const dados = {
       ],
       "atual": [
         0,
-        58,
-        113,
-        41,
-        3
+        62,
+        119,
+        43,
+        4
       ],
       "anterior": [
         0,
-        59,
-        121,
-        51,
+        62,
+        125,
+        53,
         10
       ]
     },
     "retorno": {
-      "recorrentes": 39,
-      "ineditas": 176,
-      "pctRecorrente": 18.1
+      "recorrentes": 40,
+      "ineditas": 188,
+      "pctRecorrente": 17.5
     },
     "temporadaAnterior": {
       "pessoas": 259,
@@ -3406,12 +3655,103 @@ if (dados.faixaEtaria) {
   Object.keys(dados.faixaEtaria).forEach(k => { if (!dados.faixaEtaria[k]) delete dados.faixaEtaria[k]; });
 }
 
-const paleta = ["#007044", "#155bcb", "#a9740a", "#6d3aa8", "#127a1e", "#0098DA", "#6b6b66"];
+// Paleta de séries: valores do Design System (DESIGN.md §1) para cada tema. Verde
+// de marca, info, dourado e a rampa de neutros/verdes — sem roxo/ciano inventados.
+// No escuro usa as variantes claras do DS (verde-escuro puro não contrasta em
+// fundo grafite).
+const PALETA_CLARO  = ["#007044", "#155bcb", "#c2850c", "#6b6b66", "#00492c", "#3aa877"];
+const PALETA_ESCURO = ["#54cf93", "#8fb6ff", "#e0a63b", "#8a8a85", "#7edca9", "#adf2c8"];
+let paleta = PALETA_CLARO.slice();
+
 Chart.register(ChartDataLabels);
 Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
-Chart.defaults.color = "#3a3a38";
+
+// Cinzas dependentes de tema (barras do ano anterior e categorias não
+// selecionadas). aplicarTemaGraficos() reescreve estes valores a cada troca.
+let CINZA_COMP = "#c9c9c2";
+let CINZA_DIM = "#ededea";
+
+const _IDS_GRAFICOS = [
+  "chartComparativoSemanas", "chartTendenciaDiaria", "chartPessoasDia", "chartFaixaEtaria",
+  "chartSexo", "chartRaca", "chartMotivos", "chartProfissionais", "chartHorario",
+  "chartConexaoRede", "chartBeneficios", "chartComparativoAnual"
+];
+const _PROPS_COR = ["backgroundColor", "borderColor", "pointBackgroundColor", "pointBorderColor", "hoverBackgroundColor"];
+
+// Substitui uma cor (string, string+alpha, ou array) conforme o mapa de/para.
+function _remapCor(valor, mapa) {
+  if (typeof valor === "string") {
+    if (mapa[valor]) return mapa[valor];
+    const base = valor.length === 9 ? valor.slice(0, 7) : valor;
+    if (mapa[base]) return mapa[base] + (valor.length === 9 ? valor.slice(7) : "33");
+    return valor;
+  }
+  if (Array.isArray(valor)) return valor.map((v) => _remapCor(v, mapa));
+  return valor;
+}
+
+// Reaplica eixos, grade, séries e cinzas de todos os gráficos ao tema ativo.
+// Chamada no fim da montagem e a cada alternância (clique, Hub, aba irmã).
+// recolorirSeries=false pula o re-render das barras cinzas (evita re-animar os
+// KPIs na carga inicial já no tema claro).
+function aplicarTemaGraficos(recolorirSeries = true) {
+  const cs = getComputedStyle(document.documentElement);
+  const tok = (n) => cs.getPropertyValue(n).trim();
+  const escuro = document.documentElement.getAttribute("data-theme") === "dark";
+  const corGrade = tok("--hairline");
+  const corRotulo = tok("--ink-3");
+  const corTexto = tok("--ink-2");
+  const corAnel = tok("--surface");
+
+  Chart.defaults.color = corTexto;
+  if (Chart.defaults.plugins.datalabels) Chart.defaults.plugins.datalabels.color = corTexto;
+  Object.assign(Chart.defaults.plugins.tooltip, {
+    backgroundColor: tok("--ink"), titleColor: tok("--paper"),
+    bodyColor: tok("--paper"), borderColor: tok("--hairline-strong")
+  });
+
+  // Mapa de/para: cores que estavam nos gráficos (tema oposto ao novo) -> novas.
+  const de = escuro ? PALETA_CLARO : PALETA_ESCURO;
+  const cinzaAntes = [CINZA_COMP, CINZA_DIM];
+  paleta = (escuro ? PALETA_ESCURO : PALETA_CLARO).slice();
+  CINZA_COMP = tok("--hairline-strong");   // barras do ano anterior: visíveis, secundárias
+  CINZA_DIM = tok("--surface-3");           // categoria não selecionada: bem apagada
+  const mapa = {};
+  de.forEach((c, i) => { mapa[c] = paleta[i]; });
+  cinzaAntes.forEach((c) => { mapa[c] = CINZA_COMP; });
+
+  for (const id of _IDS_GRAFICOS) {
+    const c = Chart.getChart(id);
+    if (!c) continue;
+    for (const eixo of ["x", "y"]) {
+      const s = c.options.scales && c.options.scales[eixo];
+      if (!s) continue;
+      if (s.grid) s.grid.color = corGrade;
+      s.ticks = Object.assign(s.ticks || {}, { color: corRotulo });
+    }
+    for (const d of c.data.datasets) {
+      for (const prop of _PROPS_COR) {
+        if (d[prop] != null) d[prop] = _remapCor(d[prop], mapa);
+      }
+    }
+    if (c.config.type === "doughnut") {
+      c.data.datasets.forEach((d) => { d.borderColor = corAnel; });
+    }
+    c.update("none");
+  }
+
+  // Recolore as barras cinzas dependentes de dado/seleção.
+  if (recolorirSeries) {
+    if (typeof renderizarAcumulado === "function") renderizarAcumulado();
+    const sel = document.getElementById("seletorSemana");
+    if (sel && typeof renderizarSemana === "function") renderizarSemana(Number(sel.value));
+  }
+}
+
+const _semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function animarNumero(element, target, formatFn, duration=500) {
+  if (_semMovimento) { element.textContent = formatFn(target); return; }
   let start = null;
   const initial = 0;
   function step(timestamp) {
@@ -3429,6 +3769,44 @@ function animarNumero(element, target, formatFn, duration=500) {
 function fmt(n){ return Math.round(n).toLocaleString("pt-BR"); }
 function dec(n,c){ return n.toLocaleString("pt-BR",{minimumFractionDigits:c,maximumFractionDigits:c}); }
 function soma(obj){ return Object.values(obj).reduce((a,b)=>a+b,0); }
+
+// ===== Tema claro/escuro: alternância local + herança do Hub =====
+// O Hub abre este painel em <iframe> e transmite a troca via postMessage; abas
+// irmãs do mesmo domínio sincronizam pelo evento 'storage'. Mesma chave que o Hub.
+(function(){
+  const root = document.documentElement;
+  const btn = document.getElementById("alternarTema");
+  if (!btn) return;
+
+  function sincIcone(){
+    const escuro = root.getAttribute("data-theme") === "dark";
+    btn.innerHTML = `<i class="ph ${escuro ? "ph-sun" : "ph-moon"}"></i>`;
+    btn.setAttribute("aria-label", escuro ? "Ativar tema claro" : "Ativar tema escuro");
+    btn.setAttribute("aria-pressed", String(escuro));
+  }
+  function aplicar(tema, animar){
+    if (animar){
+      root.classList.add("theme-switching");
+      requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("theme-switching")));
+    }
+    root.setAttribute("data-theme", tema);
+    try { localStorage.setItem("hub_tema", tema); } catch (e) {}
+    sincIcone();
+    if (typeof aplicarTemaGraficos === "function") aplicarTemaGraficos();
+  }
+
+  sincIcone();
+  btn.addEventListener("click", () => {
+    aplicar(root.getAttribute("data-theme") === "dark" ? "light" : "dark", true);
+  });
+  window.addEventListener("message", (ev) => {
+    const d = ev.data;
+    if (d && d.tipo === "hub:tema" && (d.tema === "dark" || d.tema === "light")) aplicar(d.tema, true);
+  });
+  window.addEventListener("storage", (ev) => {
+    if (ev.key === "hub_tema" && (ev.newValue === "dark" || ev.newValue === "light")) aplicar(ev.newValue, false);
+  });
+})();
 
 const hoje = new Date();
 document.getElementById("dataEmissao").textContent = hoje.toLocaleDateString("pt-BR");
@@ -3449,6 +3827,78 @@ const anoAnt = _ca.anoAnterior || 2025;
 const anoAtu = _ca.anoAtual || 2026;
 const temAnterior2025 = dados.ultimasSemanas.some(s => s.totalAnterior != null);
 
+// ===== Estilo base dos gráficos (Design System v2.0) =====
+// Tipografia mono para número, tooltip com a superfície/hairline do DS, grade
+// recessiva, marcas finas. Cada gráfico declara só o que é específico dele.
+const _MONO = "'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace";
+(function configurarChartJs(){
+  const cs = getComputedStyle(document.documentElement);
+  const tk = (n) => cs.getPropertyValue(n).trim();
+
+  Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = tk("--ink-2");
+  // duration 0 em vez de `animation:false` — o plugin de datalabels quebra se
+  // `animation` deixa de ser objeto (prefers-reduced-motion herda daqui).
+  Chart.defaults.animation.duration = _semMovimento ? 0 : 640;
+  Chart.defaults.animation.easing = "easeOutQuart";
+  Chart.defaults.layout.padding = { top: 24, right: 14, bottom: 2, left: 2 };
+
+  Chart.defaults.elements.bar.borderRadius = 4;
+  Chart.defaults.elements.point.hoverRadius = 5;
+  Chart.defaults.elements.point.hitRadius = 14;
+  Chart.defaults.elements.line.borderWidth = 2;
+  Chart.defaults.elements.line.tension = 0.34;
+
+  Object.assign(Chart.defaults.plugins.legend.labels, {
+    usePointStyle: true, pointStyle: "circle", boxWidth: 7, boxHeight: 7,
+    padding: 14, font: { family: _MONO, size: 10 }
+  });
+  Chart.defaults.plugins.legend.position = "bottom";
+
+  Object.assign(Chart.defaults.plugins.tooltip, {
+    backgroundColor: tk("--ink"), titleColor: tk("--paper"), bodyColor: tk("--paper"),
+    borderColor: tk("--hairline-strong"), borderWidth: 1, cornerRadius: 6,
+    padding: 10, boxPadding: 4, usePointStyle: true,
+    titleFont: { family: _MONO, size: 11, weight: "600" },
+    bodyFont: { family: _MONO, size: 11 },
+    callbacks: {
+      label: (ctx) => {
+        const val = ctx.parsed && typeof ctx.parsed.y === "number" ? ctx.parsed.y
+                  : (typeof ctx.parsed === "number" ? ctx.parsed : ctx.raw);
+        if (val == null) return null;
+        const nome = ctx.dataset.label ? ctx.dataset.label + ": " : " ";
+        let pct = "";
+        if (ctx.dataset._pct) {
+          const tot = (ctx.dataset.data || []).reduce((a, b) => a + (typeof b === "number" ? b : 0), 0);
+          if (tot > 0) pct = "  ·  " + dec(val / tot * 100, 1) + "%";
+        }
+        return " " + nome + fmt(val) + pct;
+      }
+    }
+  });
+
+  Chart.defaults.plugins.datalabels = Object.assign(Chart.defaults.plugins.datalabels || {}, {
+    color: tk("--ink-2"), clamp: true, clip: false,
+    font: { family: _MONO, size: 10, weight: "600" }
+  });
+})();
+
+// Escreve a métrica-resumo no canto do cabeçalho do card (span .m).
+function metaGrafico(idCanvas, texto){
+  const card = document.getElementById(idCanvas);
+  const alvo = card && card.closest(".chart-card");
+  const m = alvo && alvo.querySelector(".chart-hd .m");
+  if (m && texto) m.textContent = texto;
+}
+
+// Rótulo "valor + % do total" (2 linhas) para gráficos de categoria única.
+function rotuloValorPct(valor, ctx){
+  if (!valor) return null;
+  const tot = (ctx.dataset.data || []).reduce((a, b) => a + (typeof b === "number" ? b : 0), 0);
+  return tot > 0 ? fmt(valor) + "\n" + dec(valor / tot * 100, 0) + "%" : fmt(valor);
+}
+
 // Chart: Comparativo Semanas (barras agrupadas ano a ano quando há 2025)
 let chartComparativo = null;
 if(document.getElementById("chartComparativoSemanas")) {
@@ -3457,7 +3907,7 @@ if(document.getElementById("chartComparativoSemanas")) {
     dsComparativo.push({
       label: String(anoAnt),
       data: dados.ultimasSemanas.map(s => s.totalAnterior ?? null),
-      backgroundColor: "#c9c9c4", borderRadius: 4, maxBarThickness: 26
+      backgroundColor: CINZA_COMP, borderRadius: 4, maxBarThickness: 26
     });
   }
   // O dataset do ano atual é sempre o ÚLTIMO — renderizarSemana recolore ele
@@ -3494,7 +3944,18 @@ if(document.getElementById("chartComparativoSemanas")) {
         e.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
       },
       plugins: {
-        legend: { display: temAnterior2025, position: "bottom", labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } } },
+        legend: {
+          display: temAnterior2025, position: "bottom",
+          labels: {
+            usePointStyle: true, boxWidth: 8, font: { size: 10 },
+            // A cor real das barras de 2026 varia por semana (foco vs. contexto);
+            // fixa os selos da legenda para não herdar a cor da 1a barra.
+            generateLabels: () => [
+              { text: String(anoAnt), fillStyle: CINZA_COMP, strokeStyle: CINZA_COMP, pointStyle: "circle" },
+              { text: String(anoAtu), fillStyle: paleta[0], strokeStyle: paleta[0], pointStyle: "circle" }
+            ]
+          }
+        },
         datalabels: {
           anchor: "end", align: "end",
           font: { size: 9, weight: "bold" },
@@ -3566,7 +4027,7 @@ if(document.getElementById("chartPessoasDia")) {
         {
           label: String(anoAnt),
           data: [],
-          backgroundColor: "#c9c9c4",
+          backgroundColor: CINZA_COMP,
           borderRadius: 4,
           maxBarThickness: 28,
           order: 3
@@ -3590,12 +4051,12 @@ if(document.getElementById("chartPessoasDia")) {
           fill: false,
           order: 1,
           datalabels: {
-            align: "top", anchor: "end",
+            align: "right", anchor: "start",
             color: paleta[2],
-            backgroundColor: "rgba(255,255,255,.85)",
-            borderRadius: 3, padding: { top: 2, bottom: 1, left: 4, right: 4 },
-            font: { size: 10, weight: "bold" },
-            formatter: (v, ctx) => ctx.dataIndex === ctx.dataset.data.length - 1 ? "Média " + dec(v, 1) : null
+            backgroundColor: () => getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),
+            borderRadius: 4, padding: { top: 2, bottom: 1, left: 5, right: 5 },
+            font: { family: _MONO, size: 10, weight: "600" },
+            formatter: (v, ctx) => ctx.dataIndex === 0 ? "Média " + dec(v, 1) : null
           }
         }
       ]
@@ -3647,7 +4108,7 @@ function renderizarSemana(n){
   // total de atendimentos) e apenas sinalizamos a ressalva no rótulo do KPI.
   if (rotuloPernoites) {
     rotuloPernoites.innerHTML = (n >= 3)
-      ? "Pernoites <i class='fa-solid fa-circle-exclamation' style='cursor:help;' title='Devido a uma falha de comunicação, os registros de pernoites a partir da semana 3 estão incorretos.'></i>"
+      ? "Pernoites <i class='ph ph-warning-circle' aria-hidden='true' style='cursor:help;' title='Devido a uma falha de comunicação, os registros de pernoites a partir da semana 3 estão incorretos.'></i>"
       : "Pernoites";
   }
   if (textoPernoitesFrequencia) {
@@ -3691,9 +4152,11 @@ function renderizarSemana(n){
     chartPessoasDia.update();
   }
   if(chartComparativo){
+    // 2026 fica sempre verde (a cor segue o ANO, não a seleção); a semana em
+    // foco usa o verde cheio e as demais um verde esmaecido. 2025 segue cinza.
     const dsAtual = chartComparativo.data.datasets[chartComparativo.data.datasets.length - 1];
     dsAtual.backgroundColor =
-      dados.ultimasSemanas.map(sem => sem.label === `S${n}` ? paleta[0] : (temAnterior2025 ? "#bcd8cb" : "#e6e6e6"));
+      dados.ultimasSemanas.map(sem => sem.label === `S${n}` ? paleta[0] : paleta[0] + "59");
     chartComparativo.update();
   }
 
@@ -3810,7 +4273,7 @@ function renderizarAcumulado() {
   if (chartFaixaEtaria) {
     chartFaixaEtaria.data.datasets[0].data = faixasOriginais.map(f => aggFaixa[f]);
     chartFaixaEtaria.data.datasets[0].backgroundColor = faixasOriginais.map(f =>
-       filtroFaixa && filtroFaixa !== f ? "#e6e6e6" : paleta[0]
+       filtroFaixa && filtroFaixa !== f ? CINZA_DIM : paleta[0]
     );
     chartFaixaEtaria.update();
   }
@@ -3818,15 +4281,15 @@ function renderizarAcumulado() {
   if (chartSexo) {
     chartSexo.data.datasets[0].data = Object.keys(aggSexo).map(s => aggSexo[s]);
     chartSexo.data.datasets[0].backgroundColor = Object.keys(aggSexo).map((s, i) =>
-       filtroSexo && filtroSexo !== s ? "#e6e6e6" : paleta[i]
+       filtroSexo && filtroSexo !== s ? CINZA_DIM : paleta[i]
     );
     chartSexo.update();
   }
 
   if (chartRaca) {
     chartRaca.data.datasets[0].data = racasOriginais.map(r => aggRaca[r]);
-    chartRaca.data.datasets[0].backgroundColor = racasOriginais.map((r, i) =>
-       filtroRaca && filtroRaca !== r ? "#e6e6e6" : paleta[i % paleta.length]
+    chartRaca.data.datasets[0].backgroundColor = racasOriginais.map((r) =>
+       filtroRaca && filtroRaca !== r ? CINZA_DIM : paleta[0]
     );
     chartRaca.update();
   }
@@ -3850,8 +4313,8 @@ if(document.getElementById("chartFaixaEtaria")) {
       datasets: [{
         data: Object.values(dados.faixaEtaria),
         backgroundColor: paleta[0],
-        borderRadius: 4,
-        maxBarThickness: 34
+        maxBarThickness: 46,
+        _pct: true
       }]
     },
     options: {
@@ -3870,15 +4333,11 @@ if(document.getElementById("chartFaixaEtaria")) {
       },
       plugins: {
         legend: { display: false },
-        datalabels: {
-          anchor: "end", align: "end",
-          font: { size: 10, weight: "bold" },
-          formatter: Math.round
-        }
+        datalabels: { anchor: "end", align: "end", textAlign: "center", formatter: rotuloValorPct }
       },
       scales: {
-        x: { grid: { display: false }, border: { display: false } },
-        y: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "15%" }
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: _MONO } } },
+        y: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "45%", ticks: { display: false } }
       }
     }
   });
@@ -3903,7 +4362,7 @@ if(document.getElementById("chartSexo")) {
         {
           label: "Pernoite",
           data: [dados.pessoasComPernoiteAcumulado || 0, semPernoiteAcumulado],
-          backgroundColor: [paleta[2], "#636363"],
+          backgroundColor: [paleta[2], paleta[3]],
           borderWidth: 3,
           borderColor: "#fff",
           hoverOffset: 4
@@ -3913,7 +4372,7 @@ if(document.getElementById("chartSexo")) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: "40%",
+      cutout: "56%",
       onClick: (e, activeElements) => {
         if (activeElements.length > 0 && activeElements[0].datasetIndex === 0) {
           const index = activeElements[0].index;
@@ -3929,32 +4388,58 @@ if(document.getElementById("chartSexo")) {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (ctx) => `${ctx.dataset.label}: ${ctx.label} — ${fmt(ctx.parsed)}`
+            label: (ctx) => {
+              const total = ctx.chart._metasets[ctx.datasetIndex].total || 1;
+              return ` ${ctx.dataset.label} · ${ctx.label}: ${fmt(ctx.parsed)}  ·  ${dec(ctx.parsed / total * 100, 1)}%`;
+            }
           }
         },
         datalabels: {
           color: "#fff",
-          font: { size: 11, weight: "bold" },
+          anchor: "center", align: "center",
+          font: { family: _MONO, size: 11, weight: "600" },
           formatter: (val, ctx) => {
             const total = ctx.chart._metasets[ctx.datasetIndex].total;
-            if(val < total * 0.04) return null;
-            return val;
+            if (!total || val < total * 0.14) return null;
+            return dec(val / total * 100, 0) + "%";
           }
         }
       }
-    }
+    },
+    plugins: [{
+      // Total de pessoas no miolo do anel.
+      id: "centroSexo",
+      afterDatasetsDraw(chart) {
+        const { ctx, chartArea } = chart;
+        const cx = (chartArea.left + chartArea.right) / 2;
+        const cy = (chartArea.top + chartArea.bottom) / 2;
+        const cs = getComputedStyle(document.documentElement);
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.fillStyle = cs.getPropertyValue("--ink").trim();
+        ctx.font = "600 24px 'IBM Plex Mono', monospace";
+        ctx.fillText(fmt(dados.pessoasUnicasAcumulado || 0), cx, cy - 2);
+        ctx.fillStyle = cs.getPropertyValue("--ink-3").trim();
+        ctx.font = "600 9px 'IBM Plex Mono', monospace";
+        ctx.fillText("PESSOAS", cx, cy + 13);
+        ctx.restore();
+      }
+    }]
   });
 
   const legendaSexo = document.getElementById("legendaSexo");
   const rotulosSexo = Object.keys(dados.sexo);
-  const swatches = [
-    [paleta[0], rotulosSexo[0] || ""],
-    [paleta[1], rotulosSexo[1] || ""],
-    [paleta[2], "Com pernoite"]
+  const totalSexo = soma(dados.sexo) || 1;
+  const comPernoite = dados.pessoasComPernoiteAcumulado || 0;
+  const itens = [
+    [paleta[0], rotulosSexo[0], dados.sexo[rotulosSexo[0]]],
+    [paleta[1], rotulosSexo[1], dados.sexo[rotulosSexo[1]]],
+    [paleta[2], "Com pernoite", comPernoite]
   ];
-  legendaSexo.innerHTML = swatches
+  legendaSexo.innerHTML = itens
     .filter(([, rotulo]) => rotulo)
-    .map(([cor, rotulo]) => `<span><i style="background:${cor}"></i>${rotulo}</span>`)
+    .map(([cor, rotulo, n]) =>
+      `<span><i style="background:${cor}"></i>${rotulo} <b class="mono">${fmt(n || 0)}</b> · ${dec((n || 0) / totalSexo * 100, 0)}%</span>`)
     .join("");
 }
 
@@ -3966,9 +4451,9 @@ if(document.getElementById("chartRaca")) {
       labels: Object.keys(dados.raca || {}),
       datasets: [{
         data: Object.values(dados.raca || {}),
-        backgroundColor: Object.keys(dados.raca || {}).map((r, i) => paleta[i % paleta.length]),
-        borderRadius: 4,
-        maxBarThickness: 34
+        backgroundColor: paleta[0],
+        maxBarThickness: 46,
+        _pct: true
       }]
     },
     options: {
@@ -3987,15 +4472,11 @@ if(document.getElementById("chartRaca")) {
       },
       plugins: {
         legend: { display: false },
-        datalabels: {
-          anchor: "end", align: "end",
-          font: { size: 10, weight: "bold" },
-          formatter: Math.round
-        }
+        datalabels: { anchor: "end", align: "end", textAlign: "center", formatter: rotuloValorPct }
       },
       scales: {
-        x: { grid: { display: false }, border: { display: false } },
-        y: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "15%" }
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: _MONO } } },
+        y: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "45%", ticks: { display: false } }
       }
     }
   });
@@ -4086,15 +4567,17 @@ if(document.getElementById("chartProfissionais")) {
 // Chart: Horário dos Atendimentos
 if(document.getElementById("chartHorario")) {
   const entradasHora = Object.entries(dados.porHora || {}).filter(([, v]) => v >= 1);
+  const maxHora = Math.max(1, ...entradasHora.map(([, v]) => v));
+  const totalHora = entradasHora.reduce((a, [, v]) => a + v, 0) || 1;
   new Chart(document.getElementById("chartHorario"), {
     type: "bar",
     data: {
       labels: entradasHora.map(([k]) => k),
       datasets: [{
         data: entradasHora.map(([, v]) => v),
-        backgroundColor: paleta[2],
-        borderRadius: 3,
-        maxBarThickness: 16
+        // Destaca a barra de pico em dourado; as demais em verde de marca.
+        backgroundColor: entradasHora.map(([, v]) => v === maxHora ? paleta[2] : paleta[0]),
+        maxBarThickness: 20
       }]
     },
     options: {
@@ -4102,11 +4585,15 @@ if(document.getElementById("chartHorario")) {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        datalabels: { display: false }
+        tooltip: { callbacks: { label: (ctx) => ` ${fmt(ctx.parsed.y)} atend.  ·  ${dec(ctx.parsed.y / totalHora * 100, 1)}% do dia` } },
+        datalabels: {
+          anchor: "end", align: "end",
+          formatter: (v) => v >= maxHora * 0.2 ? fmt(v) : null
+        }
       },
       scales: {
-        x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: true, autoSkipPadding: 4 } },
-        y: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "15%" }
+        x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: _MONO, size: 9 }, maxRotation: 0, autoSkip: true, autoSkipPadding: 4 } },
+        y: { grid: { color: "#e6e6e6" }, border: { display: false }, beginAtZero: true, grace: "22%", ticks: { display: false } }
       }
     }
   });
@@ -4247,7 +4734,7 @@ if(document.getElementById("chartHorario")) {
       data: {
         labels: c.faixaEtaria.labels,
         datasets: [
-          { label: String(c.anoAnterior), data: c.faixaEtaria.anterior, backgroundColor: "#c9c9c4", borderRadius: 4, maxBarThickness: 26 },
+          { label: String(c.anoAnterior), data: c.faixaEtaria.anterior, backgroundColor: CINZA_COMP, borderRadius: 4, maxBarThickness: 26 },
           { label: String(c.anoAtual), data: c.faixaEtaria.atual, backgroundColor: paleta[0], borderRadius: 4, maxBarThickness: 26 }
         ]
       },
@@ -4277,6 +4764,27 @@ if(document.getElementById("chartHorario")) {
   document.getElementById("textoComparativoRessalva").innerHTML =
     `<b>Pernoites e motivos ficam fora da comparação:</b> a forma de registrar o motivo do atendimento mudou entre ${c.anoAnterior} e ${c.anoAtual} (antes a maioria entrava como "Demanda Espontânea"; agora como "Pernoite Casa de Passagem"), então essas contagens não são comparáveis entre as temporadas.`;
 })();
+
+// Métricas-resumo no cabeçalho de cada card (span .m) — contexto sem clique.
+(() => {
+  if (mediaUltimasSemanas > 0) metaGrafico("chartComparativoSemanas", `média ${fmt(mediaUltimasSemanas)} atend./semana`);
+  const nFaixa = soma(dados.faixaEtaria || {});
+  const topFx = topEntry(dados.faixaEtaria);
+  if (nFaixa) metaGrafico("chartFaixaEtaria", `${fmt(nFaixa)} pessoas${topFx ? ` · maior: ${topFx[0]}` : ""}`);
+  const nRaca = soma(dados.raca || {});
+  if (nRaca) metaGrafico("chartRaca", `${fmt(nRaca)} pessoas · ${Object.keys(dados.raca || {}).length} categorias`);
+  const somaTopMot = Object.values(dados.motivos || {}).slice(0, 5).reduce((a, b) => a + b, 0);
+  if (somaTopMot) metaGrafico("chartMotivos", `${fmt(somaTopMot)} atend. nos 5 maiores`);
+  const somaTopProf = Object.values(dados.profissionais || {}).slice(0, 8).reduce((a, b) => a + b, 0);
+  if (somaTopProf) metaGrafico("chartProfissionais", `${fmt(somaTopProf)} atend. · 8 profissionais`);
+  const pico = topEntry(dados.porHora);
+  if (pico) metaGrafico("chartHorario", `pico ${pico[0]} · ${fmt(pico[1])} atend.`);
+})();
+
+// Ajusta eixos, grade e séries neutras dos gráficos ao tema ativo (o Hub pode
+// ter carregado este painel já no escuro). Só re-renderiza as barras cinzas se
+// o tema herdado não for o claro padrão.
+aplicarTemaGraficos(document.documentElement.getAttribute("data-theme") === "dark");
 
 </script>
 </body>
