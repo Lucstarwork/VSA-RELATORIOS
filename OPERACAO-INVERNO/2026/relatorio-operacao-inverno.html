@@ -114,17 +114,6 @@
   }
   .skip-link:focus{ left:16px; top:16px; }
 
-  /* Controle utilitário: alterna claro/escuro. Fora da impressão. */
-  .theme-toggle{
-    position:absolute; top:16px; right:40px; z-index:15;
-    width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center;
-    background:var(--surface); color:var(--ink-2);
-    border:1px solid var(--hairline); border-radius:var(--radius-md);
-    cursor:pointer; font-size:17px; line-height:1;
-    transition:color var(--dur-instant), border-color var(--dur-instant);
-  }
-  @media (hover:hover){ .theme-toggle:hover{ color:var(--primary); border-color:var(--primary-soft); } }
-
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{
       animation-duration:.01ms !important; animation-iteration-count:1 !important;
@@ -133,7 +122,6 @@
   }
 
   .viz-root{
-    position:relative;
     max-width:1400px; margin:0 auto; padding:0 40px 72px;
     background:var(--paper);
   }
@@ -271,7 +259,6 @@
   }
   @media (max-width:560px){
     .viz-root{ padding:0 20px 56px; }
-    .theme-toggle{ right:20px; }
     .top-rule, .mast-foot{ margin-left:-20px; margin-right:-20px; }
     .kpis{ grid-template-columns:repeat(2,1fr); }
     .mast h1{ font-size:26px; }
@@ -293,7 +280,7 @@
     .viz-root{ max-width:none; padding:0 10mm 12mm; }
     .top-rule{ margin:0; }
     .block, .chart-card, .kpis, .lead, .find{ break-inside:avoid; }
-    .wk-select, .theme-toggle, .skip-link{ display:none; }
+    .wk-select, .skip-link{ display:none; }
   }
 </style>
 </head>
@@ -302,7 +289,6 @@
 <a class='skip-link' href='#conteudo'>Pular para o conteúdo</a>
 
 <div class='viz-root' id='app'>
-  <button id='alternarTema' class='theme-toggle' type='button' aria-label='Ativar tema escuro' aria-pressed='false'><i class='ph ph-moon'></i></button>
   <div class='top-rule'></div>
 
   <header class='mast'>
@@ -3770,35 +3756,22 @@ function fmt(n){ return Math.round(n).toLocaleString("pt-BR"); }
 function dec(n,c){ return n.toLocaleString("pt-BR",{minimumFractionDigits:c,maximumFractionDigits:c}); }
 function soma(obj){ return Object.values(obj).reduce((a,b)=>a+b,0); }
 
-// ===== Tema claro/escuro: alternância local + herança do Hub =====
-// O Hub abre este painel em <iframe> e transmite a troca via postMessage; abas
-// irmãs do mesmo domínio sincronizam pelo evento 'storage'. Mesma chave que o Hub.
+// ===== Tema claro/escuro herdado do Hub =====
+// O painel não tem seletor próprio: o Hub abre este arquivo em <iframe> e
+// transmite a troca via postMessage; abas irmãs do mesmo domínio sincronizam
+// pelo evento 'storage'. O palpite inicial já foi resolvido no <head>.
 (function(){
   const root = document.documentElement;
-  const btn = document.getElementById("alternarTema");
-  if (!btn) return;
-
-  function sincIcone(){
-    const escuro = root.getAttribute("data-theme") === "dark";
-    btn.innerHTML = `<i class="ph ${escuro ? "ph-sun" : "ph-moon"}"></i>`;
-    btn.setAttribute("aria-label", escuro ? "Ativar tema claro" : "Ativar tema escuro");
-    btn.setAttribute("aria-pressed", String(escuro));
-  }
   function aplicar(tema, animar){
+    if (root.getAttribute("data-theme") === tema) return;
     if (animar){
       root.classList.add("theme-switching");
       requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("theme-switching")));
     }
     root.setAttribute("data-theme", tema);
     try { localStorage.setItem("hub_tema", tema); } catch (e) {}
-    sincIcone();
     if (typeof aplicarTemaGraficos === "function") aplicarTemaGraficos();
   }
-
-  sincIcone();
-  btn.addEventListener("click", () => {
-    aplicar(root.getAttribute("data-theme") === "dark" ? "light" : "dark", true);
-  });
   window.addEventListener("message", (ev) => {
     const d = ev.data;
     if (d && d.tipo === "hub:tema" && (d.tema === "dark" || d.tema === "light")) aplicar(d.tema, true);
