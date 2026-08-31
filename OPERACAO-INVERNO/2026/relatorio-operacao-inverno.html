@@ -6,16 +6,27 @@
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>Relatório Semanal de Atendimentos — Operação Inverno — Araucária</title>
 
-<!-- Tema resolvido antes da 1a pintura (sem flash). Herda a escolha do Hub pela
-     mesma chave localStorage 'hub_tema'; sem valor salvo, segue a preferência do SO. -->
+<!-- Tema resolvido antes da 1a pintura (sem flash). Ordem: HTML pai (se mesma
+     origem) > localStorage 'hub_tema' (mesma origem do Hub) > preferência do SO.
+     Quando o painel roda em <iframe> de outra origem (relatório no GitHub Pages),
+     nenhuma dessas fontes existe e o Hub empurra o tema por postMessage no load. -->
 <script>
   (function(){
+    var t = null;
     try{
-      var t = localStorage.getItem('hub_tema');
-      if (t !== 'dark' && t !== 'light')
-        t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', t);
-    }catch(e){ document.documentElement.setAttribute('data-theme', 'light'); }
+      if (window.parent && window.parent !== window) {
+        var pt = window.parent.document.documentElement.getAttribute('data-theme');
+        if (pt === 'dark' || pt === 'light') t = pt;
+      }
+    }catch(e){ /* origem cruzada: sem acesso ao pai */ }
+    try{
+      if (!t) {
+        var s = localStorage.getItem('hub_tema');
+        if (s === 'dark' || s === 'light') t = s;
+      }
+    }catch(e){}
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
   })();
 </script>
 
