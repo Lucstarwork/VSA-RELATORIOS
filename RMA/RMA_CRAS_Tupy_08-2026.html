@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RMA CRAS Tupy — Agosto/2026</title>
+<link rel="stylesheet" href="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/fonts/rawline/css/rawline.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gray-90:#1b1b1b; --gray-80:#333333; --gray-70:#555555; --gray-60:#636363;
+  --gray-50:#757575; --gray-40:#888888; --gray-30:#adadad; --gray-20:#cccccc;
+  --gray-10:#e6e6e6; --gray-5:#f0f0f0; --gray-4:#f3f3f3; --gray-2:#f8f8f8;
+  --pure-0:#ffffff;
+  --brand-primary:#007044; --brand-primary-dark:#005a37;
+  --brand-primary-a08:rgba(0,112,68,.08); --brand-primary-a16:rgba(0,112,68,.16);
+  --brand-secondary:#005484; --brand-accent:#FDB92E;
+  --focus:#c2850c;
+  --fs-down-01:12px; --fs-base:14px; --fs-up-01:16.8px; --fs-up-02:20.2px;
+  --rounder-sm:4px; --shadow-sm:0 1px 6px rgba(0,0,0,.16);
+}
+* { box-sizing:border-box; }
+::selection { background:var(--brand-primary-a16); }
+body {
+  margin:0; padding:32px 16px; background:var(--gray-2);
+  font-family:'Rawline','Raleway',sans-serif;
+  font-size:var(--fs-base); color:var(--gray-80); line-height:1.45;
+}
+.folha {
+  max-width:900px; margin:0 auto; background:var(--pure-0);
+  border:1px solid var(--gray-10); border-radius:var(--rounder-sm);
+  box-shadow:var(--shadow-sm); overflow:hidden;
+  animation:viewIn .3s cubic-bezier(.25,.1,.25,1) both;
+}
+@keyframes viewIn { from { opacity:0; transform:scale(.98) translateY(6px); } }
+.faixa {
+  height:4px;
+  background:linear-gradient(to right,
+    var(--brand-primary) 0 40%, var(--brand-accent) 40% 55%,
+    var(--brand-secondary) 55% 100%);
+}
+.miolo { padding:32px 40px 40px; }
+
+.cabecalho { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+.cabecalho img { width:110px; height:auto; flex:none; }
+.instituicao { flex:1; text-align:center; }
+.instituicao .estado {
+  font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--gray-60); font-weight:600;
+}
+.instituicao .municipio {
+  font-size:var(--fs-up-02); font-weight:700; color:var(--brand-primary);
+  line-height:1.15;
+}
+.instituicao .secretaria { font-size:var(--fs-base); color:var(--gray-70); }
+.form-meta { text-align:right; font-size:var(--fs-down-01); color:var(--gray-50); flex:none; }
+.form-meta strong { display:block; color:var(--gray-70); font-weight:600; }
+
+.identificacao {
+  display:grid; grid-template-columns:2fr 1fr; gap:4px 24px;
+  border:1px solid var(--gray-10); border-radius:var(--rounder-sm);
+  padding:16px; margin-bottom:24px; background:var(--gray-2);
+}
+.identificacao .campo { font-size:var(--fs-base); }
+.identificacao .rotulo {
+  font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--gray-50); font-weight:600; display:block;
+}
+.identificacao .valor { font-weight:600; color:var(--gray-80); }
+
+.bloco { margin-bottom:24px; }
+.bloco-titulo {
+  background:var(--brand-primary); color:var(--pure-0);
+  font-weight:600; font-size:var(--fs-base);
+  padding:8px 16px; border-radius:var(--rounder-sm) var(--rounder-sm) 0 0;
+}
+table { width:100%; border-collapse:collapse; }
+.secao table { border:1px solid var(--gray-10); border-top:none; }
+.secao thead th {
+  background:var(--brand-primary-a08); color:var(--brand-primary);
+  font-weight:600; text-align:left; padding:8px 16px;
+  font-size:var(--fs-base); border-bottom:1px solid var(--gray-10);
+}
+.secao thead th.qt { text-align:right; width:96px; }
+.secao td {
+  padding:8px 16px; border-bottom:1px solid var(--gray-10);
+  color:var(--gray-80);
+}
+.secao tbody tr:last-child td { border-bottom:none; }
+.secao td.codigo { width:48px; color:var(--gray-60); font-weight:600; white-space:nowrap; }
+.secao td.qt {
+  text-align:right; font-weight:700; font-variant-numeric:tabular-nums;
+  color:var(--gray-90); width:96px;
+}
+.secao td.qt.na { color:var(--gray-40); font-weight:400; font-style:italic; }
+.secao tbody tr:hover td { background:var(--gray-2); }
+
+.rodape { margin-top:32px; }
+.coordenador { display:flex; gap:24px; margin-bottom:40px; }
+.coordenador .campo { font-size:var(--fs-base); }
+.coordenador .rotulo { font-weight:600; color:var(--gray-70); }
+.assinatura {
+  margin:0 auto; width:60%; border-top:1px solid var(--gray-40);
+  text-align:center; padding-top:4px; color:var(--gray-60);
+  font-size:var(--fs-down-01);
+}
+.aviso-na {
+  margin-top:24px; font-size:var(--fs-down-01); color:var(--gray-50);
+  font-style:italic;
+}
+
+.btn-imprimir {
+  position:fixed; top:16px; right:16px;
+  height:40px; padding:0 24px; border:none; border-radius:100em;
+  background:var(--brand-primary); color:var(--pure-0);
+  font-family:inherit; font-size:var(--fs-base); font-weight:600;
+  cursor:pointer; box-shadow:var(--shadow-sm);
+}
+.btn-imprimir:hover { background:var(--brand-primary-dark); }
+.btn-imprimir:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+
+@page { size:A4; margin:12mm; }
+@media print {
+  body { background:var(--pure-0); padding:0; }
+  .folha { border:none; box-shadow:none; max-width:none; animation:none; }
+  .miolo { padding:0; }
+  .btn-imprimir { display:none; }
+  .secao tbody tr:hover td { background:transparent; }
+}
+</style>
+</head>
+<body>
+<button class="btn-imprimir" onclick="window.print()">Imprimir / PDF</button>
+<div class="folha">
+  <div class="faixa"></div>
+  <div class="miolo">
+    <header class="cabecalho">
+      <img src="https://lucstarwork.github.io/VSA-RELATORIOS/BOLETINS-PSB/2026/1o%20SEMESTRE/assets/brasao-completo.png" alt="Brasão do Município de Araucária">
+      <div class="instituicao">
+        <div class="estado">Estado do Paraná</div>
+        <div class="municipio">Município de Araucária</div>
+        <div class="secretaria">Secretaria de Assistência Social</div>
+      </div>
+      <div class="form-meta">
+        <strong>Formulário 1</strong>
+        01/09/2026<br>09:12:08
+      </div>
+    </header>
+
+    <div class="identificacao">
+      <div class="campo"><span class="rotulo">Tipo do Formulário</span>
+        <span class="valor">CRAS - Registro Mensal de Atendimentos</span></div>
+      <div class="campo"><span class="rotulo">Mês/Ano</span>
+        <span class="valor">08/2026</span></div>
+      <div class="campo"><span class="rotulo">Nome da Unidade</span>
+        <span class="valor">CRAS Tupy</span></div>
+      <div class="campo"><span class="rotulo">Nº da Unidade</span>
+        <span class="valor">41018006003</span></div>
+      <div class="campo"><span class="rotulo">Endereço</span>
+        <span class="valor">Rua Jardineira</span></div>
+      <div class="campo"><span class="rotulo">Município</span>
+        <span class="valor">Araucária - PR</span></div>
+    </div>
+
+    <section class="bloco"><div class="bloco-titulo">Bloco 1 - Famílias em acompanhamentos pelo PAIF</div><div class="secao"><table><thead><tr><th colspan="2">A. Volume de famílias em acompanhamento pelo PAIF</th><th class="qt">Total</th></tr></thead><tbody><tr><td class="codigo">A.1.</td><td>Total de famílias em acompanhamento pelo PAIF</td><td class="qt">102</td></tr><tr><td class="codigo">A.2.</td><td>Novas famílias inseridas no acompanhamento do PAIF durante o mês de referência</td><td class="qt">1</td></tr></tbody></table></div><div class="secao"><table><thead><tr><th colspan="2">B. Perfil das novas famílias inseridas em acompanhamento do PAIF, no mês de referência</th><th class="qt">Total</th></tr></thead><tbody><tr><td class="codigo">B.1.</td><td>Famílias em situação de extrema pobreza</td><td class="qt">1</td></tr><tr><td class="codigo">B.2.</td><td>Famílias beneficiárias do Programa Bolsa Família</td><td class="qt">1</td></tr><tr><td class="codigo">B.3.</td><td>Famílias beneficiárias do Programa Bolsa Família, em descumprimento de condicionalidades</td><td class="qt">1</td></tr><tr><td class="codigo">B.4.</td><td>Famílias com membros beneficiários do BPC</td><td class="qt">0</td></tr><tr><td class="codigo">B.5.</td><td>Famílias com crianças ou adolescentes em situação de trabalho infantil</td><td class="qt">0</td></tr><tr><td class="codigo">B.6.</td><td>Famílias com crianças ou adolescentes em Serviço de Acolhimento</td><td class="qt">0</td></tr></tbody></table></div></section><section class="bloco"><div class="bloco-titulo">Bloco 2 - Atendimentos individualizados realizados no CRAS</div><div class="secao"><table><thead><tr><th colspan="2">C. Volume de atendimentos individualizados realizados no CRAS, no mês de referência</th><th class="qt">Quantidade</th></tr></thead><tbody><tr><td class="codigo">C.1.</td><td>Total de atendimentos individualizados realizados, no mês</td><td class="qt">472</td></tr><tr><td class="codigo">C.2.</td><td>Famílias encaminhadas para inclusão no Cadastro Único</td><td class="qt">13</td></tr><tr><td class="codigo">C.3.</td><td>Famílias encaminhadas para atualização cadastral no Cadastro Único</td><td class="qt">75</td></tr><tr><td class="codigo">C.4.</td><td>Indivíduos encaminhados para acesso ao BPC</td><td class="qt">0</td></tr><tr><td class="codigo">C.5.</td><td>Famílias encaminhadas para o CREAS</td><td class="qt">0</td></tr><tr><td class="codigo">C.6.</td><td>Visitas domiciliares realizadas</td><td class="qt">13</td></tr><tr><td class="codigo">C.7.</td><td>Total de auxílios-natalidade concedidos/entregues durante o mês de referência</td><td class="qt">0</td></tr><tr><td class="codigo">C.8.</td><td>Total de auxílios-funeral concedidos/entregues durante o mês de referência</td><td class="qt">1</td></tr><tr><td class="codigo">C.9.</td><td>Outros benefícios eventuais concedidos/entregues durante o mês de referência</td><td class="qt">77</td></tr></tbody></table></div></section><section class="bloco"><div class="bloco-titulo">Bloco 3 - Atendimentos coletivos realizados no CRAS</div><div class="secao"><table><thead><tr><th colspan="2">D. Volume dos Serviços de Convivência e Fortalecimento de Vínculos, no mês de referência</th><th class="qt">Quantidade</th></tr></thead><tbody><tr><td class="codigo">D.1.</td><td>Famílias participando regularmente de grupos no âmbito do PAIF</td><td class="qt">15</td></tr><tr><td class="codigo">D.2.</td><td>Crianças entre 0 e 6 anos em Serviços de Convivência e Fortalecimento de Vínculos</td><td class="qt">0</td></tr><tr><td class="codigo">D.3.</td><td>Crianças/adolescentes entre 7 e 14 anos em Serviços de Convivência e Fortalecimento de Vínculos</td><td class="qt">0</td></tr><tr><td class="codigo">D.4.</td><td>Adolescentes de 15 a 17 anos em Serviços de Convivência e Fortalecimento de Vínculos</td><td class="qt">0</td></tr><tr><td class="codigo">D.8.</td><td>Adultos entre 18 e 59 anos em Serviços de Convivência e Fortalecimento de Vínculos</td><td class="qt">11</td></tr><tr><td class="codigo">D.5.</td><td>Idosos em Serviços de Convivência e Fortalecimento de Vínculos</td><td class="qt">18</td></tr><tr><td class="codigo">D.6.</td><td>Pessoas que participaram de palestras, oficinas e outras atividades coletivas de caráter não continuado</td><td class="qt">16</td></tr><tr><td class="codigo">D.7.</td><td>Pessoas com deficiência, participando dos Serviços de Convivência ou dos grupos do PAIF</td><td class="qt">0</td></tr></tbody></table></div></section>
+
+    <footer class="rodape">
+      <div class="coordenador">
+        <div class="campo"><span class="rotulo">Nome do Coordenador:</span>
+          Rossana de Moraes Bueno</div>
+        <div class="campo"><span class="rotulo">CPF:</span>
+          031.234.269-12</div>
+      </div>
+      <div class="assinatura">Assinatura</div>
+      
+    </footer>
+  </div>
+</div>
+</body>
+</html>
