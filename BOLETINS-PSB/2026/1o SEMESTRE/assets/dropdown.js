@@ -123,7 +123,7 @@ function criarGovDropdown(selectId, compacto) {
     trigger.appendChild(label);
     
     const icone = document.createElement('i');
-    icone.className = 'fas fa-chevron-down';
+    icone.className = 'ph ph-caret-down';
     icone.setAttribute('aria-hidden', 'true');
     trigger.appendChild(icone);
     
