@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAS Costeira — Araucária</title>
+    <!-- Tema resolvido antes da 1a pintura (sem flash), herdado do HUB. Ordem:
+         HTML pai (iframe de mesma origem) > localStorage 'hub_tema' > SO. Quando
+         o boletim roda em <iframe> de outra origem, o Hub empurra o tema por
+         postMessage no load (ver script no fim do <body>). -->
+    <script>
+        (function () {
+            var t = null;
+            try {
+                if (window.parent && window.parent !== window) {
+                    var pt = window.parent.document.documentElement.getAttribute('data-theme');
+                    if (pt === 'dark' || pt === 'light') t = pt;
+                }
+            } catch (e) { /* origem cruzada: sem acesso ao pai */ }
+            try {
+                if (!t) { var s = localStorage.getItem('hub_tema'); if (s === 'dark' || s === 'light') t = s; }
+            } catch (e) {}
+            if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <style>/* ============================================================================
+   Boletim PSB — Vigilância Socioassistencial (Araucária/PR)
+   Design System "Editorial Acolhedor" — implementação fiel a
+   kiwi/design/assets/design_system_preview.html (fonte da verdade).
+   Tokens PRIMITIVOS -> SEMÂNTICOS. Relatório desktop-first, tema claro.
+   ============================================================================ */
+
+/* ---- 1. PRIMITIVOS (valores crus, agnósticos de tema) --------------------- */
+:root {
+    /* Verde Araucária (marca) */
+    --green-95:#031b0f; --green-90:#00281a; --green-80:#00492c; --green-70:#005a37;
+    --green-60:#007044; --green-50:#0a8a56; --green-40:#3aa877; --green-30:#7ed9a3;
+    --green-20:#adf2c8; --green-10:#d6f7e3; --green-05:#eaf8f0;
+
+    /* Azul-marinho institucional — reservado ao logotipo, nunca acento */
+    --navy:#103858; --navy-deep:#0c2a43;
+
+    /* Neutros quentes — base do tema claro (neve, sem tom verde) */
+    --n-99:#fafaf9; --n-97:#f5f5f3; --n-94:#ededea; --n-88:#e2e2dd;
+    --n-78:#c9c9c2; --n-55:#6b6b66; --n-38:#3a3a38; --n-16:#1a1a17;
+
+    /* Semânticas cruas (gov.br) */
+    --gold:#c2850c; --gold-light:#e0a63b;
+
+    /* Tipografia */
+    --font-serif:'Spectral', Georgia, 'Times New Roman', serif;
+    --font-sans:'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* Escala tipográfica (ritmo editorial) */
+    --fs-eyebrow:11px; --fs-label:12px; --fs-caption:13px; --fs-body:15px;
+    --fs-body-lg:17px; --fs-h4:20px; --fs-h3:24px; --fs-h2:30px; --fs-h1:40px;
+
+    /* Espaçamento base 4px */
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
+    --sp-8:32px; --sp-10:40px; --sp-12:48px; --sp-16:64px; --sp-20:80px;
+
+    /* Raio (acolhedor: suave, nunca 0) */
+    --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-pill:999px;
+    --hair:1px;
+
+    /* Movimento */
+    --dur-instant:.1s; --dur-fast:.2s; --dur-surface:.32s;
+    --ease-out:cubic-bezier(.22,.61,.36,1);
+    --ease-standard:cubic-bezier(.25,.1,.25,1);
+    --ease-emphasis:cubic-bezier(.2,0,0,1);
+
+    --content-max:1600px; --focus-w:3px;
+
+    /* ---- 2. SEMÂNTICOS — TEMA CLARO --------------------------------------- */
+    --paper:var(--n-99);
+    --surface:#ffffff;
+    --surface-2:var(--n-97);
+    --surface-3:var(--n-94);
+    --surface-float:#ffffff;
+
+    --ink:var(--n-16);
+    --ink-2:var(--n-38);
+    --ink-3:var(--n-55);
+    --ink-inverse:#ffffff;
+
+    --hairline:var(--n-88);
+    --hairline-strong:var(--n-78);
+    --rule:var(--n-16);
+
+    --primary:var(--green-60);
+    --primary-strong:var(--green-80);
+    --primary-soft:#eaf5ef;
+    --primary-soft-border:#b7e4cb;
+    --on-primary:#ffffff;
+
+    --brand-ink:var(--navy);
+    --focus:var(--gold);
+
+    --success:#127a1e; --success-bg:#e6f4e6;
+    --warning:#8a5a00; --warning-bg:#fbf0cc;
+    --danger:#c42b1c;  --danger-bg:#fbe4e0;
+    --info:#155bcb;    --info-bg:#eaf1fd;
+
+    --shadow-float:0 4px 16px -4px rgba(20,20,18,.16), 0 1px 3px rgba(20,20,18,.08);
+    --scrim:rgba(20,20,18,.44);
+
+    color-scheme:light;
+}
+
+/* ---- 2b. SEMÂNTICOS — TEMA ESCURO (grafite neutro, herdado do HUB) -------
+   O relatório não tem seletor próprio: o tema é resolvido no <head> a partir
+   do HUB (iframe pai / localStorage 'hub_tema' / preferência do SO). Grafite
+   neutro, sem tingimento azul/verde; verde continua sendo a única marca. */
+[data-theme="dark"] {
+    --paper:var(--g-08);
+    --surface:var(--g-12);
+    --surface-2:var(--g-16);
+    --surface-3:var(--g-22);
+    --surface-float:var(--g-16);
+
+    --ink:var(--g-ink);
+    --ink-2:var(--g-ink2);
+    --ink-3:var(--g-ink3);
+    --ink-inverse:var(--g-08);
+
+    --hairline:rgba(255,255,255,.11);
+    --hairline-strong:rgba(255,255,255,.22);
+    --rule:var(--g-ink);
+
+    --primary:#54cf93;
+    --primary-strong:#7edca9;
+    --primary-soft:rgba(84,207,147,.12);
+    --primary-soft-border:rgba(84,207,147,.30);
+    --on-primary:#052b18;
+
+    --brand-ink:var(--g-ink);
+    --focus:var(--gold-light);
+
+    --success:#5fd07a; --success-bg:rgba(95,208,122,.13);
+    --warning:#f0c24a; --warning-bg:rgba(240,194,74,.13);
+    --danger:#ff9b8e;  --danger-bg:rgba(255,155,142,.13);
+    --info:#8fb6ff;    --info-bg:rgba(143,182,255,.13);
+
+    --shadow-float:0 8px 28px -6px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.5);
+    --scrim:rgba(0,0,0,.68);
+
+    color-scheme:dark;
+}
+
+/* Grafite neutro do tema escuro — precisa existir como primitivo. */
+:root {
+    --g-08:#0e0e0e; --g-12:#171717; --g-16:#1f1f1f; --g-22:#282828;
+    --g-ink:#ededec; --g-ink2:#b4b4b0; --g-ink3:#8a8a85;
+
+    /* ---- 3. ALIASES LEGADOS (consumidos em style="" inline dos templates) - */
+    --brand-primary:var(--primary);
+    --brand-secondary:var(--primary);
+    --brand-accent:var(--gold);
+    --feedback-success:var(--success); --feedback-success-bg:var(--success-bg);
+    --feedback-warning:var(--warning); --feedback-warning-bg:var(--warning-bg);
+    --feedback-danger:var(--danger);   --feedback-danger-bg:var(--danger-bg);
+    --feedback-info:var(--info);       --feedback-info-bg:var(--info-bg);
+    --gray-90:var(--ink);   --gray-80:var(--ink-2); --gray-70:var(--ink-2);
+    --gray-60:var(--ink-3); --gray-50:var(--ink-3); --gray-40:var(--ink-3);
+    --gray-30:var(--hairline-strong); --gray-20:var(--hairline-strong);
+    --gray-10:var(--hairline); --gray-5:var(--surface-2); --pure-0:var(--surface);
+    --spacing-scale-half:var(--sp-1); --spacing-scale-base:var(--sp-2);
+    --spacing-scale-baseh:var(--sp-3); --spacing-scale-2x:var(--sp-4);
+    --spacing-scale-2xh:var(--sp-5); --spacing-scale-3x:var(--sp-6);
+    --spacing-scale-4x:var(--sp-8); --spacing-scale-5x:var(--sp-10);
+    --spacing-scale-6x:var(--sp-12);
+    --surface-rounder-sm:var(--radius-sm); --surface-rounder-md:var(--radius-md);
+    --surface-rounder-lg:var(--radius-lg); --surface-rounder-pill:var(--radius-pill);
+    --font-family-base:var(--font-sans);
+    --font-size-scale-base:var(--fs-caption);
+    --largura-relatorio:var(--content-max);
+}
+
+/* ---- 4. RESET / BASE (espelha o design_system_preview.html) -------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background var(--dur-surface) var(--ease-standard), color var(--dur-surface) var(--ease-standard);
+}
+/* A troca de tema (herdada do HUB) não anima bordas/hover do resto da tela. */
+.theme-switching, .theme-switching * { transition: none !important; }
+h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin: 0;
+    overflow-wrap: break-word;
+}
+p { margin: 0; }
+a { color: var(--primary); text-decoration: none; }
+@media (hover: hover) { a:hover { text-decoration: underline; } }
+
+:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+::selection { background: var(--primary-soft-border); color: var(--ink); }
+
+* { scrollbar-width: thin; scrollbar-color: var(--hairline-strong) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--hairline-strong); border-radius: 99px; border: 3px solid var(--paper); }
+
+.container {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: var(--sp-10) var(--sp-8);
+}
+
+/* ---- 5. HEADER INSTITUCIONAL (breadcrumb) + RODAPÉ ----------------------- */
+/* .premium-header está no <style> inline de _base.html.j2. */
+.breadcrumb {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-3);
+    display: flex; align-items: center; gap: var(--sp-2);
+    margin: 0;
+}
+.breadcrumb a { color: var(--ink-3); text-decoration: none; }
+@media (hover: hover) { .breadcrumb a:hover { color: var(--primary); text-decoration: none; } }
+.breadcrumb-sep { color: var(--ink-3); opacity: .55; }
+.breadcrumb-atual { color: var(--ink); font-weight: 600; }
+
+.gov-footer {
+    background-color: var(--surface);
+    color: var(--ink-3);
+    border-top: 1.5px solid var(--rule);
+    margin-top: var(--sp-20);
+}
+.gov-footer-inner {
+    max-width: var(--content-max); margin: 0 auto;
+    padding: var(--sp-8);
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: var(--sp-8);
+}
+.gov-footer-brand {
+    display: flex; align-items: center; gap: var(--sp-3);
+    font-family: var(--font-serif); font-weight: 600; font-size: var(--fs-body-lg);
+    color: var(--brand-ink);
+}
+.gov-footer-logo { height: 46px; width: auto; }
+.gov-footer-info { text-align: right; font-family: var(--font-mono); font-size: var(--fs-label); line-height: 1.7; }
+.gov-footer-info p { margin: var(--sp-1) 0; }
+.gov-footer-info p:first-child { color: var(--ink-2); }
+@media (max-width: 840px) {
+    .gov-footer-inner { flex-direction: column; align-items: flex-start; }
+    .gov-footer-info { text-align: left; }
+}
+
+/* ---- 6. CABEÇALHO EDITORIAL DE SEÇÃO ------------------------------------
+   Régua hairline de fechamento + título serifado. O design system usa eyebrow
+   com significado (não numeração sequencial), e o <h2> do template carrega só
+   o título — então a composição é régua + Spectral, sem kicker fabricado. */
+h1 { font-size: var(--fs-h1); margin: 0 0 var(--sp-4) 0; }
+h2 {
+    font-size: var(--fs-h2);
+    margin: var(--sp-16) 0 var(--sp-6) 0;
+    padding-top: var(--sp-5);
+    border-top: 1.5px solid var(--rule);
+    position: relative;
+    scroll-margin-top: 88px;
+    line-height: 1.15;
+}
+h3 { font-size: var(--fs-h4); margin: 0 0 var(--sp-3) 0; }
+
+/* Marca d'água discreta por seção — flutua ao fundo sem empurrar texto. */
+h2::after {
+    content: ''; position: absolute; width: 56px; height: 56px; right: 0; top: var(--sp-4);
+    background-repeat: no-repeat; background-position: center; background-size: contain;
+    opacity: 0.10; pointer-events: none; z-index: -1;
+}
+h2:nth-of-type(6n+1)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-01.png'); }
+h2:nth-of-type(6n+2)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-02.png'); }
+h2:nth-of-type(6n+3)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-03.png'); }
+h2:nth-of-type(6n+4)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-04.png'); }
+h2:nth-of-type(6n+5)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-05.png'); }
+h2:nth-of-type(6n+0)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-06.png'); }
+
+.page-header { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); }
+.page-header-ilustracao { flex-shrink: 0; width: 96px; height: 96px; }
+.page-header-ilustracao img { width: 100%; height: 100%; object-fit: contain; opacity: 0.9; }
+.periodo { color: var(--ink-3); margin: 0 0 var(--sp-8) 0; }
+@media print { .page-header-ilustracao, h2::after { display: none; } }
+
+/* ---- 7. KPI (padrão .kpi-card: hairline plano, valor mono tabular) ------- */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(164px, 1fr));
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-4);
+}
+.kpi-tile {
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color var(--dur-fast) var(--ease-standard);
+}
+@media (hover: hover) { .kpi-tile:hover { border-color: var(--hairline-strong); } }
+.kpi-tile .valor {
+    font-family: var(--font-mono);
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    order: 1;
+}
+.kpi-tile .rotulo {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    line-height: 1.4;
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-3);
+    order: 0;
+}
+.kpi-tile .rotulo::before {
+    content: '';
+    flex: 0 0 7px; width: 7px; height: 7px;
+    border-radius: 2px; background: var(--primary);
+    transform: translateY(-1px);
+}
+/* KPI-herói: número de abertura, maior e em verde. */
+.kpi-tile.destaque .valor { font-size: 46px; color: var(--primary); letter-spacing: -.02em; }
+@media (max-width: 576px) { .kpi-tile.destaque .valor { font-size: 36px; } }
+
+/* Variação vs. média — badge mono neutro (a cor não julga; a seta indica). */
+.badge-variacao {
+    display: inline-flex; align-items: center; gap: var(--sp-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-eyebrow); font-weight: 600; letter-spacing: .02em;
+    padding: 3px 9px; border-radius: var(--radius-sm);
+    width: fit-content; order: 2; margin-top: var(--sp-3);
+    color: var(--info);
+    background: var(--info-bg);
+    border: var(--hair) solid color-mix(in srgb, var(--info) 40%, transparent);
+}
+
+/* ---- 8. SUPERFÍCIES — CARDS PLANOS, HAIRLINE, SEM SOMBRA ----------------- */
+.gov-card {
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) { .gov-card:hover { border-color: var(--hairline-strong); transform: translateY(-2px); } }
+.gov-card-header { padding: var(--sp-4) var(--sp-5) var(--sp-2); }
+.gov-card-header .title { margin: 0; font-family: var(--font-serif); font-size: var(--fs-h4); font-weight: 600; color: var(--ink); }
+.gov-card-content { padding: 0 var(--sp-5) var(--sp-4); color: var(--ink-2); flex-grow: 1; }
+.gov-card-content p { margin: var(--sp-2) 0; font-size: var(--fs-caption); line-height: 1.5; display: flex; align-items: center; }
+.gov-card-content p::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--primary); margin-right: var(--sp-3); flex-shrink: 0; }
+.gov-card-footer { padding: var(--sp-3) var(--sp-5); border-top: var(--hair) solid var(--hairline); background: var(--surface-2); }
+.gov-card-footer a {
+    color: var(--primary); font-size: var(--fs-caption); font-weight: 600; text-decoration: none;
+    display: inline-flex; align-items: center; gap: var(--sp-1);
+    transition: gap var(--dur-fast) var(--ease-out), color var(--dur-fast);
+}
+.gov-card-footer a::after { content: ''; position: absolute; inset: 0; z-index: 0; }
+@media (hover: hover) { .gov-card:hover .gov-card-footer a { color: var(--primary-strong); gap: var(--sp-3); } }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-8); }
+
+.chart-card {
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: var(--sp-6);
+    margin-bottom: var(--sp-6);
+}
+.chart-card h3 { margin-bottom: var(--sp-4); }
+.chart-card .chart-area { position: relative; height: 320px; }
+.chart-card .chart-footer {
+    margin-top: var(--sp-4); padding-top: var(--sp-3);
+    border-top: var(--hair) solid var(--hairline);
+    font-family: var(--font-mono); font-size: var(--fs-label); color: var(--ink-3);
+}
+.chart-card .chart-footer strong { color: var(--ink-2); font-weight: 600; }
+
+/* Acento de categoria — cor com propósito (topo do card). */
+.chart-card.categoria-paif { border-top: 2px solid var(--primary); }
+.chart-card.categoria-scfv { border-top: 2px solid var(--primary-strong); }
+.chart-card.categoria-beneficios { border-top: 2px solid var(--gold); }
+.chart-card.categoria-pessoal { border-top: 2px solid var(--ink-3); }
+.chart-card.categoria-demografia { border-top: 2px solid var(--info); }
+.chart-card.categoria-motivos { border-top: 2px solid var(--success); }
+
+.chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); margin-bottom: var(--sp-6); }
+.chart-grid-2 .chart-card { margin-bottom: 0; }
+@media (max-width: 900px) { .chart-grid-2 { grid-template-columns: 1fr; } }
+
+/* ---- 9. TABELA TÉCNICA (padrão .dtable: sem zebra, divisor hairline) ----- */
+.gov-table-wrapper {
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    background: var(--surface);
+    margin-bottom: var(--sp-8);
+}
+table.gov-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 0; min-width: 520px; }
+table.gov-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3);
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: 1.5px solid var(--rule);
+    white-space: nowrap; background: var(--surface); user-select: none;
+}
+table.gov-table td {
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: var(--hair) solid var(--hairline);
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+    transition: background var(--dur-instant);
+}
+table.gov-table tbody tr:last-child td { border-bottom: 0; }
+table.gov-table td a, table.gov-table td a:visited { color: var(--ink); text-decoration: none; font-weight: 600; border-bottom: 1px dashed transparent; transition: color var(--dur-fast), border-color var(--dur-fast); }
+@media (hover: hover) {
+    table.gov-table td a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+    table.gov-table tbody tr:hover td { background: var(--surface-2); }
+}
+table.gov-table.striped tbody tr:nth-child(even) { background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
+
+table.gov-table th.sortable { cursor: pointer; padding-right: 26px; }
+@media (hover: hover) { table.gov-table th.sortable:hover { color: var(--ink); } }
+table.gov-table th.sortable::after { content: '↕'; position: absolute; right: var(--sp-2); font-size: 12px; color: var(--ink-3); opacity: 0; transition: opacity var(--dur-fast); }
+table.gov-table th { position: relative; }
+@media (hover: hover) { table.gov-table th.sortable:hover::after { opacity: .5; } }
+table.gov-table th.sort-asc::after { content: '↑'; opacity: 1 !important; color: var(--primary); }
+table.gov-table th.sort-desc::after { content: '↓'; opacity: 1 !important; color: var(--primary); }
+tr.linha-fora-da-unidade td:first-child { font-weight: 600; color: var(--ink); }
+
+.gov-table-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 600; margin-left: var(--sp-2); }
+.gov-table-badge.danger { background: var(--danger-bg); color: var(--danger); }
+.gov-table-badge.warning { background: var(--warning-bg); color: var(--warning); }
+
+/* ---- 10. FEEDBACK (padrão .msg: ícone + texto, nunca só cor) ------------- */
+.alerta-box {
+    display: flex; gap: var(--sp-3); align-items: flex-start;
+    background: var(--warning-bg);
+    border: var(--hair) solid color-mix(in srgb, var(--warning) 35%, transparent);
+    border-radius: var(--radius-md);
+    padding: var(--sp-4);
+    margin-bottom: var(--sp-4);
+    color: var(--ink-2);
+}
+.alerta-box > i { font-size: 20px; color: var(--warning); flex: 0 0 20px; margin-top: 1px; }
+.alerta-box p { margin: 0; font-size: 14px; line-height: 1.5; }
+.alerta-box strong { color: var(--ink); font-weight: 600; }
+.alerta-box ul { margin: var(--sp-2) 0 0 0; padding-left: var(--sp-6); }
+
+.empty-state {
+    text-align: center;
+    padding: var(--sp-10) var(--sp-5);
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--sp-8);
+}
+.empty-state img { width: 120px; height: auto; margin-bottom: var(--sp-4); opacity: 0.9; }
+.empty-state p { color: var(--ink-3); font-size: 14px; max-width: 42ch; margin: 0 auto; }
+
+/* ---- 11. NARRATIVA (leitura corrida — serifada, editorial) --------------- */
+.narrativa {
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: var(--sp-6);
+    margin-bottom: var(--sp-8);
+}
+.narrativa-secao { margin-bottom: var(--sp-5); }
+.narrativa-secao:last-child { margin-bottom: 0; }
+.narrativa-secao h4 { font-family: var(--font-serif); font-size: var(--fs-body-lg); font-weight: 600; color: var(--primary-strong); margin: 0 0 var(--sp-2) 0; }
+.narrativa-secao p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+[data-theme="dark"] .narrativa-secao h4 { color: var(--primary); }
+
+/* Contexto da Unidade em duas colunas: aproveita a largura do desktop e evita
+   a coluna estreita de texto flutuando com o lado direito vazio. A síntese
+   ("Leitura da Vigilância") ocupa a largura inteira, fechando a leitura. */
+.narrativa-contexto {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-6) var(--sp-8);
+    align-items: start;
+}
+@media (max-width: 900px) { .narrativa-contexto { grid-template-columns: 1fr; } }
+.narrativa-contexto .narrativa-secao { margin-bottom: 0; }
+.narrativa-secao-total {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--sp-5);
+    margin-top: var(--sp-1);
+}
+
+/* Marco conceitual (lastro no kiwi): abre a seção como um lead editorial
+   serifado, distinto do dado quantitativo que vem em seguida. */
+.contexto-marco {
+    display: block;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--fs-body-lg);
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: var(--sp-3);
+}
+
+/* ---- 12. FILTRO / DROPDOWN CUSTOM (padrão .cselect) --------------------- */
+.chart-filter { display: flex; flex-direction: column; gap: var(--sp-2); max-width: 320px; margin-bottom: var(--sp-4); }
+.chart-filter label { font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+
+.dropdown-demo-container { position: relative; width: 100%; }
+.dropdown-trigger {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+    font-family: var(--font-sans); font-size: 16px; color: var(--ink);
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline-strong);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px; height: 42px; cursor: pointer; user-select: none;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+@media (hover: hover) { .dropdown-trigger:hover { border-color: var(--ink-3); } }
+.dropdown-trigger.active, .dropdown-trigger:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); outline: none; }
+.dropdown-trigger i { color: var(--ink-3); font-size: 18px; flex-shrink: 0; margin-left: var(--sp-2); transition: transform var(--dur-fast) var(--ease-out), color var(--dur-fast); }
+.dropdown-trigger.active i { transform: rotate(180deg); color: var(--primary); }
+.dropdown-trigger .placeholder { color: var(--ink-3); }
+.dropdown-surface {
+    text-align: left; position: absolute; top: calc(100% + 6px); left: 0;
+    min-width: 100%; width: max-content; max-height: 260px; overflow-y: auto;
+    background: var(--surface-float);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-float);
+    padding: 6px;
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity var(--dur-fast), transform var(--dur-fast) var(--ease-out), visibility var(--dur-fast);
+    z-index: 2100;
+}
+.dropdown-trigger.active + .dropdown-surface { opacity: 1; visibility: visible; transform: none; }
+.dropdown-item { padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; color: var(--ink-2); font-size: 14px; white-space: nowrap; transition: background var(--dur-instant), color var(--dur-instant); }
+.dropdown-item:hover, .dropdown-item.active { background: var(--surface-2); color: var(--ink); }
+.dropdown-item.active { color: var(--primary); font-weight: 600; }
+.chart-filter:has(.dropdown-trigger.active) { position: relative; z-index: 2100; }
+.dropdown-demo-container.dropdown-compacto { width: auto; min-width: 180px; }
+.dropdown-compacto .dropdown-trigger { height: 36px; }
+.dropdown-compacto .dropdown-item { font-size: var(--fs-caption); }
+
+/* ---- 13. LAYOUT: SUMÁRIO FIXO + CONTEÚDO -------------------------------- */
+.relatorio-layout { display: grid; grid-template-columns: 1fr; gap: var(--sp-8); align-items: start; }
+@media (min-width: 1024px) { .relatorio-layout { grid-template-columns: 220px minmax(0, 1fr); } }
+.relatorio-toc { display: none; }
+@media (min-width: 1024px) {
+    .relatorio-toc {
+        display: block; position: sticky; top: var(--sp-6);
+        max-height: calc(100vh - var(--sp-8)); overflow-y: auto;
+        padding-right: var(--sp-4);
+        border-right: var(--hair) solid var(--hairline);
+    }
+}
+.relatorio-toc-titulo {
+    display: block; font-family: var(--font-mono);
+    font-size: 10px; text-transform: uppercase; letter-spacing: .16em; font-weight: 600;
+    color: var(--ink-3); margin-bottom: var(--sp-4);
+}
+.relatorio-toc-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.relatorio-toc-lista a {
+    display: block;
+    padding: 7px var(--sp-3);
+    border-left: 2px solid transparent;
+    color: var(--ink-2); text-decoration: none;
+    font-size: var(--fs-caption); line-height: 1.3;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    transition: background var(--dur-instant), color var(--dur-instant), border-color var(--dur-instant);
+}
+@media (hover: hover) { .relatorio-toc-lista a:hover { color: var(--ink); background: var(--surface-2); text-decoration: none; } }
+.relatorio-toc-lista a.ativo { color: var(--primary-strong); border-left-color: var(--primary); background: var(--primary-soft); font-weight: 600; }
+[data-theme="dark"] .relatorio-toc-lista a.ativo { color: var(--primary); }
+@media print { .relatorio-toc { display: none !important; } .relatorio-layout { display: block; } }
+
+/* ---- 14. REVELAÇÃO SUAVE AO ROLAR --------------------------------------- */
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity .5s var(--ease-out), transform .5s var(--ease-out); }
+.reveal.reveal-visivel { opacity: 1; transform: none; }
+@media print { .reveal { opacity: 1 !important; transform: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { transition: none; opacity: 1; transform: none; }
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* ---- 15. COMPARAÇÃO ENTRE UNIDADES -------------------------------------- */
+.comparacao-unidades { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-6); margin-bottom: var(--sp-8); }
+.comparacao-selecao { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sp-6); margin-bottom: var(--sp-6); }
+.comparacao-selecao .chart-filter { margin-bottom: 0; max-width: 260px; }
+.comparacao-vs { font-family: var(--font-mono); font-weight: 600; color: var(--ink-3); font-size: var(--fs-label); text-transform: uppercase; letter-spacing: .06em; padding-bottom: var(--sp-2); }
+.comparacao-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+.comparacao-kpi { border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-4); background: var(--surface-2); }
+.comparacao-kpi .rotulo { display: block; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3); font-weight: 600; margin-bottom: var(--sp-3); }
+.comparacao-kpi .valores { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); }
+.comparacao-kpi .valor-a, .comparacao-kpi .valor-b { font-family: var(--font-mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.comparacao-kpi .valor-a { color: var(--primary); }
+.comparacao-kpi .valor-b { color: var(--gold); }
+.comparacao-kpi .diferenca { font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 500; color: var(--ink-3); margin-top: var(--sp-2); }
+.comparacao-chart-area { position: relative; height: 280px; }
+
+/* ---- 16. CAPA (abertura) ------------------------------------------------- */
+.capa-relatorio {
+    background: linear-gradient(180deg, var(--primary-soft) 0%, rgba(255,255,255,0) 100%);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-8) var(--sp-8) var(--sp-6);
+    margin-bottom: var(--sp-10);
+}
+@media (max-width: 576px) { .capa-relatorio { padding: var(--sp-6) var(--sp-4); } }
+/* Faixa-resumo municipal: 6 KPIs em linha única (encaixados), sem tile órfão. */
+.capa-relatorio .kpi-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width: 1200px) { .capa-relatorio .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px)  { .capa-relatorio .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---- 17. SELO DA EDIÇÃO MENSAL -----------------------------------------
+   Única diferença visível entre Mensal e Semestral: o design system proíbe
+   uma segunda cor de marca, então a edição se distingue pelo selo verde. */
+.badge-edicao-mensal {
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    margin-top: var(--sp-3); width: fit-content;
+    padding: 3px 10px; border-radius: var(--radius-pill);
+    background: var(--primary-soft); color: var(--primary-strong);
+    border: var(--hair) solid var(--primary-soft-border);
+    font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 600;
+    text-transform: uppercase; letter-spacing: .1em;
+}
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script>Chart.register(ChartDataLabels);</script>
+    <script>
+    /* ==================================================================
+       Tema dos gráficos herdado do HUB (Design System v2.0).
+       Os gráficos das páginas usam cores fixas de tema claro; este módulo
+       (a) fixa os defaults do Chart.js a partir dos tokens do DS e
+       (b) retematiza cada gráfico no load e a cada troca de tema, sem
+       precisar tocar em cada configuração de gráfico. Espelha o padrão do
+       relatorio-operacao-inverno.html.
+       ================================================================== */
+    (function () {
+        const raiz = document.documentElement;
+        const _mono = "'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace";
+        const tok = (n) => getComputedStyle(raiz).getPropertyValue(n).trim();
+
+        // Pares de cor claro <-> escuro (por tripla RGB, ignorando alpha).
+        // Cobre exatamente as cores fixadas nos gráficos das páginas.
+        const PARES = [
+            [[0, 112, 68], [84, 207, 147]],      // verde marca
+            [[21, 91, 203], [143, 182, 255]],    // info
+            [[19, 81, 180], [143, 182, 255]],    // azul comparação B
+            [[253, 185, 46], [224, 166, 59]],    // dourado vivo
+            [[194, 133, 12], [224, 166, 59]],    // dourado DS
+            [[22, 136, 33], [95, 208, 122]],     // sucesso (motivos)
+            [[229, 34, 7], [255, 155, 142]],     // vermelho (vulnerabilidade)
+            [[107, 107, 102], [138, 138, 133]],  // cinza (linha de média)
+            [[136, 136, 136], [138, 138, 133]],  // cinza #888
+            [[99, 99, 99], [138, 138, 133]],     // cinza #636
+            [[85, 85, 85], [138, 138, 133]],     // #555 (rótulos)
+            [[255, 255, 255], [31, 31, 31]]      // branco (pílula/anel) -> superfície
+        ];
+
+        function _parse(cor) {
+            if (typeof cor !== "string") return null;
+            let m = cor.match(/^#([0-9a-f]{6})([0-9a-f]{2})?$/i);
+            if (m) {
+                const h = m[1];
+                return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16),
+                         a: m[2] != null ? parseInt(m[2], 16) / 255 : null, hex: true };
+            }
+            m = cor.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/i);
+            if (m) return { r: +m[1], g: +m[2], b: +m[3], a: m[4] != null ? +m[4] : null, hex: false };
+            return null;
+        }
+
+        function _corAlvo(r, g, b, escuro) {
+            for (const [claro, esc] of PARES) {
+                if ((r === claro[0] && g === claro[1] && b === claro[2]) ||
+                    (r === esc[0] && g === esc[1] && b === esc[2])) {
+                    return escuro ? esc : claro;
+                }
+            }
+            return null;
+        }
+
+        function _remap(valor, escuro) {
+            if (Array.isArray(valor)) return valor.map((v) => _remap(v, escuro));
+            const c = _parse(valor);
+            if (!c) return valor;
+            const alvo = _corAlvo(c.r, c.g, c.b, escuro);
+            if (!alvo) return valor;
+            if (c.a != null) return "rgba(" + alvo[0] + ", " + alvo[1] + ", " + alvo[2] + ", " + c.a + ")";
+            return "rgb(" + alvo[0] + ", " + alvo[1] + ", " + alvo[2] + ")";
+        }
+
+        const PROPS = ["backgroundColor", "borderColor", "hoverBackgroundColor", "pointBackgroundColor", "pointBorderColor"];
+
+        function configurarDefaults() {
+            Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+            Chart.defaults.font.size = 11;
+            Chart.defaults.color = tok("--ink-2");
+        }
+
+        // Rótulo (datalabel) sempre legível: texto na cor de tinta forte do
+        // tema, sobre uma pílula na cor da superfície do tema (funciona tanto
+        // no topo da barra quanto sobre um segmento colorido do doughnut).
+        function _corChip(escuro) { return escuro ? "rgba(23,23,23,0.82)" : "rgba(255,255,255,0.82)"; }
+        function _ajustarDatalabels(dl, corLabel, corChip) {
+            if (!dl) return;
+            dl.color = corLabel;
+            if (dl.backgroundColor != null) dl.backgroundColor = corChip;
+        }
+
+        function retematizar() {
+            const escuro = raiz.getAttribute("data-theme") === "dark";
+            const corGrade = tok("--hairline");
+            const corRotulo = tok("--ink-3");
+            const corTexto = tok("--ink-2");
+            const corSuperficie = tok("--surface");
+            const corInk = tok("--ink");
+            const corPaper = tok("--paper");
+            const corHairFor = tok("--hairline-strong");
+            const corChip = _corChip(escuro);
+            Chart.defaults.color = corTexto;
+
+            for (const grafico of Object.values(Chart.instances)) {
+                const o = grafico.options;
+                if (o.scales) {
+                    for (const eixo of Object.values(o.scales)) {
+                        if (eixo.grid) eixo.grid.color = corGrade;
+                        eixo.ticks = Object.assign(eixo.ticks || {}, { color: corRotulo });
+                        if (eixo.border) eixo.border.color = corGrade;
+                    }
+                }
+                const tt = o.plugins && o.plugins.tooltip;
+                if (tt) Object.assign(tt, { backgroundColor: corInk, titleColor: corPaper, bodyColor: corPaper, borderColor: corHairFor });
+                // Rótulos declarados no nível do gráfico (ex.: doughnuts).
+                if (o.plugins && o.plugins.datalabels) _ajustarDatalabels(o.plugins.datalabels, corInk, corChip);
+
+                const ehDoughnut = grafico.config.type === "doughnut";
+                for (const d of grafico.data.datasets) {
+                    for (const p of PROPS) if (d[p] != null) d[p] = _remap(d[p], escuro);
+                    if (ehDoughnut) d.borderColor = corSuperficie;
+                    // Rótulos declarados no nível do dataset (barras/linhas).
+                    _ajustarDatalabels(d.datalabels, corInk, corChip);
+                }
+                grafico.update("none");
+            }
+        }
+
+        configurarDefaults();
+        window.retematizarGraficos = retematizar;
+        window.addEventListener("load", retematizar);
+
+        // Troca de tema herdada do HUB: postMessage (iframe) e storage (abas irmãs).
+        function aplicar(tema, animar) {
+            if (raiz.getAttribute("data-theme") === tema) return;
+            if (animar) {
+                raiz.classList.add("theme-switching");
+                requestAnimationFrame(() => requestAnimationFrame(() => raiz.classList.remove("theme-switching")));
+            }
+            raiz.setAttribute("data-theme", tema);
+            try { localStorage.setItem("hub_tema", tema); } catch (e) {}
+            retematizar();
+        }
+        window.addEventListener("message", (ev) => {
+            const d = ev.data;
+            if (d && d.tipo === "hub:tema" && (d.tema === "dark" || d.tema === "light")) aplicar(d.tema, true);
+        });
+        window.addEventListener("storage", (ev) => {
+            if (ev.key === "hub_tema" && (ev.newValue === "dark" || ev.newValue === "light")) aplicar(ev.newValue, false);
+        });
+    })();
+    </script>
+    <script>// Dropdown (Menus Suspensos) — combobox custom do Design System
+// Mantém um <select> nativo oculto por trás pra não quebrar leituras de .value existentes no resto do código.
+function toggleGovDropdown(id) {
+    const select = document.getElementById(id);
+    if (select && select.disabled) return;
+    const trigger = document.getElementById(id + '-trigger');
+    const jaAberto = trigger.classList.contains('active');
+    document.querySelectorAll('.dropdown-trigger.active').forEach(t => t.classList.remove('active'));
+    if (!jaAberto) {
+        trigger.classList.add('active');
+        trigger.setAttribute('aria-expanded', 'true');
+    } else {
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+}
+
+function selecionarGovDropdown(id, valor, rotulo) {
+    const select = document.getElementById(id);
+    if (select.multiple) {
+        if (valor === "") {
+            Array.from(select.options).forEach(o => o.selected = false);
+            select.options[0].selected = true;
+        } else {
+            if (select.options.length > 0 && select.options[0].value === "") {
+                select.options[0].selected = false;
+            }
+            const opt = Array.from(select.options).find(o => o.value === valor);
+            if (opt) opt.selected = !opt.selected;
+            if (select.selectedOptions.length === 0 && select.options.length > 0) {
+                select.options[0].selected = true;
+            }
+        }
+        select.dispatchEvent(new Event('change'));
+        sincronizarGovDropdown(id);
+        return;
+    }
+    select.value = valor;
+    select.dispatchEvent(new Event('change'));
+    const label = document.getElementById(id + '-label');
+    label.textContent = rotulo;
+    label.classList.remove('placeholder');
+    document.querySelectorAll('#' + id + '-surface .dropdown-item').forEach(it => {
+        it.classList.toggle('active', it.dataset.valor === valor);
+    });
+    const trigger = document.getElementById(id + '-trigger');
+    trigger.classList.remove('active');
+    trigger.setAttribute('aria-expanded', 'false');
+}
+
+function resetarGovDropdown(id) {
+    const label = document.getElementById(id + '-label');
+    label.textContent = 'Selecione...';
+    label.classList.add('placeholder');
+    document.querySelectorAll('#' + id + '-surface .dropdown-item').forEach(it => it.classList.remove('active'));
+}
+
+function sincronizarGovDropdown(id) {
+    const select = document.getElementById(id);
+    const label = document.getElementById(id + '-label');
+    if (!select || !label) return;
+
+    if (select.multiple) {
+        const selectedOpts = Array.from(select.selectedOptions).filter(o => o.value !== "");
+        document.querySelectorAll('#' + id + '-surface .dropdown-item').forEach(it => {
+            const isSelected = selectedOpts.some(o => o.value === it.dataset.valor) || (selectedOpts.length === 0 && it.dataset.valor === "");
+            it.classList.toggle('active', isSelected);
+        });
+        if (selectedOpts.length === 0) {
+            label.textContent = select.options.length ? select.options[0].textContent : 'Todos';
+            label.classList.add('placeholder');
+        } else if (selectedOpts.length === 1) {
+            label.textContent = selectedOpts[0].textContent;
+            label.classList.remove('placeholder');
+        } else {
+            label.textContent = selectedOpts.length + ' selecionados';
+            label.classList.remove('placeholder');
+        }
+        return;
+    }
+
+    const opt = select.selectedOptions[0];
+    const ehPlaceholder = !opt || opt.disabled;
+    document.querySelectorAll('#' + id + '-surface .dropdown-item').forEach(it => {
+        it.classList.toggle('active', !ehPlaceholder && it.dataset.valor === select.value);
+    });
+    if (ehPlaceholder) {
+        label.textContent = opt ? opt.textContent : (select.options.length ? select.options[0].textContent : 'Selecione...');
+        label.classList.add('placeholder');
+    } else {
+        label.textContent = opt.textContent;
+        label.classList.remove('placeholder');
+    }
+}
+
+function criarGovDropdown(selectId, compacto) {
+    const select = document.getElementById(selectId);
+    if (!select || select.dataset.govDropdown) return;
+    select.dataset.govDropdown = '1';
+    
+    const container = document.createElement('div');
+    container.className = 'dropdown-demo-container' + (compacto ? ' dropdown-compacto' : '');
+    
+    if (select.style.marginBottom) {
+        container.style.marginBottom = select.style.marginBottom;
+        select.style.marginBottom = '';
+    }
+    select.parentNode.insertBefore(container, select);
+    
+    const trigger = document.createElement('div');
+    trigger.className = 'dropdown-trigger';
+    trigger.id = selectId + '-trigger';
+    trigger.tabIndex = 0;
+    trigger.setAttribute('role', 'button');
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.onclick = function () { toggleGovDropdown(selectId); };
+    trigger.onkeydown = function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGovDropdown(selectId); }
+    };
+    
+    const label = document.createElement('span');
+    label.id = selectId + '-label';
+    trigger.appendChild(label);
+    
+    const icone = document.createElement('i');
+    icone.className = 'ph ph-caret-down';
+    icone.setAttribute('aria-hidden', 'true');
+    trigger.appendChild(icone);
+    
+    const surface = document.createElement('div');
+    surface.className = 'dropdown-surface';
+    surface.id = selectId + '-surface';
+    surface.setAttribute('role', 'listbox');
+    
+    container.appendChild(trigger);
+    container.appendChild(surface);
+    container.appendChild(select);
+    select.style.display = 'none';
+    
+    reconstruirGovDropdown(selectId);
+}
+
+function reconstruirGovDropdown(selectId) {
+    const select = document.getElementById(selectId);
+    const surface = document.getElementById(selectId + '-surface');
+    if (!select || !surface) return;
+    surface.innerHTML = '';
+    Array.from(select.options).forEach(op => {
+        if (op.disabled) return;
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.setAttribute('role', 'option');
+        item.dataset.valor = op.value;
+        item.textContent = op.textContent;
+        item.onclick = function () { selecionarGovDropdown(selectId, op.value, op.textContent); };
+        surface.appendChild(item);
+    });
+    sincronizarGovDropdown(selectId);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Busca todos os selects com classe gov-select e aplica o dropdown custom
+    document.querySelectorAll('select.gov-select').forEach(select => {
+        if (select.id) {
+            criarGovDropdown(select.id, false);
+        }
+    });
+});
+
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.dropdown-demo-container')) {
+        document.querySelectorAll('.dropdown-trigger.active').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.dropdown-trigger.active').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+</script>
+    <script>
+        window.addEventListener('scroll', function() {
+            var header = document.querySelector('.premium-header');
+            if (header) {
+                if (window.scrollY > 40) {
+                    header.classList.add('is-scrolled');
+                } else {
+                    header.classList.remove('is-scrolled');
+                }
+            }
+        });
+    </script>
+</head>
+<body class="edicao-mensal">
+    <style>
+        /* Cabeçalho institucional — plano, hairline, régua verde de fechamento
+           (design system "editorial acolhedor": verde é a única cor de marca). */
+        .premium-header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--hairline);
+            padding: 0;
+            position: relative;
+        }
+        .premium-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+        .premium-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--sp-6);
+            padding-top: var(--sp-4);
+            padding-bottom: var(--sp-4);
+        }
+        .premium-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            flex-wrap: wrap;
+        }
+        .premium-header.is-scrolled .premium-nav {
+            position: fixed;
+            bottom: var(--sp-6);
+            left: var(--sp-6);
+            z-index: 2000;
+            box-shadow: var(--shadow-float);
+            border-radius: var(--radius-md);
+            animation: slideUpNav var(--dur-surface) var(--ease-out) forwards;
+        }
+        @keyframes slideUpNav {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .premium-header.is-scrolled .premium-nav { animation: none; }
+        }
+        .premium-logo img {
+            height: 58px;
+            width: auto;
+            display: block;
+        }
+        .premium-separator {
+            width: 1px;
+            height: 36px;
+            background-color: var(--hairline);
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .premium-separator { display: block; }
+        }
+        .premium-text-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .premium-supertitle {
+            font-family: var(--font-mono);
+            font-size: var(--fs-eyebrow);
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: var(--ink-3);
+            font-weight: 600;
+            margin-bottom: var(--sp-1);
+        }
+        .premium-supertitle span.highlight {
+            color: var(--primary);
+        }
+        .premium-title {
+            font-family: var(--font-serif);
+            font-size: var(--fs-h4);
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0;
+            letter-spacing: -.01em;
+            line-height: 1.2;
+        }
+        .premium-title span {
+            font-weight: 500;
+            color: var(--ink-3);
+        }
+        .premium-nav {
+            display: flex;
+            align-items: center;
+        }
+        .premium-nav .breadcrumb {
+            display: flex;
+            align-items: center;
+            background: var(--surface-2);
+            padding: var(--sp-2) var(--sp-3);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--hairline);
+            margin: 0;
+        }
+        .premium-nav .breadcrumb-sep {
+            margin: 0 var(--sp-2);
+        }
+    </style>
+    <header class="premium-header">
+        <div class="container premium-container">
+            <div class="premium-brand">
+                <div class="premium-logo">
+                    <img src="https://lucstarwork.github.io/VSA-IMAGENS/assets/brasao-completo.png" alt="Prefeitura de Araucária">
+                </div>
+                <div class="premium-separator"></div>
+                <div class="premium-text-group">
+                    <div class="premium-supertitle">
+                        PRODUTO DA <span class="highlight">VIGILÂNCIA SOCIOASSISTENCIAL</span> • SMAS
+                    </div>
+                    <h1 class="premium-title">Boletim Mensal PSB <span>/ Proteção Social Básica</span></h1>
+                    <span class="badge-edicao-mensal">Edição Mensal</span>
+                </div>
+            </div>
+            
+            <div class="premium-nav">
+                
+<nav class="breadcrumb" aria-label="Trilha de navegação">
+    <a href="index.html">Início</a>
+    <span class="breadcrumb-sep" aria-hidden="true">›</span>
+    <span class="breadcrumb-atual">CRAS Costeira</span>
+</nav>
+
+            </div>
+        </div>
+    </header>
+    <div class="container relatorio-layout">
+        <nav class="relatorio-toc" aria-label="Sumário deste boletim">
+            <span class="relatorio-toc-titulo">Neste boletim</span>
+            <ol class="relatorio-toc-lista" id="relatorio-toc-lista"></ol>
+        </nav>
+        <main class="relatorio-conteudo">
+            
+<div class="page-header" style="margin: var(--sp-2) 0; border-bottom: 1px solid var(--hairline); padding-bottom: var(--sp-3);">
+    <div>
+        <h1 style="font-size: 28px; margin: 0 0 var(--sp-3) 0;">
+            Boletim Mensal PSB <span style="font-weight: 500; color: var(--hairline-strong); margin: 0 var(--sp-2);">/</span> <span style="color: var(--primary-strong);">CRAS Costeira</span>
+        </h1>
+        <p style="font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: .02em; color: var(--ink-3); margin: 0; display: inline-flex; align-items: center; gap: var(--sp-2);">
+            <i class="ph ph-calendar-blank" aria-hidden="true"></i>
+            Período de referência: Agosto de 2026
+        </p>
+    </div>
+    
+
+<div class="page-header-ilustracao">
+    <img src="https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-04.png" alt="" aria-hidden="true">
+</div>
+</div>
+
+<h2>Perfil do Território</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile">
+        <span class="valor">3.185</span>
+        <span class="rotulo">Famílias referenciadas (CadÚnico)</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">944</span>
+        <span class="rotulo">Famílias no Bolsa Família</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">R$ 878,6</span>
+        <span class="rotulo">Renda média familiar</span>
+        
+        <span class="badge-variacao"><span aria-hidden="true">↓</span> 2% abaixo da média municipal</span>
+    </div>
+</div>
+
+<h2>Agendamentos CadÚnico</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile">
+        <span class="valor">36</span>
+        <span class="rotulo">Agendamentos de Inclusão</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">76</span>
+        <span class="rotulo">Agendamentos de Atualização</span>
+    </div>
+</div>
+
+<h2>Taxa de Comparecimento</h2>
+
+<div class="alerta-box">
+    <i class="ph ph-warning-circle" aria-hidden="true"></i>
+    <p>
+        <strong>17 agendamentos</strong> individuais
+        estão com status "Pendente" (nunca atualizado no sistema para Atendido/Ausente) e não
+        entram no cálculo abaixo — podem indicar registros esquecidos que merecem revisão.
+    </p>
+</div>
+
+<div class="kpi-grid">
+    
+    <div class="kpi-tile">
+        <span class="valor">63.5%</span>
+        <span class="rotulo">Taxa de Comparecimento</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">36.5%</span>
+        <span class="rotulo">Taxa de Ausência</span>
+    </div>
+    
+    <div class="kpi-tile">
+        <span class="valor">80</span>
+        <span class="rotulo">Agendamentos Atendidos</span>
+    </div>
+    <div class="kpi-tile">
+        <span class="valor">46</span>
+        <span class="rotulo">Agendamentos com Ausência</span>
+    </div>
+</div>
+
+
+<div class="chart-card">
+    <h3>Perfil de Vulnerabilidade Territorial</h3>
+    <div class="chart-area"><canvas id="grafico-vulnerabilidade"></canvas></div>
+    <div class="chart-footer">Fonte: Observatório do CadÚnico</div>
+    
+    <div class="kpi-grid" style="margin-top: var(--spacing-scale-3x);">
+        
+        <div class="kpi-tile"><span class="valor">951</span><span class="rotulo">Famílias no Bolsa Família</span></div>
+        
+        <div class="kpi-tile"><span class="valor">822</span><span class="rotulo">Renda per capita — Extrema pobreza (≤ R$ 218)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">1.028</span><span class="rotulo">Famílias com pessoa com deficiência</span></div>
+        
+        <div class="kpi-tile"><span class="valor">251</span><span class="rotulo">Pessoas com BPC deficiência (fonte: INSS)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">194</span><span class="rotulo">Pessoas com BPC idoso (fonte: INSS)</span></div>
+        
+        <div class="kpi-tile"><span class="valor">22</span><span class="rotulo">Famílias acompanhadas pelo PAIF</span></div>
+        
+    </div>
+    
+</div>
+
+
+<h2>Perfil dos Atendidos</h2>
+<div class="chart-grid-2">
+    <div class="chart-card categoria-demografia">
+        <h3>Raça/Cor dos Atendidos</h3>
+        <div class="chart-area"><canvas id="grafico-raca-cor"></canvas></div>
+        <div class="chart-footer">
+            Fonte: <strong>IPM Social</strong>
+        </div>
+    </div>
+    <div class="chart-card categoria-demografia">
+        <h3>Sexo dos Atendidos</h3>
+        <div class="chart-area"><canvas id="grafico-sexo"></canvas></div>
+        <div class="chart-footer">
+            Fonte: <strong>IPM Social</strong>
+        </div>
+    </div>
+</div>
+
+<div class="chart-card categoria-demografia">
+    <h3>Pessoas Atendidas Únicas por Mês</h3>
+    <div class="chart-area"><canvas id="grafico-pessoas-unicas-mes"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>
+    </div>
+</div>
+
+<h2>Atendimento Individual</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile destaque">
+        <span class="valor">670</span>
+        <span class="rotulo">Total de atendimentos</span>
+        
+        <span class="badge-variacao"><span aria-hidden="true">↓</span> 2% abaixo da média municipal</span>
+    </div>
+    <div class="kpi-tile"><span class="valor">457</span><span class="rotulo">Pessoas únicas atendidas</span></div>
+    <div class="kpi-tile"><span class="valor">409</span><span class="rotulo">Famílias únicas atendidas</span></div>
+    <div class="kpi-tile"><span class="valor">32</span><span class="rotulo">Visitas domiciliares</span></div>
+</div>
+
+<div class="chart-card categoria-motivos">
+    <h3>Motivos de atendimento mais frequentes</h3>
+    <div class="chart-area"><canvas id="grafico-motivos"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>
+    </div>
+</div>
+
+<div class="chart-card categoria-paif">
+    <h3>Atendimentos por mês</h3>
+    <div class="chart-area"><canvas id="grafico-atendimentos-mes"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>
+    </div>
+</div>
+
+<h2>Atendimento Coletivo (SCFV)</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile"><span class="valor">48</span><span class="rotulo">Total de atendimentos SCFV</span></div>
+    <div class="kpi-tile"><span class="valor">24</span><span class="rotulo">Pessoas únicas em grupo</span></div>
+    <div class="kpi-tile"><span class="valor">4</span><span class="rotulo">Grupos únicos</span></div>
+    
+    <div class="kpi-tile"><span class="valor">100,0%</span><span class="rotulo">Frequência média</span></div>
+    
+</div>
+
+<h2>Programas e Serviços</h2>
+<div class="kpi-grid">
+    <div class="kpi-tile"><span class="valor">22</span><span class="rotulo">Famílias Ativas no PAIF</span></div>
+    <div class="kpi-tile"><span class="valor">0</span><span class="rotulo">Famílias Desligadas do PAIF</span></div>
+    <div class="kpi-tile"><span class="valor">9</span><span class="rotulo">Famílias Ativas no PRC</span></div>
+    <div class="kpi-tile"><span class="valor">0</span><span class="rotulo">Famílias Desligadas do PRC</span></div>
+</div>
+
+<h2>Dispensações e BPC</h2>
+<div class="chart-card categoria-beneficios">
+    <h3>Composição de dispensações</h3>
+    <div class="chart-area"><canvas id="grafico-beneficios"></canvas></div>
+    <div class="chart-footer">Fonte: <strong>IPM Social</strong></div>
+</div>
+
+<div class="chart-card categoria-beneficios">
+    <h3>Dispensações por mês</h3>
+    <div class="chart-filter">
+        <label for="filtro-beneficio-mes">Benefício</label>
+        <select id="filtro-beneficio-mes" class="gov-select">
+            <option value="__todos__">Todos</option>
+            
+            <option value="Prato Cheio">Prato Cheio</option>
+            
+        </select>
+    </div>
+    <div class="chart-area"><canvas id="grafico-beneficios-mes"></canvas></div>
+    <div class="chart-footer">
+        Fonte: <strong>IPM Social</strong>
+    </div>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-tile">
+        <span class="valor">58</span>
+        <span class="rotulo">Total de dispensações</span>
+        
+        <span class="badge-variacao"><span aria-hidden="true">↓</span> 21% abaixo da média municipal</span>
+    </div>
+    <div class="kpi-tile"><span class="valor">194</span><span class="rotulo">BPC Idoso ativos</span></div>
+    <div class="kpi-tile"><span class="valor">251</span><span class="rotulo">BPC Pessoa com Deficiência ativos</span></div>
+    <div class="kpi-tile"><span class="valor">445</span><span class="rotulo">Total de BPCs ativos</span></div>
+</div>
+
+<h2>Quadro de Pessoal</h2>
+<div class="chart-card categoria-pessoal">
+    <h3>Carga de atendimento por profissional</h3>
+    <div class="chart-area"><canvas id="grafico-pessoal"></canvas></div>
+    <div class="chart-footer">
+        Carga = atendimentos realizados por profissionais do cargo ÷ profissionais ativos do cargo.
+    </div>
+</div>
+<div class="gov-table-wrapper">
+<table class="gov-table">
+    <thead><tr>
+        <th>Assistente Social</th><th>Psicólogos</th><th>Educadores</th>
+        
+    </tr></thead>
+    <tbody>
+        <tr>
+            <td>3</td>
+            <td>2</td>
+            <td>3</td>
+            
+        </tr>
+    </tbody>
+</table>
+</div>
+
+
+<h2>Produção por Profissional</h2>
+<div class="gov-table-wrapper">
+<table class="gov-table striped">
+    <thead>
+        <tr>
+            <th class="sortable" data-type="string" title="Clique para ordenar">Nome</th>
+            <th class="sortable" data-type="string" title="Clique para ordenar">Cargo</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. Individuais</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. SCFV</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Dispensações</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr>
+            <td>
+                
+                    Cintia Ramos Lorusso da Silva
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>74</td>
+            <td>0</td>
+            <td>12</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Edson Luiz Ribas de Lima
+                
+            </td>
+            <td>Educador Social</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Flavia Scalsavara
+                
+            </td>
+            <td>Educador Social</td>
+            <td>266</td>
+            <td>38</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Marlene do Nascimento
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>3</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Mauricio de Campos Queiroz
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>61</td>
+            <td>0</td>
+            <td>26</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Patricia de Oliveira Rodrigues
+                
+            </td>
+            <td>Psicólogo</td>
+            <td>6</td>
+            <td>17</td>
+            <td>5</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Thaisa de Siqueira
+                
+            </td>
+            <td>Assistente Social (C)</td>
+            <td>12</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Vanessa Figueroa Barbosa dos Santos
+                
+            </td>
+            <td>Psicólogo</td>
+            <td>40</td>
+            <td>0</td>
+            <td>11</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Viviane dos Santos
+                
+            </td>
+            <td>Educador Social</td>
+            <td>205</td>
+            <td>14</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    <strong title="Atendimentos onde não foi possível identificar o profissional no sistema." style="cursor: help;">Não identificado</strong>
+                
+            </td>
+            <td>-</td>
+            <td>5</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+        
+    </tbody>
+</table>
+</div>
+
+
+<h2>Contexto da Unidade</h2>
+<div class="narrativa narrativa-contexto">
+    
+    <div class="narrativa-secao">
+        <h4>Atendimento</h4>
+        <p><span class="contexto-marco">O PAIF é o serviço estruturante da Proteção Social Básica e a principal razão de ser do CRAS: trabalho social continuado com as famílias, de caráter preventivo e proativo, para fortalecer vínculos antes que o direito seja violado. Vale distinguir o atendimento — a ação pontual que responde a uma demanda — do acompanhamento familiar, contínuo e formalizado num Plano de Acompanhamento. O volume abaixo é uma medida da cobertura dessa oferta preventiva no território.</span> No período, a unidade realizou <strong>670</strong> atendimentos individuais — <strong>um patamar 2% abaixo da média das 8 unidades, hoje em 684</strong> — e <strong>48</strong> atendimentos em grupo (SCFV), ocupando a <strong>5ª posição</strong> em volume de atendimentos individuais entre os 8 CRAS. Foram <strong>3.185</strong> famílias referenciadas e <strong>32</strong> visitas domiciliares no período.</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Equipe</h4>
+        <p><span class="contexto-marco">O dimensionamento das equipes segue a NOB-RH/SUAS. A carga por profissional mede a intensidade da demanda que cada técnico absorve — não o desempenho individual: carga muito acima da média sinaliza território sob pressão e eventual necessidade de reforço ou redistribuição de equipe, não falha de quem atende.</span> <strong>AS</strong>: carga de <strong>47,9</strong> atendimentos por profissional (<strong>28% abaixo do que se observa, em média, nas demais unidades (66)</strong>), <strong>5ª colocação</strong> em carga entre as 8 unidades. <strong>Psicólogo</strong>: carga de <strong>24,9</strong> atendimentos por profissional (<strong>um patamar 51% abaixo da média das 8 unidades, hoje em 51</strong>), <strong>6ª colocação</strong> em carga entre as 8 unidades. <strong>Educador Social</strong>: carga de <strong>174,9</strong> atendimentos por profissional (<strong>um patamar 41% acima da média das 8 unidades, hoje em 124</strong>), <strong>3ª colocação</strong> em carga entre as 8 unidades. Considerando a carga combinada dos 3 cargos núcleo (AS, Psicólogo, Educador Social), a unidade ocupa a <strong>5ª posição</strong> em intensidade de demanda por profissional entre as 8 CRAS. Além dos atendimentos pontuais, a unidade tem <strong>22</strong> famílias em acompanhamento continuado no PAIF — uma carga de <strong>4,4</strong> famílias por técnico (AS + Psicólogo) (<strong>72% abaixo da média municipal de 16</strong>), <strong>8ª colocação</strong> em carga de referenciamento entre as 8 unidades. Dessas famílias, <strong>9%</strong> chegaram por busca ativa da própria equipe. Nenhuma família foi desligada do PAIF nesta unidade no período.</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Território e Vulnerabilidade</h4>
+        <p><span class="contexto-marco">Para a Vigilância, o território não é o mapa: é o “território usado”, o chão mais a identidade de quem vive nele (Milton Santos). Boa parte das vulnerabilidades e potencialidades de uma família é determinada pelo território — e a vulnerabilidade é multidimensional, não se reduz à renda. Os números abaixo descrevem a demanda potencial deste território (Eixo 1 da Vigilância).</span> A renda média familiar referenciada é de <strong>R$ 878,6</strong> (<strong>2% abaixo do que se observa, em média, nas demais unidades (R$ 899,1)</strong>). <strong>30%</strong> das famílias referenciadas estão no Bolsa Família (<strong>um patamar 6% abaixo da média das 8 unidades, hoje em 32%</strong>). O indicador de maior incidência entre as famílias referenciadas é "<strong>Famílias com crianças/adolescentes 0–17 (%)</strong>", em <strong>54%</strong> (<strong>um patamar 2% acima da média das 8 unidades, hoje em 53%</strong>).</p>
+    </div>
+    
+    <div class="narrativa-secao">
+        <h4>Benefícios</h4>
+        <p><span class="contexto-marco">Os benefícios eventuais (LOAS, art. 22) são provisões pontuais para situações de vulnerabilidade temporária — nascimento, morte, desabrigo, insegurança alimentar, calamidade. O volume e o tipo concedidos por território indicam onde a vulnerabilidade aguda está concentrada, sendo mais sensíveis a choques recentes do que os indicadores estruturais do CadÚnico.</span> Foram <strong>58</strong> dispensações no período — <strong>21% abaixo da média municipal de 73</strong> — colocando a unidade na <strong>5ª posição</strong> em volume de dispensações entre as 8 CRAS.  O benefício mais dispensado na unidade foi "Prato Cheio", com <strong>37</strong> dispensações.</p>
+    </div>
+    
+    <div class="narrativa-secao narrativa-secao-total">
+        <h4>Leitura da Vigilância</h4>
+        <p>A Vigilância cruza a <strong>demanda</strong> (riscos e vulnerabilidades do território) com a <strong>oferta</strong> (o padrão dos serviços instalados), sempre referenciada ao território — e essa adequação se lê <strong>território a território, nunca pela média municipal</strong>, que esconde as diferenças internas da rede. Por isso os indicadores desta unidade valem confrontados sobretudo com o seu próprio território, e não apenas com as outras sete CRAS. Na leitura combinada de carga por profissional, esta unidade aparece na <strong>5ª posição</strong> em intensidade de demanda entre os 8 CRAS — um ponto de partida para a conversa local, não um veredito. Este boletim é um fluxo de mão dupla: volta para a equipe como insumo de leitura e planejamento, não como instrumento de fiscalização.</p>
+    </div>
+    
+</div>
+
+<script>
+
+(function () {
+    const estimativasVulnerabilidade = [1750, 1410, 1262];
+    new Chart(document.getElementById('grafico-vulnerabilidade'), {
+        type: 'bar',
+        data: {
+            labels: ["Famílias com crianças/adolescentes 0–17 (%)", "Famílias com membro não alfabetizado (%)", "Monoparentais chefiadas por mulher (%)"],
+            datasets: [{
+                label: '% das famílias referenciadas',
+                data: [54.5, 43.9, 39.3],
+                backgroundColor: 'rgba(229, 34, 7, 0.65)',
+                hoverBackgroundColor: 'rgba(229, 34, 7, 1)',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const estimativa = estimativasVulnerabilidade[context.dataIndex];
+                            return context.parsed.x + '% (~' + estimativa.toLocaleString('pt-BR') + ' famílias)';
+                        }
+                    }
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'right',
+                    color: '#555',
+                    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                    borderRadius: 3,
+                    padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                    font: { family: 'IBM Plex Sans, sans-serif', size: 11, weight: 'bold' },
+                    formatter: function(value) { return value; }
+                }
+            },
+            scales: { x: { beginAtZero: true, max: 100 } },
+            layout: { padding: { right: 35 } }
+        }
+    });
+})();
+
+
+(function () {
+    function tooltipPercentualDoughnut(context) {
+        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+        const pct = total ? ((context.parsed / total) * 100).toFixed(1) : 0;
+        return context.label + ': ' + context.parsed.toLocaleString('pt-BR') + ' (' + pct + '%)';
+    }
+
+    const optsDoughnut = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        layout: { padding: 10 },
+        plugins: { 
+            legend: { 
+                position: 'right',
+                labels: { font: { family: 'IBM Plex Sans, sans-serif', size: 12 }, usePointStyle: true, padding: 15 }
+            },
+            tooltip: { 
+                backgroundColor: 'rgba(0, 0, 0, 0.8)', titleFont: { size: 13, family: 'IBM Plex Sans, sans-serif' },
+                bodyFont: { size: 13, family: 'IBM Plex Sans, sans-serif' }, padding: 12, cornerRadius: 8,
+                usePointStyle: true, callbacks: { label: tooltipPercentualDoughnut } 
+            },
+            datalabels: {
+                color: '#555',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                borderRadius: 3,
+                padding: { top: 4, bottom: 4, left: 6, right: 6 },
+                font: { family: 'IBM Plex Sans, sans-serif', size: 11, weight: 'bold' },
+                display: function(context) {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    const pct = total ? (context.dataset.data[context.dataIndex] / total) * 100 : 0;
+                    return pct >= 5;
+                },
+                formatter: (value, context) => {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    const pct = total ? Math.round((value / total) * 100) : 0;
+                    return pct + '%';
+                },
+                anchor: 'center',
+                align: 'center'
+            }
+        }
+    };
+
+    // Paleta de marca + neutros do design system, ciclada para cobrir
+    // qualquer quantidade de tipos de benefício.
+    var paletaBeneficios = ['#007044', '#155bcb', '#c2850c', '#888888', '#155bcb', '#168821', '#6b6b66', '#636363'];
+    var rawLabels = ["Prato Cheio", "Outros Benefícios"];
+    var rawValores = [37, 21];
+    
+    var labelsAgrupados = [];
+    var valoresAgrupados = [];
+    
+    for (var i = 0; i < rawLabels.length; i++) {
+        var label = rawLabels[i];
+        if (label === '2ª Via Certidão de Nascimento [fora do Município]') {
+            label = '2ª Via Certidão de Nascimento';
+        }
+        
+        var index = labelsAgrupados.indexOf(label);
+        if (index === -1) {
+            labelsAgrupados.push(label);
+            valoresAgrupados.push(rawValores[i]);
+        } else {
+            valoresAgrupados[index] += rawValores[i];
+        }
+    }
+
+    var coresBeneficios = labelsAgrupados.map(function (_, i) { return paletaBeneficios[i % paletaBeneficios.length]; });
+
+    new Chart(document.getElementById('grafico-beneficios'), {
+        type: 'doughnut',
+        data: {
+            labels: labelsAgrupados,
+            datasets: [{
+                data: valoresAgrupados,
+                backgroundColor: coresBeneficios,
+                borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4
+            }]
+        },
+        options: optsDoughnut
+    });
+
+
+
+    var rawLabelsRacaCor = ["Branca", "Parda", "Preta", "Amarela", "Não informado"];
+    var rawValRacaCor = [340, 108, 21, 3, 5];
+    var fRacaCor = rawLabelsRacaCor.map((l, i) => ({l, v: rawValRacaCor[i]})).filter(x => x.l !== 'Não informado' && x.l !== 'Não Informado');
+    var paletaRacaCor = ['#155bcb', '#007044', '#c2850c', '#6b6b66', '#155bcb', '#168821'];
+
+    new Chart(document.getElementById('grafico-raca-cor'), {
+        type: 'doughnut',
+        data: {
+            labels: fRacaCor.map(x => x.l),
+            datasets: [{
+                data: fRacaCor.map(x => x.v),
+                backgroundColor: fRacaCor.map((_, i) => paletaRacaCor[i % paletaRacaCor.length]),
+                borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4
+            }]
+        },
+        options: optsDoughnut
+    });
+
+    var rawLabelsSexo = ["Feminino", "Masculino", "Não informado"];
+    var rawValSexo = [366, 106, 5];
+    var fSexo = rawLabelsSexo.map((l, i) => ({l, v: rawValSexo[i]})).filter(x => x.l !== 'Não informado' && x.l !== 'Não Informado');
+    var paletaSexo = ['#007044', '#155bcb', '#c2850c', '#c2850c'];
+
+    new Chart(document.getElementById('grafico-sexo'), {
+        type: 'doughnut',
+        data: {
+            labels: fSexo.map(x => x.l),
+            datasets: [{
+                data: fSexo.map(x => x.v),
+                backgroundColor: fSexo.map((_, i) => paletaSexo[i % paletaSexo.length]),
+                borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4
+            }]
+        },
+        options: optsDoughnut
+    });
+})();
+
+new Chart(document.getElementById('grafico-motivos'), {
+    type: 'bar',
+    data: {
+        labels: ["Orientação Sociofamiliar", "Orientação e Encaminhamentos para a Rede de Serviços Locais", "Recepção / Procura Espontânea / Orientações", "Contato Telefônico", "Escuta", "Acolhida", "Avaliação Benefício Eventual Alimentação", "Cadu -acesso a Programas e Benefícios (folha Resumo", "Tarifa Social", "Carteirinha Idoso)", "Outros Motivos"],
+        datasets: [{
+            label: 'Ocorrências',
+            data: [587, 288, 281, 241, 117, 54, 45, 38, 38, 38, 156],
+            backgroundColor: 'rgba(22, 136, 33, 0.7)',
+            hoverBackgroundColor: 'rgba(22, 136, 33, 1)',
+            borderRadius: 4,
+            borderWidth: 0,
+            barPercentage: 0.7,
+            datalabels: {
+                anchor: 'end',
+                align: 'right',
+                color: '#555',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                borderRadius: 3,
+                padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                font: { family: 'IBM Plex Sans, sans-serif', size: 11, weight: 'bold' },
+                formatter: function(value) {
+                    return value.toLocaleString('pt-BR');
+                }
+            }
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { right: 40 } },
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true } }
+    }
+});
+
+(function () {
+    
+    // No modo mensal há um único mês: a "linha" de média teria um só ponto e o
+    // Chart.js não desenha segmento (pointRadius 0). Este plugin traça a média
+    // dos demais territórios como um risco horizontal tracejado sobre cada barra.
+    const linhaMediaDemaisPlugin = {
+        id: 'linhaMediaDemais',
+        afterDatasetsDraw(chart) {
+            const linha = chart.data.datasets.find(d => d.type === 'line');
+            const idxBar = chart.data.datasets.findIndex(d => d.type === 'bar');
+            if (!linha || idxBar < 0) return;
+            const meta = chart.getDatasetMeta(idxBar);
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.setLineDash([6, 4]);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(229, 34, 7, 0.65)';
+            meta.data.forEach((barra, i) => {
+                const media = linha.data[i];
+                if (!media) return;
+                const y = chart.scales.y.getPixelForValue(media);
+                const meia = (barra.width ? barra.width / 2 : 24) + 8;
+                ctx.beginPath();
+                ctx.moveTo(barra.x - meia, y);
+                ctx.lineTo(barra.x + meia, y);
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+    };
+    
+    const graficoMesPlugins = [linhaMediaDemaisPlugin];
+
+    // Gráfico de atendimentos individuais por mês (barra + linha de média)
+    const labelsAtendimentosMes = ["Agosto"];
+    const valoresAtendimentosMes = [670];
+    const mediaAtendimentosMes = valoresAtendimentosMes.length > 0
+        ? valoresAtendimentosMes.reduce((a, b) => a + b, 0) / valoresAtendimentosMes.length
+        : 0;
+    
+    const serieMediaAtendimentosMes = [685.4];
+    
+
+    new Chart(document.getElementById('grafico-atendimentos-mes'), {
+        data: {
+            labels: labelsAtendimentosMes,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média dos demais territórios',
+                    data: serieMediaAtendimentosMes,
+                    borderColor: 'rgba(107, 107, 102, 0.55)',
+                    backgroundColor: 'rgba(107, 107, 102, 0.55)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === valoresAtendimentosMes.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#6b6b66', display: false,
+                        font: { weight: 'bold', size: 11, family: 'IBM Plex Sans, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Atendimentos',
+                    data: valoresAtendimentosMes,
+                    backgroundColor: 'rgba(0, 112, 68, 0.65)',
+                    hoverBackgroundColor: 'rgba(0, 112, 68, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'IBM Plex Sans, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'IBM Plex Sans, sans-serif' },
+                    bodyFont: { size: 13, family: 'IBM Plex Sans, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' atendimentos';
+                        },
+                        afterLabel: function(context) {
+                            if (context.dataset.type === 'line') return '';
+                            
+                            const media = serieMediaAtendimentosMes[context.dataIndex];
+                            
+                            if (!media) return '';
+                            const variacaoPct = ((context.parsed.y - media) / media) * 100;
+                            const direcao = variacaoPct >= 0 ? 'acima' : 'abaixo';
+                            return Math.abs(Math.round(variacaoPct)) + '% ' + direcao + ' da média dos demais territórios';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'IBM Plex Sans, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'IBM Plex Sans, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
+            }
+        },
+        plugins: graficoMesPlugins
+    });
+
+    // Gráfico de pessoas atendidas únicas por mês (barra + linha de média)
+    const labelsPessoasUnicasMes = ["Agosto"];
+    const valoresPessoasUnicasMes = [477];
+    const mediaPessoasUnicasMes = valoresPessoasUnicasMes.length > 0
+        ? valoresPessoasUnicasMes.reduce((a, b) => a + b, 0) / valoresPessoasUnicasMes.length
+        : 0;
+    
+    const serieMediaPessoasUnicasMes = [481.3];
+    
+
+    new Chart(document.getElementById('grafico-pessoas-unicas-mes'), {
+        data: {
+            labels: labelsPessoasUnicasMes,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média dos demais territórios',
+                    data: serieMediaPessoasUnicasMes,
+                    borderColor: 'rgba(107, 107, 102, 0.55)',
+                    backgroundColor: 'rgba(107, 107, 102, 0.55)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === valoresPessoasUnicasMes.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#6b6b66', display: false,
+                        font: { weight: 'bold', size: 11, family: 'IBM Plex Sans, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Pessoas Únicas Atendidas',
+                    data: valoresPessoasUnicasMes,
+                    backgroundColor: 'rgba(21, 91, 203, 0.65)',
+                    hoverBackgroundColor: 'rgba(21, 91, 203, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'IBM Plex Sans, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'IBM Plex Sans, sans-serif' },
+                    bodyFont: { size: 13, family: 'IBM Plex Sans, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' pessoas';
+                        },
+                        afterLabel: function(context) {
+                            if (context.dataset.type === 'line') return '';
+                            
+                            const media = serieMediaPessoasUnicasMes[context.dataIndex];
+                            
+                            if (!media) return '';
+                            const variacaoPct = ((context.parsed.y - media) / media) * 100;
+                            const direcao = variacaoPct >= 0 ? 'acima' : 'abaixo';
+                            return Math.abs(Math.round(variacaoPct)) + '% ' + direcao + ' da média dos demais territórios';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'IBM Plex Sans, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'IBM Plex Sans, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
+            }
+        },
+        plugins: graficoMesPlugins
+    });
+
+    // Gráfico de benefícios dispensados por mês, com filtro por tipo
+    const dadosBeneficiosMes = {"labels": ["Agosto"], "todos": [58], "por_tipo": {"Prato Cheio": [37]}, "media_outros": [75.4], "media_outros_por_tipo": {"Prato Cheio": [43.4]}};
+
+    function valoresParaFiltroBeneficioMes(tipo) {
+        return tipo === '__todos__' ? dadosBeneficiosMes.todos : dadosBeneficiosMes.por_tipo[tipo];
+    }
+
+    function mediaDeMes(valores) {
+        return valores.length > 0 ? valores.reduce((a, b) => a + b, 0) / valores.length : 0;
+    }
+
+    const mediaInicialBeneficiosMes = mediaDeMes(dadosBeneficiosMes.todos);
+    
+    const serieMediaBeneficiosMes = [75.4];
+    const serieMediaBeneficiosMesPorTipo = {"Prato Cheio": [43.4]};
+    
+
+    const chartBeneficiosMes = new Chart(document.getElementById('grafico-beneficios-mes'), {
+        data: {
+            labels: dadosBeneficiosMes.labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Média dos demais territórios',
+                    data: serieMediaBeneficiosMes,
+                    borderColor: 'rgba(107, 107, 102, 0.55)',
+                    backgroundColor: 'rgba(107, 107, 102, 0.55)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0,
+                    order: 1,
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataIndex === dadosBeneficiosMes.labels.length - 1;
+                        },
+                        align: 'top',
+                        anchor: 'end',
+                        formatter: function(value) {
+                            return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
+                        },
+                        color: '#6b6b66', display: false,
+                        font: { weight: 'bold', size: 11, family: 'IBM Plex Sans, sans-serif' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Dispensações',
+                    data: dadosBeneficiosMes.todos,
+                    backgroundColor: 'rgba(194, 133, 12, 0.65)',
+                    hoverBackgroundColor: 'rgba(194, 133, 12, 1)',
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barPercentage: 0.6,
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#555',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: 3,
+                        padding: 2,
+                        font: { family: 'IBM Plex Sans, sans-serif', size: 11, weight: 'bold' },
+                        formatter: function(value) {
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1500, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13, family: 'IBM Plex Sans, sans-serif' },
+                    bodyFont: { size: 13, family: 'IBM Plex Sans, sans-serif' },
+                    padding: 12,
+                    cornerRadius: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                return label + Math.round(value).toLocaleString('pt-BR');
+                            }
+                            return label + value.toLocaleString('pt-BR') + ' benefícios';
+                        },
+                        afterLabel: function(context) {
+                            if (context.dataset.type === 'line') return '';
+                            const media = context.chart.data.datasets[0].data[context.dataIndex];
+                            if (!media) return '';
+                            const variacaoPct = ((context.parsed.y - media) / media) * 100;
+                            const direcao = variacaoPct >= 0 ? 'acima' : 'abaixo';
+                            return Math.abs(Math.round(variacaoPct)) + '% ' + direcao + ' da média dos demais territórios';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'IBM Plex Sans, sans-serif', size: 11 } } },
+                y: {
+                    beginAtZero: true,
+                    grace: '10%',
+                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { font: { family: 'IBM Plex Sans, sans-serif', size: 11 } },
+                    border: { display: false }
+                }
+            }
+        },
+        plugins: graficoMesPlugins
+    });
+
+    document.getElementById('filtro-beneficio-mes').addEventListener('change', (e) => {
+        const valores = valoresParaFiltroBeneficioMes(e.target.value);
+        
+        chartBeneficiosMes.data.datasets[0].data = e.target.value === '__todos__'
+            ? serieMediaBeneficiosMes
+            : (serieMediaBeneficiosMesPorTipo[e.target.value] || valores.map(() => 0));
+        
+        chartBeneficiosMes.data.datasets[1].data = valores;
+        chartBeneficiosMes.update();
+    });
+})();
+
+new Chart(document.getElementById('grafico-pessoal'), {
+    type: 'bar',
+    data: {
+        labels: ["Assistente Social", "Psicólogo", "Educador Social"],
+        datasets: [{
+            label: 'Atendimentos por profissional',
+            data: [47.9, 24.9, 174.9],
+            backgroundColor: 'rgba(0, 112, 68, 0.65)',
+            hoverBackgroundColor: 'rgba(0, 112, 68, 1)',
+            borderRadius: 6,
+            borderWidth: 0,
+            barPercentage: 0.6,
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                color: '#555',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                borderRadius: 3,
+                padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                font: { family: 'IBM Plex Sans, sans-serif', size: 11, weight: 'bold' },
+                formatter: function(value) {
+                    return value.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+                }
+            }
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { top: 25 } },
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grace: '5%' } }
+    }
+});
+
+// Lógica para ordenação da tabela
+function getCellValue(tr, idx) {
+    return tr.children[idx].innerText || tr.children[idx].textContent;
+}
+
+function parseValue(v, type) {
+    if (type === 'number') {
+        const num = parseFloat(v.replace(/\./g, '').replace(',', '.'));
+        return isNaN(num) ? 0 : num;
+    }
+    return v.toLowerCase();
+}
+
+function comparer(index, asc, type) {
+    return function(a, b) {
+        const valA_raw = getCellValue(a, 0).trim();
+        const valB_raw = getCellValue(b, 0).trim();
+        
+        if (valA_raw.includes('Não identificado')) return 1;
+        if (valB_raw.includes('Não identificado')) return -1;
+
+        const valA = parseValue(getCellValue(asc ? a : b, index), type);
+        const valB = parseValue(getCellValue(asc ? b : a, index), type);
+        if (type === 'number') {
+            return valA - valB;
+        }
+        return valA.toString().localeCompare(valB.toString(), 'pt-BR');
+    };
+}
+
+document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', (() => {
+    const table = th.closest('table');
+    const tbody = table.querySelector('tbody');
+    const type = th.dataset.type || 'string';
+    const index = Array.from(th.parentNode.children).indexOf(th);
+    const asc = !th.classList.contains('sort-asc');
+
+    table.querySelectorAll('th').forEach(t => t.classList.remove('sort-asc', 'sort-desc'));
+    th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+
+    Array.from(tbody.querySelectorAll('tr'))
+        .sort(comparer(index, asc, type))
+        .forEach(tr => tbody.appendChild(tr));
+})));
+
+// Ordenar por Cargo em ordem alfabética por padrão no carregamento
+const thCargo = document.querySelector('.gov-table-wrapper th[data-type="string"]:nth-child(2)');
+if (thCargo) {
+    thCargo.click();
+}
+</script>
+
+        </main>
+    </div>
+    <footer class="gov-footer">
+        <div class="gov-footer-inner">
+            <div class="gov-footer-brand">
+                <img src="https://lucstarwork.github.io/VSA-IMAGENS/assets/brasao-simples.png" alt="Prefeitura de Araucária" class="gov-footer-logo">
+                <span>Vigilância Socioassistencial — PSB</span>
+            </div>
+            <div class="gov-footer-info">
+                <p>Boletim PSB — período de referência: Agosto de 2026. Emitido em 1 de setembro de 2026.</p>
+                <p>Dados de uso interno — Secretaria Municipal de Assistência Social de Araucária.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const kpis = document.querySelectorAll('.kpi-tile .valor');
+        
+        kpis.forEach(el => {
+            const textoOriginal = el.innerText.trim();
+            if (textoOriginal === '-' || textoOriginal.toLowerCase() === 'sem profissional') return;
+
+            // Remove caracteres de formatação para encontrar o número real
+            let numStr = textoOriginal.replace(/[^\d,.-]/g, '');
+            if (!numStr) return;
+            
+            // Converte formato brasileiro (ex: 1.000,50) para float (1000.50)
+            numStr = numStr.replace(/\./g, '').replace(',', '.');
+            const valorFinal = parseFloat(numStr);
+            if (isNaN(valorFinal) || valorFinal === 0) return;
+            
+            const isFloat = textoOriginal.includes(',');
+            const isDinheiro = textoOriginal.includes('R$');
+            
+            const duracao = 1500; // 1.5 segundos
+            const inicio = performance.now();
+            
+            // Função para formatar o número em transição de volta pro formato BR
+            const formatar = (num) => {
+                let parts = num.toFixed(isFloat ? 1 : 0).split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                let formatado = parts.join(',');
+                if (isDinheiro) return 'R$ ' + formatado;
+                return formatado;
+            };
+
+            const animar = (tempoAtual) => {
+                const tempoDecorrido = tempoAtual - inicio;
+                const progresso = Math.min(tempoDecorrido / duracao, 1);
+                
+                // EaseOut quintic para um efeito de desaceleração suave
+                const easeOut = 1 - Math.pow(1 - progresso, 5);
+                
+                const valorAtual = valorFinal * easeOut;
+                
+                if (progresso < 1) {
+                    el.innerText = formatar(valorAtual);
+                    requestAnimationFrame(animar);
+                } else {
+                    el.innerText = textoOriginal; // Define exatamente o original no final
+                }
+            };
+            
+            // Define como zero e inicia
+            el.innerText = formatar(0);
+            requestAnimationFrame(animar);
+        });
+    });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sumário lateral: varre os <h2> já existentes no conteúdo — nenhuma
+        // mudança de estrutura Jinja é necessária, funciona igual em
+        // qualquer página que estenda este layout.
+        const secoes = Array.from(document.querySelectorAll(".relatorio-conteudo h2"));
+        const lista = document.getElementById("relatorio-toc-lista");
+
+        if (secoes.length && lista) {
+            secoes.forEach(function (h2, i) {
+                if (!h2.id) h2.id = "secao-" + (i + 1);
+                const item = document.createElement("li");
+                const link = document.createElement("a");
+                link.href = "#" + h2.id;
+                link.textContent = h2.textContent;
+                link.dataset.alvo = h2.id;
+                item.appendChild(link);
+                lista.appendChild(item);
+            });
+
+            const links = Array.from(lista.querySelectorAll("a"));
+            const observerScrollSpy = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    const link = links.find(function (l) { return l.dataset.alvo === entry.target.id; });
+                    if (!link) return;
+                    if (entry.isIntersecting) {
+                        links.forEach(function (l) { l.classList.remove("ativo"); });
+                        link.classList.add("ativo");
+                    }
+                });
+            }, { rootMargin: "-10% 0px -80% 0px" });
+            secoes.forEach(function (h2) { observerScrollSpy.observe(h2); });
+
+            // Garante que o último item fique ativo caso a página chegue ao fim
+            // mas a última seção não alcance a linha de detecção do observer.
+            window.addEventListener('scroll', function() {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+                    links.forEach(function (l) { l.classList.remove("ativo"); });
+                    if (links.length > 0) links[links.length - 1].classList.add("ativo");
+                }
+            });
+        }
+
+        // Revelação suave: cada seção (h2 + irmãos até o próximo h2) entra
+        // com fade + leve deslocamento ao cruzar a viewport, uma vez só.
+        const prefereReducaoMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!prefereReducaoMovimento && secoes.length) {
+            const grupos = secoes.map(function (h2) {
+                const grupo = [h2];
+                let irmao = h2.nextElementSibling;
+                while (irmao && irmao.tagName !== "H2") {
+                    grupo.push(irmao);
+                    irmao = irmao.nextElementSibling;
+                }
+                return grupo;
+            });
+
+            const observerReveal = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("reveal-visivel");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -10% 0px" });
+
+            grupos.forEach(function (grupo) {
+                grupo.forEach(function (el) {
+                    el.classList.add("reveal");
+                    observerReveal.observe(el);
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>
