@@ -33,6 +33,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script>Chart.register(ChartDataLabels);</script>
+    <script>
+        // Dark mode (HUB): ajusta os defaults do Chart.js e liga a flag que as
+        // configs de gráfico abaixo consultam. Roda antes da construção dos
+        // gráficos porque o tema já foi resolvido no <head>.
+        (function () {
+            if (document.documentElement.getAttribute('data-theme') !== 'dark') return;
+            window.__psbDark = true;
+            if (window.Chart) {
+                Chart.defaults.color = '#c7ced8';
+                Chart.defaults.borderColor = 'rgba(255,255,255,0.10)';
+            }
+        })();
+    </script>
     <script src="assets/dropdown.js"></script>
     <script>
         window.addEventListener('scroll', function() {
@@ -175,6 +188,20 @@
             color: #0f172a;
             font-weight: 600;
         }
+
+        /* --- Dark mode (herdado do HUB): faz as cores hardcoded deste boletim
+               antigo responderem ao data-theme. So dark; light fica intacto. --- */
+        [data-theme="dark"] .premium-header { background-color: #16181c !important; border-bottom-color: rgba(255,255,255,0.10) !important; }
+        [data-theme="dark"] .premium-title { color: #e8edf2 !important; }
+        [data-theme="dark"] .premium-title span { color: #94a3b8 !important; }
+        [data-theme="dark"] .premium-supertitle { color: #94a3b8 !important; }
+        [data-theme="dark"] .premium-separator { background-color: rgba(255,255,255,0.14) !important; }
+        [data-theme="dark"] .premium-nav .breadcrumb { background: #22252b !important; border-color: rgba(255,255,255,0.12) !important; color: #cbd5e1 !important; }
+        [data-theme="dark"] .premium-nav .breadcrumb-atual { color: #e8edf2 !important; }
+        [data-theme="dark"] .premium-nav .breadcrumb-sep { color: #64748b !important; }
+        [data-theme="dark"] .page-header { border-bottom-color: rgba(255,255,255,0.12) !important; }
+        [data-theme="dark"] .page-header h1 { color: #e8edf2 !important; }
+        [data-theme="dark"] .page-header h1 span { color: #93c5e8 !important; }
     </style>
     <header class="premium-header">
         <div class="container premium-container">
@@ -452,6 +479,155 @@
 </table>
 </div>
 
+<h2>Produção por Profissional</h2>
+<div class="gov-table-wrapper">
+<table class="gov-table striped">
+    <thead>
+        <tr>
+            <th class="sortable" data-type="string" title="Clique para ordenar">Nome</th>
+            <th class="sortable" data-type="string" title="Clique para ordenar">Cargo</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. PAIF</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. SCFV</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Benefícios Dispensados</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr>
+            <td>
+                
+                    Anne Cristina Outeiro Barbosa
+                
+            </td>
+            <td>Psicólogo</td>
+            <td>203</td>
+            <td>39</td>
+            <td>57</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Cintia Gisele Ferreira Fachim
+                
+            </td>
+            <td>Assistente Social (C)</td>
+            <td>294</td>
+            <td>0</td>
+            <td>31</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Felipe Muniz da Rosa
+                
+            </td>
+            <td>Educador Social</td>
+            <td>514</td>
+            <td>117</td>
+            <td>86</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Lillian Simoes dos Santos Brito
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Sonia Maria Stresser Ruhr
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>234</td>
+            <td>0</td>
+            <td>56</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Susan Brepohl de Britto
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>995</td>
+            <td>0</td>
+            <td>105</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Tiago Tarcisio Majczak
+                
+            </td>
+            <td>Educador Social</td>
+            <td>1233</td>
+            <td>76</td>
+            <td>110</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Vania Nogueira
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>379</td>
+            <td>28</td>
+            <td>33</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Weslley Yago Leal da Silva
+                
+            </td>
+            <td>Psicólogo</td>
+            <td>151</td>
+            <td>8</td>
+            <td>32</td>
+        </tr>
+        
+        <tr class="linha-fora-da-unidade" title="Não faz parte da equipe desta unidade — atendimento registrado aqui, mas lotado em outro CRAS">
+            <td>
+                
+                    Kellen Wanessa da Cunha
+                
+            </td>
+            <td>Educador Social</td>
+            <td>587</td>
+            <td>43</td>
+            <td>61</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    <strong title="Atendimentos onde não foi possível identificar o profissional no sistema." style="cursor: help;">Não identificado</strong>
+                
+            </td>
+            <td>-</td>
+            <td>378</td>
+            <td>45</td>
+            <td>85</td>
+        </tr>
+        
+    </tbody>
+</table>
+</div>
 
 <h2>Contexto da Unidade</h2>
 <div class="narrativa">
@@ -511,8 +687,8 @@
                 datalabels: {
                     anchor: 'end',
                     align: 'right',
-                    color: '#555',
-                    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                    color: (window.__psbDark ? '#d7dde4' : '#555'),
+                    backgroundColor: (window.__psbDark ? 'rgba(28,30,34,0.92)' : 'rgba(255, 255, 255, 0.85)'),
                     borderRadius: 3,
                     padding: { top: 2, bottom: 2, left: 4, right: 4 },
                     font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
@@ -549,8 +725,8 @@
                 usePointStyle: true, callbacks: { label: tooltipPercentualDoughnut } 
             },
             datalabels: {
-                color: '#555',
-                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                color: (window.__psbDark ? '#d7dde4' : '#555'),
+                backgroundColor: (window.__psbDark ? 'rgba(28,30,34,0.92)' : 'rgba(255, 255, 255, 0.85)'),
                 borderRadius: 3,
                 padding: { top: 4, bottom: 4, left: 6, right: 6 },
                 font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
@@ -663,8 +839,8 @@ new Chart(document.getElementById('grafico-motivos'), {
             datalabels: {
                 anchor: 'end',
                 align: 'right',
-                color: '#555',
-                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                color: (window.__psbDark ? '#d7dde4' : '#555'),
+                backgroundColor: (window.__psbDark ? 'rgba(28,30,34,0.92)' : 'rgba(255, 255, 255, 0.85)'),
                 borderRadius: 3,
                 padding: { top: 2, bottom: 2, left: 4, right: 4 },
                 font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
@@ -718,7 +894,7 @@ new Chart(document.getElementById('grafico-motivos'), {
                         formatter: function(value) {
                             return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
                         },
-                        color: '#e52207',
+                        color: (window.__psbDark ? '#ff8a72' : '#e52207'),
                         font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
                     }
                 },
@@ -735,8 +911,8 @@ new Chart(document.getElementById('grafico-motivos'), {
                     datalabels: {
                         anchor: 'end',
                         align: 'top',
-                        color: '#555',
-                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        color: (window.__psbDark ? '#d7dde4' : '#555'),
+                        backgroundColor: (window.__psbDark ? 'rgba(28,30,34,0.92)' : 'rgba(255, 255, 255, 0.85)'),
                         borderRadius: 3,
                         padding: 2,
                         font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
@@ -785,7 +961,7 @@ new Chart(document.getElementById('grafico-motivos'), {
                 y: {
                     beginAtZero: true,
                     grace: '10%',
-                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    grid: { color: (window.__psbDark ? 'rgba(255,255,255,0.10)' : '#e0e0e0'), drawBorder: false, borderDash: [5, 5] },
                     ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
                     border: { display: false }
                 }
@@ -826,7 +1002,7 @@ new Chart(document.getElementById('grafico-motivos'), {
                         formatter: function(value) {
                             return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
                         },
-                        color: '#e52207',
+                        color: (window.__psbDark ? '#ff8a72' : '#e52207'),
                         font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
                     }
                 },
@@ -843,8 +1019,8 @@ new Chart(document.getElementById('grafico-motivos'), {
                     datalabels: {
                         anchor: 'end',
                         align: 'top',
-                        color: '#555',
-                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        color: (window.__psbDark ? '#d7dde4' : '#555'),
+                        backgroundColor: (window.__psbDark ? 'rgba(28,30,34,0.92)' : 'rgba(255, 255, 255, 0.85)'),
                         borderRadius: 3,
                         padding: 2,
                         font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
@@ -893,7 +1069,7 @@ new Chart(document.getElementById('grafico-motivos'), {
                 y: {
                     beginAtZero: true,
                     grace: '10%',
-                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    grid: { color: (window.__psbDark ? 'rgba(255,255,255,0.10)' : '#e0e0e0'), drawBorder: false, borderDash: [5, 5] },
                     ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
                     border: { display: false }
                 }
@@ -940,7 +1116,7 @@ new Chart(document.getElementById('grafico-motivos'), {
                         formatter: function(value) {
                             return 'Média: ' + Math.round(value).toLocaleString('pt-BR');
                         },
-                        color: '#e52207',
+                        color: (window.__psbDark ? '#ff8a72' : '#e52207'),
                         font: { weight: 'bold', size: 11, family: 'Rawline, sans-serif' }
                     }
                 },
@@ -957,8 +1133,8 @@ new Chart(document.getElementById('grafico-motivos'), {
                     datalabels: {
                         anchor: 'end',
                         align: 'top',
-                        color: '#555',
-                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        color: (window.__psbDark ? '#d7dde4' : '#555'),
+                        backgroundColor: (window.__psbDark ? 'rgba(28,30,34,0.92)' : 'rgba(255, 255, 255, 0.85)'),
                         borderRadius: 3,
                         padding: 2,
                         font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
@@ -1009,7 +1185,7 @@ new Chart(document.getElementById('grafico-motivos'), {
                 y: {
                     beginAtZero: true,
                     grace: '10%',
-                    grid: { color: '#e0e0e0', drawBorder: false, borderDash: [5, 5] },
+                    grid: { color: (window.__psbDark ? 'rgba(255,255,255,0.10)' : '#e0e0e0'), drawBorder: false, borderDash: [5, 5] },
                     ticks: { font: { family: 'Rawline, sans-serif', size: 11 } },
                     border: { display: false }
                 }
@@ -1041,8 +1217,8 @@ new Chart(document.getElementById('grafico-pessoal'), {
             datalabels: {
                 anchor: 'end',
                 align: 'top',
-                color: '#555',
-                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                color: (window.__psbDark ? '#d7dde4' : '#555'),
+                backgroundColor: (window.__psbDark ? 'rgba(28,30,34,0.92)' : 'rgba(255, 255, 255, 0.85)'),
                 borderRadius: 3,
                 padding: { top: 2, bottom: 2, left: 4, right: 4 },
                 font: { family: 'Rawline, sans-serif', size: 11, weight: 'bold' },
