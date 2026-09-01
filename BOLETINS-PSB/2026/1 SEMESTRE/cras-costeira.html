@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRAS Costeira — Araucária</title>
+    <!-- Tema resolvido antes da 1a pintura (sem flash), herdado do HUB. Ordem:
+         HTML pai (iframe de mesma origem) > localStorage 'hub_tema' > SO. Quando
+         o boletim roda em <iframe> de outra origem, o Hub empurra o tema por
+         postMessage (ver script no fim do <body>). -->
+    <script>
+        (function () {
+            var t = null;
+            try {
+                if (window.parent && window.parent !== window) {
+                    var pt = window.parent.document.documentElement.getAttribute('data-theme');
+                    if (pt === 'dark' || pt === 'light') t = pt;
+                }
+            } catch (e) { /* origem cruzada: sem acesso ao pai */ }
+            try {
+                if (!t) { var s = localStorage.getItem('hub_tema'); if (s === 'dark' || s === 'light') t = s; }
+            } catch (e) {}
+            if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -430,6 +450,131 @@
 </table>
 </div>
 
+<h2>Produção por Profissional</h2>
+<div class="gov-table-wrapper">
+<table class="gov-table striped">
+    <thead>
+        <tr>
+            <th class="sortable" data-type="string" title="Clique para ordenar">Nome</th>
+            <th class="sortable" data-type="string" title="Clique para ordenar">Cargo</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. PAIF</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. SCFV</th>
+            <th class="sortable" data-type="number" title="Clique para ordenar">Benefícios Dispensados</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr>
+            <td>
+                
+                    Cintia Ramos Lorusso da Silva
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>284</td>
+            <td>0</td>
+            <td>61</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Flavia Scalsavara
+                
+            </td>
+            <td>Educador Social</td>
+            <td>1046</td>
+            <td>151</td>
+            <td>51</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Marlene do Nascimento
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>582</td>
+            <td>0</td>
+            <td>83</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Mauricio de Campos Queiroz
+                
+            </td>
+            <td>Assistente Social</td>
+            <td>243</td>
+            <td>8</td>
+            <td>114</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Patricia de Oliveira Rodrigues
+                
+            </td>
+            <td>Psicólogo</td>
+            <td>99</td>
+            <td>298</td>
+            <td>55</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Thaisa de Siqueira
+                
+            </td>
+            <td>Assistente Social (C)</td>
+            <td>365</td>
+            <td>0</td>
+            <td>22</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Vanessa Figueroa Barbosa dos Santos
+                
+            </td>
+            <td>Psicólogo</td>
+            <td>193</td>
+            <td>43</td>
+            <td>58</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    Viviane dos Santos
+                
+            </td>
+            <td>Educador Social</td>
+            <td>656</td>
+            <td>208</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>
+                
+                    <strong title="Atendimentos onde não foi possível identificar o profissional no sistema." style="cursor: help;">Não identificado</strong>
+                
+            </td>
+            <td>-</td>
+            <td>183</td>
+            <td>47</td>
+            <td>35</td>
+        </tr>
+        
+    </tbody>
+</table>
+</div>
 
 <h2>Contexto da Unidade</h2>
 <div class="narrativa">
@@ -1234,6 +1379,31 @@ if (thCargo) {
             });
         }
     });
+    </script>
+    <!-- Troca de tema herdada do HUB: postMessage (iframe) e storage (abas irmas). -->
+    <script>
+        (function () {
+            var raiz = document.documentElement;
+            function aplicar(tema, animar) {
+                if (tema !== 'dark' && tema !== 'light') return;
+                if (raiz.getAttribute('data-theme') === tema) return;
+                if (animar) {
+                    raiz.classList.add('theme-switching');
+                    requestAnimationFrame(function () {
+                        requestAnimationFrame(function () { raiz.classList.remove('theme-switching'); });
+                    });
+                }
+                raiz.setAttribute('data-theme', tema);
+                try { localStorage.setItem('hub_tema', tema); } catch (e) {}
+            }
+            window.addEventListener('message', function (ev) {
+                var d = ev.data;
+                if (d && d.tipo === 'hub:tema' && (d.tema === 'dark' || d.tema === 'light')) aplicar(d.tema, true);
+            });
+            window.addEventListener('storage', function (ev) {
+                if (ev.key === 'hub_tema' && (ev.newValue === 'dark' || ev.newValue === 'light')) aplicar(ev.newValue, false);
+            });
+        })();
     </script>
 </body>
 </html>
