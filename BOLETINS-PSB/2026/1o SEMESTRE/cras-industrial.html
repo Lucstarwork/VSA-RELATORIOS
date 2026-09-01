@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRAS Industrial — Araucária</title>
+    <!-- Tema resolvido antes da 1a pintura (sem flash), herdado do HUB. Ordem:
+         HTML pai (iframe de mesma origem) > localStorage 'hub_tema' > SO. Quando
+         o boletim roda em <iframe> de outra origem, o Hub empurra o tema por
+         postMessage (ver script no fim do <body>). -->
+    <script>
+        (function () {
+            var t = null;
+            try {
+                if (window.parent && window.parent !== window) {
+                    var pt = window.parent.document.documentElement.getAttribute('data-theme');
+                    if (pt === 'dark' || pt === 'light') t = pt;
+                }
+            } catch (e) { /* origem cruzada: sem acesso ao pai */ }
+            try {
+                if (!t) { var s = localStorage.getItem('hub_tema'); if (s === 'dark' || s === 'light') t = s; }
+            } catch (e) {}
+            if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -430,143 +450,6 @@
 </table>
 </div>
 
-<h2>Produção por Profissional</h2>
-<div class="gov-table-wrapper">
-<table class="gov-table striped">
-    <thead>
-        <tr>
-            <th class="sortable" data-type="string" title="Clique para ordenar">Nome</th>
-            <th class="sortable" data-type="string" title="Clique para ordenar">Cargo</th>
-            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. PAIF</th>
-            <th class="sortable" data-type="number" title="Clique para ordenar">Atend. SCFV</th>
-            <th class="sortable" data-type="number" title="Clique para ordenar">Benefícios Dispensados</th>
-        </tr>
-    </thead>
-    <tbody>
-        
-        <tr>
-            <td>
-                
-                    Alexandre Pierri Kuster
-                
-            </td>
-            <td>Psicólogo</td>
-            <td>66</td>
-            <td>0</td>
-            <td>12</td>
-        </tr>
-        
-        <tr>
-            <td>
-                
-                    Ana Patricia de Oliveira Silva
-                
-            </td>
-            <td>Educador Social</td>
-            <td>998</td>
-            <td>324</td>
-            <td>54</td>
-        </tr>
-        
-        <tr>
-            <td>
-                
-                    Anelise Soares de Menezes
-                
-            </td>
-            <td>Assistente Social (C)</td>
-            <td>459</td>
-            <td>48</td>
-            <td>30</td>
-        </tr>
-        
-        <tr>
-            <td>
-                
-                    Fernanda Carolina Baptista Ferreira
-                
-            </td>
-            <td>Assistente Social</td>
-            <td>221</td>
-            <td>34</td>
-            <td>45</td>
-        </tr>
-        
-        <tr>
-            <td>
-                
-                    Lea Maria Ferreira
-                
-            </td>
-            <td>Psicólogo</td>
-            <td>275</td>
-            <td>6</td>
-            <td>82</td>
-        </tr>
-        
-        <tr>
-            <td>
-                
-                    Michael de Oliveira Santos
-                
-            </td>
-            <td>Assistente Social</td>
-            <td>344</td>
-            <td>0</td>
-            <td>51</td>
-        </tr>
-        
-        <tr>
-            <td>
-                
-                    Regiane Carolina de Oliveira
-                
-            </td>
-            <td>Educador Social</td>
-            <td>1411</td>
-            <td>72</td>
-            <td>95</td>
-        </tr>
-        
-        <tr>
-            <td>
-                
-                    Thais Paim Marinho
-                
-            </td>
-            <td>Psicólogo</td>
-            <td>91</td>
-            <td>0</td>
-            <td>25</td>
-        </tr>
-        
-        <tr class="linha-fora-da-unidade" title="Não faz parte da equipe desta unidade — atendimento registrado aqui, mas lotado em outro CRAS">
-            <td>
-                
-                    Lillian Simoes dos Santos Brito
-                
-            </td>
-            <td>Assistente Social</td>
-            <td>292</td>
-            <td>235</td>
-            <td>65</td>
-        </tr>
-        
-        <tr>
-            <td>
-                
-                    <strong title="Atendimentos onde não foi possível identificar o profissional no sistema." style="cursor: help;">Não identificado</strong>
-                
-            </td>
-            <td>-</td>
-            <td>1941</td>
-            <td>411</td>
-            <td>55</td>
-        </tr>
-        
-    </tbody>
-</table>
-</div>
 
 <h2>Contexto da Unidade</h2>
 <div class="narrativa">
@@ -1371,6 +1254,31 @@ if (thCargo) {
             });
         }
     });
+    </script>
+    <!-- Troca de tema herdada do HUB: postMessage (iframe) e storage (abas irmas). -->
+    <script>
+        (function () {
+            var raiz = document.documentElement;
+            function aplicar(tema, animar) {
+                if (tema !== 'dark' && tema !== 'light') return;
+                if (raiz.getAttribute('data-theme') === tema) return;
+                if (animar) {
+                    raiz.classList.add('theme-switching');
+                    requestAnimationFrame(function () {
+                        requestAnimationFrame(function () { raiz.classList.remove('theme-switching'); });
+                    });
+                }
+                raiz.setAttribute('data-theme', tema);
+                try { localStorage.setItem('hub_tema', tema); } catch (e) {}
+            }
+            window.addEventListener('message', function (ev) {
+                var d = ev.data;
+                if (d && d.tipo === 'hub:tema' && (d.tema === 'dark' || d.tema === 'light')) aplicar(d.tema, true);
+            });
+            window.addEventListener('storage', function (ev) {
+                if (ev.key === 'hub_tema' && (ev.newValue === 'dark' || ev.newValue === 'light')) aplicar(ev.newValue, false);
+            });
+        })();
     </script>
 </body>
 </html>
