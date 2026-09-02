@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boletim Cadastro Único — Agosto de 2026 — Araucária</title>
+    <!-- Tema resolvido antes da 1a pintura (sem flash), herdado do HUB. Ordem:
+         HTML pai (iframe de mesma origem) > localStorage 'hub_tema' > SO. Quando
+         o boletim roda em <iframe> de outra origem, o Hub empurra o tema por
+         postMessage no load (ver script no fim do <body>). Mesmo contrato do
+         boletim PSB — os dois consomem o mesmo HUB. -->
+    <script>
+        (function () {
+            var t = null;
+            try {
+                if (window.parent && window.parent !== window) {
+                    var pt = window.parent.document.documentElement.getAttribute('data-theme');
+                    if (pt === 'dark' || pt === 'light') t = pt;
+                }
+            } catch (e) { /* origem cruzada: sem acesso ao pai */ }
+            try {
+                if (!t) { var s = localStorage.getItem('hub_tema'); if (s === 'dark' || s === 'light') t = s; }
+            } catch (e) {}
+            if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <style>/* ============================================================================
+   Boletim PSB — Vigilância Socioassistencial (Araucária/PR)
+   Design System "Editorial Acolhedor" — implementação fiel a
+   kiwi/design/assets/design_system_preview.html (fonte da verdade).
+   Tokens PRIMITIVOS -> SEMÂNTICOS. Relatório desktop-first, tema claro.
+   ============================================================================ */
+
+/* ---- 1. PRIMITIVOS (valores crus, agnósticos de tema) --------------------- */
+:root {
+    /* Verde Araucária (marca) */
+    --green-95:#031b0f; --green-90:#00281a; --green-80:#00492c; --green-70:#005a37;
+    --green-60:#007044; --green-50:#0a8a56; --green-40:#3aa877; --green-30:#7ed9a3;
+    --green-20:#adf2c8; --green-10:#d6f7e3; --green-05:#eaf8f0;
+
+    /* Azul-marinho institucional — reservado ao logotipo, nunca acento */
+    --navy:#103858; --navy-deep:#0c2a43;
+
+    /* Neutros quentes — base do tema claro (neve, sem tom verde) */
+    --n-99:#fafaf9; --n-97:#f5f5f3; --n-94:#ededea; --n-88:#e2e2dd;
+    --n-78:#c9c9c2; --n-55:#6b6b66; --n-38:#3a3a38; --n-16:#1a1a17;
+
+    /* Semânticas cruas (gov.br) */
+    --gold:#c2850c; --gold-light:#e0a63b;
+
+    /* Tipografia */
+    --font-serif:'Spectral', Georgia, 'Times New Roman', serif;
+    --font-sans:'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* Escala tipográfica (ritmo editorial) */
+    --fs-eyebrow:11px; --fs-label:12px; --fs-caption:13px; --fs-body:15px;
+    --fs-body-lg:17px; --fs-h4:20px; --fs-h3:24px; --fs-h2:30px; --fs-h1:40px;
+
+    /* Espaçamento base 4px */
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
+    --sp-8:32px; --sp-10:40px; --sp-12:48px; --sp-16:64px; --sp-20:80px;
+
+    /* Raio (acolhedor: suave, nunca 0) */
+    --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-pill:999px;
+    --hair:1px;
+
+    /* Movimento */
+    --dur-instant:.1s; --dur-fast:.2s; --dur-surface:.32s;
+    --ease-out:cubic-bezier(.22,.61,.36,1);
+    --ease-standard:cubic-bezier(.25,.1,.25,1);
+    --ease-emphasis:cubic-bezier(.2,0,0,1);
+
+    --content-max:1600px; --focus-w:3px;
+
+    /* ---- 2. SEMÂNTICOS — TEMA CLARO --------------------------------------- */
+    --paper:var(--n-99);
+    --surface:#ffffff;
+    --surface-2:var(--n-97);
+    --surface-3:var(--n-94);
+    --surface-float:#ffffff;
+
+    --ink:var(--n-16);
+    --ink-2:var(--n-38);
+    --ink-3:var(--n-55);
+    --ink-inverse:#ffffff;
+
+    --hairline:var(--n-88);
+    --hairline-strong:var(--n-78);
+    --rule:var(--n-16);
+
+    --primary:var(--green-60);
+    --primary-strong:var(--green-80);
+    --primary-soft:#eaf5ef;
+    --primary-soft-border:#b7e4cb;
+    --on-primary:#ffffff;
+
+    --brand-ink:var(--navy);
+    --focus:var(--gold);
+
+    --success:#127a1e; --success-bg:#e6f4e6;
+    --warning:#8a5a00; --warning-bg:#fbf0cc;
+    --danger:#c42b1c;  --danger-bg:#fbe4e0;
+    --info:#155bcb;    --info-bg:#eaf1fd;
+
+    --shadow-float:0 4px 16px -4px rgba(20,20,18,.16), 0 1px 3px rgba(20,20,18,.08);
+    --scrim:rgba(20,20,18,.44);
+
+    color-scheme:light;
+}
+
+/* ---- 2b. SEMÂNTICOS — TEMA ESCURO (grafite neutro, herdado do HUB) -------
+   O relatório não tem seletor próprio: o tema é resolvido no <head> a partir
+   do HUB (iframe pai / localStorage 'hub_tema' / preferência do SO). Grafite
+   neutro, sem tingimento azul/verde; verde continua sendo a única marca. */
+[data-theme="dark"] {
+    --paper:var(--g-08);
+    --surface:var(--g-12);
+    --surface-2:var(--g-16);
+    --surface-3:var(--g-22);
+    --surface-float:var(--g-16);
+
+    --ink:var(--g-ink);
+    --ink-2:var(--g-ink2);
+    --ink-3:var(--g-ink3);
+    --ink-inverse:var(--g-08);
+
+    --hairline:rgba(255,255,255,.11);
+    --hairline-strong:rgba(255,255,255,.22);
+    --rule:var(--g-ink);
+
+    --primary:#54cf93;
+    --primary-strong:#7edca9;
+    --primary-soft:rgba(84,207,147,.12);
+    --primary-soft-border:rgba(84,207,147,.30);
+    --on-primary:#052b18;
+
+    --brand-ink:var(--g-ink);
+    --focus:var(--gold-light);
+
+    --success:#5fd07a; --success-bg:rgba(95,208,122,.13);
+    --warning:#f0c24a; --warning-bg:rgba(240,194,74,.13);
+    --danger:#ff9b8e;  --danger-bg:rgba(255,155,142,.13);
+    --info:#8fb6ff;    --info-bg:rgba(143,182,255,.13);
+
+    --shadow-float:0 8px 28px -6px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.5);
+    --scrim:rgba(0,0,0,.68);
+
+    color-scheme:dark;
+}
+
+/* Grafite neutro do tema escuro — precisa existir como primitivo. */
+:root {
+    --g-08:#0e0e0e; --g-12:#171717; --g-16:#1f1f1f; --g-22:#282828;
+    --g-ink:#ededec; --g-ink2:#b4b4b0; --g-ink3:#8a8a85;
+
+    /* ---- 3. ALIASES LEGADOS (consumidos em style="" inline dos templates) - */
+    --brand-primary:var(--primary);
+    --brand-secondary:var(--primary);
+    --brand-accent:var(--gold);
+    --feedback-success:var(--success); --feedback-success-bg:var(--success-bg);
+    --feedback-warning:var(--warning); --feedback-warning-bg:var(--warning-bg);
+    --feedback-danger:var(--danger);   --feedback-danger-bg:var(--danger-bg);
+    --feedback-info:var(--info);       --feedback-info-bg:var(--info-bg);
+    --gray-90:var(--ink);   --gray-80:var(--ink-2); --gray-70:var(--ink-2);
+    --gray-60:var(--ink-3); --gray-50:var(--ink-3); --gray-40:var(--ink-3);
+    --gray-30:var(--hairline-strong); --gray-20:var(--hairline-strong);
+    --gray-10:var(--hairline); --gray-5:var(--surface-2); --pure-0:var(--surface);
+    --spacing-scale-half:var(--sp-1); --spacing-scale-base:var(--sp-2);
+    --spacing-scale-baseh:var(--sp-3); --spacing-scale-2x:var(--sp-4);
+    --spacing-scale-2xh:var(--sp-5); --spacing-scale-3x:var(--sp-6);
+    --spacing-scale-4x:var(--sp-8); --spacing-scale-5x:var(--sp-10);
+    --spacing-scale-6x:var(--sp-12);
+    --surface-rounder-sm:var(--radius-sm); --surface-rounder-md:var(--radius-md);
+    --surface-rounder-lg:var(--radius-lg); --surface-rounder-pill:var(--radius-pill);
+    --font-family-base:var(--font-sans);
+    --font-size-scale-base:var(--fs-caption);
+    --largura-relatorio:var(--content-max);
+}
+
+/* ---- 4. RESET / BASE (espelha o design_system_preview.html) -------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background var(--dur-surface) var(--ease-standard), color var(--dur-surface) var(--ease-standard);
+}
+/* A troca de tema (herdada do HUB) não anima bordas/hover do resto da tela. */
+.theme-switching, .theme-switching * { transition: none !important; }
+h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin: 0;
+    overflow-wrap: break-word;
+}
+p { margin: 0; }
+a { color: var(--primary); text-decoration: none; }
+@media (hover: hover) { a:hover { text-decoration: underline; } }
+
+:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+::selection { background: var(--primary-soft-border); color: var(--ink); }
+
+* { scrollbar-width: thin; scrollbar-color: var(--hairline-strong) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--hairline-strong); border-radius: 99px; border: 3px solid var(--paper); }
+
+.container {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: var(--sp-10) var(--sp-8);
+}
+
+/* ---- 5. HEADER INSTITUCIONAL (breadcrumb) + RODAPÉ ----------------------- */
+/* .premium-header está no <style> inline de _base.html.j2. */
+.breadcrumb {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-3);
+    display: flex; align-items: center; gap: var(--sp-2);
+    margin: 0;
+}
+.breadcrumb a { color: var(--ink-3); text-decoration: none; }
+@media (hover: hover) { .breadcrumb a:hover { color: var(--primary); text-decoration: none; } }
+.breadcrumb-sep { color: var(--ink-3); opacity: .55; }
+.breadcrumb-atual { color: var(--ink); font-weight: 600; }
+
+.gov-footer {
+    background-color: var(--surface);
+    color: var(--ink-3);
+    border-top: 1.5px solid var(--rule);
+    margin-top: var(--sp-20);
+}
+.gov-footer-inner {
+    max-width: var(--content-max); margin: 0 auto;
+    padding: var(--sp-8);
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: var(--sp-8);
+}
+.gov-footer-brand {
+    display: flex; align-items: center; gap: var(--sp-3);
+    font-family: var(--font-serif); font-weight: 600; font-size: var(--fs-body-lg);
+    color: var(--brand-ink);
+}
+.gov-footer-logo { height: 46px; width: auto; }
+.gov-footer-info { text-align: right; font-family: var(--font-mono); font-size: var(--fs-label); line-height: 1.7; }
+.gov-footer-info p { margin: var(--sp-1) 0; }
+.gov-footer-info p:first-child { color: var(--ink-2); }
+@media (max-width: 840px) {
+    .gov-footer-inner { flex-direction: column; align-items: flex-start; }
+    .gov-footer-info { text-align: left; }
+}
+
+/* ---- 6. CABEÇALHO EDITORIAL DE SEÇÃO ------------------------------------
+   Régua hairline de fechamento + título serifado. O design system usa eyebrow
+   com significado (não numeração sequencial), e o <h2> do template carrega só
+   o título — então a composição é régua + Spectral, sem kicker fabricado. */
+h1 { font-size: var(--fs-h1); margin: 0 0 var(--sp-4) 0; }
+h2 {
+    font-size: var(--fs-h2);
+    margin: var(--sp-16) 0 var(--sp-6) 0;
+    padding-top: var(--sp-5);
+    border-top: 1.5px solid var(--rule);
+    position: relative;
+    scroll-margin-top: 88px;
+    line-height: 1.15;
+}
+h3 { font-size: var(--fs-h4); margin: 0 0 var(--sp-3) 0; }
+
+/* Marca d'água discreta por seção — flutua ao fundo sem empurrar texto. */
+h2::after {
+    content: ''; position: absolute; width: 56px; height: 56px; right: 0; top: var(--sp-4);
+    background-repeat: no-repeat; background-position: center; background-size: contain;
+    opacity: 0.10; pointer-events: none; z-index: -1;
+}
+h2:nth-of-type(6n+1)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-01.png'); }
+h2:nth-of-type(6n+2)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-02.png'); }
+h2:nth-of-type(6n+3)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-03.png'); }
+h2:nth-of-type(6n+4)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-04.png'); }
+h2:nth-of-type(6n+5)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-05.png'); }
+h2:nth-of-type(6n+0)::after { background-image: url('https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-06.png'); }
+
+.page-header { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); }
+.page-header-ilustracao { flex-shrink: 0; width: 96px; height: 96px; }
+.page-header-ilustracao img { width: 100%; height: 100%; object-fit: contain; opacity: 0.9; }
+.periodo { color: var(--ink-3); margin: 0 0 var(--sp-8) 0; }
+@media print { .page-header-ilustracao, h2::after { display: none; } }
+
+/* ---- 7. KPI (padrão .kpi-card: hairline plano, valor mono tabular) ------- */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(164px, 1fr));
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-4);
+}
+.kpi-tile {
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color var(--dur-fast) var(--ease-standard);
+}
+@media (hover: hover) { .kpi-tile:hover { border-color: var(--hairline-strong); } }
+.kpi-tile .valor {
+    font-family: var(--font-mono);
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    order: 1;
+}
+.kpi-tile .rotulo {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    line-height: 1.4;
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-3);
+    order: 0;
+}
+.kpi-tile .rotulo::before {
+    content: '';
+    flex: 0 0 7px; width: 7px; height: 7px;
+    border-radius: 2px; background: var(--primary);
+    transform: translateY(-1px);
+}
+/* KPI-herói: número de abertura, maior e em verde. */
+.kpi-tile.destaque .valor { font-size: 46px; color: var(--primary); letter-spacing: -.02em; }
+@media (max-width: 576px) { .kpi-tile.destaque .valor { font-size: 36px; } }
+
+/* Variação vs. média — badge mono neutro (a cor não julga; a seta indica). */
+.badge-variacao {
+    display: inline-flex; align-items: center; gap: var(--sp-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-eyebrow); font-weight: 600; letter-spacing: .02em;
+    padding: 3px 9px; border-radius: var(--radius-sm);
+    width: fit-content; order: 2; margin-top: var(--sp-3);
+    color: var(--info);
+    background: var(--info-bg);
+    border: var(--hair) solid color-mix(in srgb, var(--info) 40%, transparent);
+}
+
+/* ---- 8. SUPERFÍCIES — CARDS PLANOS, HAIRLINE, SEM SOMBRA ----------------- */
+.gov-card {
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) { .gov-card:hover { border-color: var(--hairline-strong); transform: translateY(-2px); } }
+.gov-card-header { padding: var(--sp-4) var(--sp-5) var(--sp-2); }
+.gov-card-header .title { margin: 0; font-family: var(--font-serif); font-size: var(--fs-h4); font-weight: 600; color: var(--ink); }
+.gov-card-content { padding: 0 var(--sp-5) var(--sp-4); color: var(--ink-2); flex-grow: 1; }
+.gov-card-content p { margin: var(--sp-2) 0; font-size: var(--fs-caption); line-height: 1.5; display: flex; align-items: center; }
+.gov-card-content p::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--primary); margin-right: var(--sp-3); flex-shrink: 0; }
+.gov-card-footer { padding: var(--sp-3) var(--sp-5); border-top: var(--hair) solid var(--hairline); background: var(--surface-2); }
+.gov-card-footer a {
+    color: var(--primary); font-size: var(--fs-caption); font-weight: 600; text-decoration: none;
+    display: inline-flex; align-items: center; gap: var(--sp-1);
+    transition: gap var(--dur-fast) var(--ease-out), color var(--dur-fast);
+}
+.gov-card-footer a::after { content: ''; position: absolute; inset: 0; z-index: 0; }
+@media (hover: hover) { .gov-card:hover .gov-card-footer a { color: var(--primary-strong); gap: var(--sp-3); } }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-8); }
+
+.chart-card {
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: var(--sp-6);
+    margin-bottom: var(--sp-6);
+}
+.chart-card h3 { margin-bottom: var(--sp-4); }
+.chart-card .chart-area { position: relative; height: 320px; }
+.chart-card .chart-footer {
+    margin-top: var(--sp-4); padding-top: var(--sp-3);
+    border-top: var(--hair) solid var(--hairline);
+    font-family: var(--font-mono); font-size: var(--fs-label); color: var(--ink-3);
+}
+.chart-card .chart-footer strong { color: var(--ink-2); font-weight: 600; }
+
+/* Acento de categoria — cor com propósito (topo do card). */
+.chart-card.categoria-paif { border-top: 2px solid var(--primary); }
+.chart-card.categoria-scfv { border-top: 2px solid var(--primary-strong); }
+.chart-card.categoria-beneficios { border-top: 2px solid var(--gold); }
+.chart-card.categoria-pessoal { border-top: 2px solid var(--ink-3); }
+.chart-card.categoria-demografia { border-top: 2px solid var(--info); }
+.chart-card.categoria-motivos { border-top: 2px solid var(--success); }
+
+.chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); margin-bottom: var(--sp-6); }
+.chart-grid-2 .chart-card { margin-bottom: 0; }
+@media (max-width: 900px) { .chart-grid-2 { grid-template-columns: 1fr; } }
+
+/* ---- 9. TABELA TÉCNICA (padrão .dtable: sem zebra, divisor hairline) ----- */
+.gov-table-wrapper {
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    background: var(--surface);
+    margin-bottom: var(--sp-8);
+}
+table.gov-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 0; min-width: 520px; }
+table.gov-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3);
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: 1.5px solid var(--rule);
+    white-space: nowrap; background: var(--surface); user-select: none;
+}
+table.gov-table td {
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: var(--hair) solid var(--hairline);
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+    transition: background var(--dur-instant);
+}
+table.gov-table tbody tr:last-child td { border-bottom: 0; }
+table.gov-table td a, table.gov-table td a:visited { color: var(--ink); text-decoration: none; font-weight: 600; border-bottom: 1px dashed transparent; transition: color var(--dur-fast), border-color var(--dur-fast); }
+@media (hover: hover) {
+    table.gov-table td a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+    table.gov-table tbody tr:hover td { background: var(--surface-2); }
+}
+table.gov-table.striped tbody tr:nth-child(even) { background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
+
+table.gov-table th.sortable { cursor: pointer; padding-right: 26px; }
+@media (hover: hover) { table.gov-table th.sortable:hover { color: var(--ink); } }
+table.gov-table th.sortable::after { content: '↕'; position: absolute; right: var(--sp-2); font-size: 12px; color: var(--ink-3); opacity: 0; transition: opacity var(--dur-fast); }
+table.gov-table th { position: relative; }
+@media (hover: hover) { table.gov-table th.sortable:hover::after { opacity: .5; } }
+table.gov-table th.sort-asc::after { content: '↑'; opacity: 1 !important; color: var(--primary); }
+table.gov-table th.sort-desc::after { content: '↓'; opacity: 1 !important; color: var(--primary); }
+tr.linha-fora-da-unidade td:first-child { font-weight: 600; color: var(--ink); }
+
+.gov-table-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 600; margin-left: var(--sp-2); }
+.gov-table-badge.danger { background: var(--danger-bg); color: var(--danger); }
+.gov-table-badge.warning { background: var(--warning-bg); color: var(--warning); }
+
+/* ---- 10. FEEDBACK (padrão .msg: ícone + texto, nunca só cor) ------------- */
+.alerta-box {
+    display: flex; gap: var(--sp-3); align-items: flex-start;
+    background: var(--warning-bg);
+    border: var(--hair) solid color-mix(in srgb, var(--warning) 35%, transparent);
+    border-radius: var(--radius-md);
+    padding: var(--sp-4);
+    margin-bottom: var(--sp-4);
+    color: var(--ink-2);
+}
+.alerta-box > i { font-size: 20px; color: var(--warning); flex: 0 0 20px; margin-top: 1px; }
+.alerta-box p { margin: 0; font-size: 14px; line-height: 1.5; }
+.alerta-box strong { color: var(--ink); font-weight: 600; }
+.alerta-box ul { margin: var(--sp-2) 0 0 0; padding-left: var(--sp-6); }
+
+.empty-state {
+    text-align: center;
+    padding: var(--sp-10) var(--sp-5);
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--sp-8);
+}
+.empty-state img { width: 120px; height: auto; margin-bottom: var(--sp-4); opacity: 0.9; }
+.empty-state p { color: var(--ink-3); font-size: 14px; max-width: 42ch; margin: 0 auto; }
+
+/* ---- 11. NARRATIVA (leitura corrida — serifada, editorial) --------------- */
+.narrativa {
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: var(--sp-6);
+    margin-bottom: var(--sp-8);
+}
+.narrativa-secao { margin-bottom: var(--sp-5); }
+.narrativa-secao:last-child { margin-bottom: 0; }
+.narrativa-secao h4 { font-family: var(--font-serif); font-size: var(--fs-body-lg); font-weight: 600; color: var(--primary-strong); margin: 0 0 var(--sp-2) 0; }
+.narrativa-secao p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+[data-theme="dark"] .narrativa-secao h4 { color: var(--primary); }
+
+/* Contexto da Unidade em duas colunas: aproveita a largura do desktop e evita
+   a coluna estreita de texto flutuando com o lado direito vazio. A síntese
+   ("Leitura da Vigilância") ocupa a largura inteira, fechando a leitura. */
+.narrativa-contexto {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-6) var(--sp-8);
+    align-items: start;
+}
+@media (max-width: 900px) { .narrativa-contexto { grid-template-columns: 1fr; } }
+.narrativa-contexto .narrativa-secao { margin-bottom: 0; }
+.narrativa-secao-total {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--sp-5);
+    margin-top: var(--sp-1);
+}
+
+/* Marco conceitual (lastro no kiwi): abre a seção como um lead editorial
+   serifado, distinto do dado quantitativo que vem em seguida. */
+.contexto-marco {
+    display: block;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--fs-body-lg);
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: var(--sp-3);
+}
+
+/* ---- 12. FILTRO / DROPDOWN CUSTOM (padrão .cselect) --------------------- */
+.chart-filter { display: flex; flex-direction: column; gap: var(--sp-2); max-width: 320px; margin-bottom: var(--sp-4); }
+.chart-filter label { font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+
+.dropdown-demo-container { position: relative; width: 100%; }
+.dropdown-trigger {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+    font-family: var(--font-sans); font-size: 16px; color: var(--ink);
+    background: var(--surface);
+    border: var(--hair) solid var(--hairline-strong);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px; height: 42px; cursor: pointer; user-select: none;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+@media (hover: hover) { .dropdown-trigger:hover { border-color: var(--ink-3); } }
+.dropdown-trigger.active, .dropdown-trigger:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); outline: none; }
+.dropdown-trigger i { color: var(--ink-3); font-size: 18px; flex-shrink: 0; margin-left: var(--sp-2); transition: transform var(--dur-fast) var(--ease-out), color var(--dur-fast); }
+.dropdown-trigger.active i { transform: rotate(180deg); color: var(--primary); }
+.dropdown-trigger .placeholder { color: var(--ink-3); }
+.dropdown-surface {
+    text-align: left; position: absolute; top: calc(100% + 6px); left: 0;
+    min-width: 100%; width: max-content; max-height: 260px; overflow-y: auto;
+    background: var(--surface-float);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-float);
+    padding: 6px;
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity var(--dur-fast), transform var(--dur-fast) var(--ease-out), visibility var(--dur-fast);
+    z-index: 2100;
+}
+.dropdown-trigger.active + .dropdown-surface { opacity: 1; visibility: visible; transform: none; }
+.dropdown-item { padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; color: var(--ink-2); font-size: 14px; white-space: nowrap; transition: background var(--dur-instant), color var(--dur-instant); }
+.dropdown-item:hover, .dropdown-item.active { background: var(--surface-2); color: var(--ink); }
+.dropdown-item.active { color: var(--primary); font-weight: 600; }
+.chart-filter:has(.dropdown-trigger.active) { position: relative; z-index: 2100; }
+.dropdown-demo-container.dropdown-compacto { width: auto; min-width: 180px; }
+.dropdown-compacto .dropdown-trigger { height: 36px; }
+.dropdown-compacto .dropdown-item { font-size: var(--fs-caption); }
+
+/* ---- 13. LAYOUT: SUMÁRIO FIXO + CONTEÚDO -------------------------------- */
+.relatorio-layout { display: grid; grid-template-columns: 1fr; gap: var(--sp-8); align-items: start; }
+@media (min-width: 1024px) { .relatorio-layout { grid-template-columns: 220px minmax(0, 1fr); } }
+.relatorio-toc { display: none; }
+@media (min-width: 1024px) {
+    .relatorio-toc {
+        display: block; position: sticky; top: var(--sp-6);
+        max-height: calc(100vh - var(--sp-8)); overflow-y: auto;
+        padding-right: var(--sp-4);
+        border-right: var(--hair) solid var(--hairline);
+    }
+}
+.relatorio-toc-titulo {
+    display: block; font-family: var(--font-mono);
+    font-size: 10px; text-transform: uppercase; letter-spacing: .16em; font-weight: 600;
+    color: var(--ink-3); margin-bottom: var(--sp-4);
+}
+.relatorio-toc-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.relatorio-toc-lista a {
+    display: block;
+    padding: 7px var(--sp-3);
+    border-left: 2px solid transparent;
+    color: var(--ink-2); text-decoration: none;
+    font-size: var(--fs-caption); line-height: 1.3;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    transition: background var(--dur-instant), color var(--dur-instant), border-color var(--dur-instant);
+}
+@media (hover: hover) { .relatorio-toc-lista a:hover { color: var(--ink); background: var(--surface-2); text-decoration: none; } }
+.relatorio-toc-lista a.ativo { color: var(--primary-strong); border-left-color: var(--primary); background: var(--primary-soft); font-weight: 600; }
+[data-theme="dark"] .relatorio-toc-lista a.ativo { color: var(--primary); }
+@media print { .relatorio-toc { display: none !important; } .relatorio-layout { display: block; } }
+
+/* ---- 14. REVELAÇÃO SUAVE AO ROLAR --------------------------------------- */
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity .5s var(--ease-out), transform .5s var(--ease-out); }
+.reveal.reveal-visivel { opacity: 1; transform: none; }
+@media print { .reveal { opacity: 1 !important; transform: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { transition: none; opacity: 1; transform: none; }
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* ---- 15. COMPARAÇÃO ENTRE UNIDADES -------------------------------------- */
+.comparacao-unidades { background: var(--surface); border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-6); margin-bottom: var(--sp-8); }
+.comparacao-selecao { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sp-6); margin-bottom: var(--sp-6); }
+.comparacao-selecao .chart-filter { margin-bottom: 0; max-width: 260px; }
+.comparacao-vs { font-family: var(--font-mono); font-weight: 600; color: var(--ink-3); font-size: var(--fs-label); text-transform: uppercase; letter-spacing: .06em; padding-bottom: var(--sp-2); }
+.comparacao-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+.comparacao-kpi { border: var(--hair) solid var(--hairline); border-radius: var(--radius-md); padding: var(--sp-4); background: var(--surface-2); }
+.comparacao-kpi .rotulo { display: block; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3); font-weight: 600; margin-bottom: var(--sp-3); }
+.comparacao-kpi .valores { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); }
+.comparacao-kpi .valor-a, .comparacao-kpi .valor-b { font-family: var(--font-mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.comparacao-kpi .valor-a { color: var(--primary); }
+.comparacao-kpi .valor-b { color: var(--gold); }
+.comparacao-kpi .diferenca { font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 500; color: var(--ink-3); margin-top: var(--sp-2); }
+.comparacao-chart-area { position: relative; height: 280px; }
+
+/* ---- 16. CAPA (abertura) ------------------------------------------------- */
+.capa-relatorio {
+    background: linear-gradient(180deg, var(--primary-soft) 0%, rgba(255,255,255,0) 100%);
+    border: var(--hair) solid var(--hairline);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-8) var(--sp-8) var(--sp-6);
+    margin-bottom: var(--sp-10);
+}
+@media (max-width: 576px) { .capa-relatorio { padding: var(--sp-6) var(--sp-4); } }
+/* Faixa-resumo municipal: 6 KPIs em linha única (encaixados), sem tile órfão. */
+.capa-relatorio .kpi-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width: 1200px) { .capa-relatorio .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px)  { .capa-relatorio .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---- 17. SELO DA EDIÇÃO MENSAL -----------------------------------------
+   Única diferença visível entre Mensal e Semestral: o design system proíbe
+   uma segunda cor de marca, então a edição se distingue pelo selo verde. */
+.badge-edicao-mensal {
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    margin-top: var(--sp-3); width: fit-content;
+    padding: 3px 10px; border-radius: var(--radius-pill);
+    background: var(--primary-soft); color: var(--primary-strong);
+    border: var(--hair) solid var(--primary-soft-border);
+    font-family: var(--font-mono); font-size: var(--fs-eyebrow); font-weight: 600;
+    text-transform: uppercase; letter-spacing: .1em;
+}
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script>Chart.register(ChartDataLabels);</script>
+    <script>
+    /* ==================================================================
+       Tema dos gráficos herdado do HUB (Design System v2.0).
+       Os gráficos das páginas usam cores fixas de tema claro; este módulo
+       (a) fixa os defaults do Chart.js a partir dos tokens do DS e
+       (b) retematiza cada gráfico no load e a cada troca de tema, sem
+       precisar tocar em cada configuração de gráfico. Espelha o boletim PSB.
+       ================================================================== */
+    (function () {
+        const raiz = document.documentElement;
+        const tok = (n) => getComputedStyle(raiz).getPropertyValue(n).trim();
+
+        // Pares de cor claro <-> escuro (por tripla RGB, ignorando alpha).
+        // Cobre exatamente as cores fixadas nos gráficos das páginas.
+        const PARES = [
+            [[0, 112, 68], [84, 207, 147]],      // verde marca
+            [[21, 91, 203], [143, 182, 255]],    // info
+            [[19, 81, 180], [143, 182, 255]],    // azul comparação B
+            [[253, 185, 46], [224, 166, 59]],    // dourado vivo
+            [[194, 133, 12], [224, 166, 59]],    // dourado DS
+            [[22, 136, 33], [95, 208, 122]],     // sucesso (motivos)
+            [[229, 34, 7], [255, 155, 142]],     // vermelho (vulnerabilidade)
+            [[200, 33, 10], [255, 155, 142]],    // vermelho DS (--danger claro)
+            [[107, 107, 102], [138, 138, 133]],  // cinza (linha de média)
+            [[136, 136, 136], [138, 138, 133]],  // cinza #888
+            [[99, 99, 99], [138, 138, 133]],     // cinza #636
+            [[85, 85, 85], [138, 138, 133]],     // #555 (rótulos)
+            [[255, 255, 255], [31, 31, 31]]      // branco (pílula/anel) -> superfície
+        ];
+
+        function _parse(cor) {
+            if (typeof cor !== "string") return null;
+            let m = cor.match(/^#([0-9a-f]{6})([0-9a-f]{2})?$/i);
+            if (m) {
+                const h = m[1];
+                return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16),
+                         a: m[2] != null ? parseInt(m[2], 16) / 255 : null, hex: true };
+            }
+            m = cor.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/i);
+            if (m) return { r: +m[1], g: +m[2], b: +m[3], a: m[4] != null ? +m[4] : null, hex: false };
+            return null;
+        }
+
+        function _corAlvo(r, g, b, escuro) {
+            for (const [claro, esc] of PARES) {
+                if ((r === claro[0] && g === claro[1] && b === claro[2]) ||
+                    (r === esc[0] && g === esc[1] && b === esc[2])) {
+                    return escuro ? esc : claro;
+                }
+            }
+            return null;
+        }
+
+        function _remap(valor, escuro) {
+            if (Array.isArray(valor)) return valor.map((v) => _remap(v, escuro));
+            const c = _parse(valor);
+            if (!c) return valor;
+            const alvo = _corAlvo(c.r, c.g, c.b, escuro);
+            if (!alvo) return valor;
+            if (c.a != null) return "rgba(" + alvo[0] + ", " + alvo[1] + ", " + alvo[2] + ", " + c.a + ")";
+            return "rgb(" + alvo[0] + ", " + alvo[1] + ", " + alvo[2] + ")";
+        }
+
+        const PROPS = ["backgroundColor", "borderColor", "hoverBackgroundColor", "pointBackgroundColor", "pointBorderColor"];
+
+        function configurarDefaults() {
+            Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+            Chart.defaults.font.size = 11;
+            Chart.defaults.color = tok("--ink-2");
+        }
+
+        function _corChip(escuro) { return escuro ? "rgba(23,23,23,0.82)" : "rgba(255,255,255,0.82)"; }
+        function _ajustarDatalabels(dl, corLabel, corChip) {
+            if (!dl) return;
+            dl.color = corLabel;
+            if (dl.backgroundColor != null) dl.backgroundColor = corChip;
+        }
+
+        function retematizar() {
+            const escuro = raiz.getAttribute("data-theme") === "dark";
+            const corGrade = tok("--hairline");
+            const corRotulo = tok("--ink-3");
+            const corTexto = tok("--ink-2");
+            const corSuperficie = tok("--surface");
+            const corInk = tok("--ink");
+            const corPaper = tok("--paper");
+            const corHairFor = tok("--hairline-strong");
+            const corChip = _corChip(escuro);
+            Chart.defaults.color = corTexto;
+
+            for (const grafico of Object.values(Chart.instances)) {
+                const o = grafico.options;
+                if (o.scales) {
+                    for (const eixo of Object.values(o.scales)) {
+                        if (eixo.grid) eixo.grid.color = corGrade;
+                        eixo.ticks = Object.assign(eixo.ticks || {}, { color: corRotulo });
+                        if (eixo.border) eixo.border.color = corGrade;
+                    }
+                }
+                const tt = o.plugins && o.plugins.tooltip;
+                if (tt) Object.assign(tt, { backgroundColor: corInk, titleColor: corPaper, bodyColor: corPaper, borderColor: corHairFor });
+                if (o.plugins && o.plugins.datalabels) _ajustarDatalabels(o.plugins.datalabels, corInk, corChip);
+
+                const ehDoughnut = grafico.config.type === "doughnut";
+                for (const d of grafico.data.datasets) {
+                    for (const p of PROPS) if (d[p] != null) d[p] = _remap(d[p], escuro);
+                    if (ehDoughnut) d.borderColor = corSuperficie;
+                    _ajustarDatalabels(d.datalabels, corInk, corChip);
+                }
+                grafico.update("none");
+            }
+        }
+
+        configurarDefaults();
+        window.retematizarGraficos = retematizar;
+        window.addEventListener("load", retematizar);
+
+        // Troca de tema herdada do HUB: postMessage (iframe) e storage (abas irmãs).
+        function aplicar(tema, animar) {
+            if (raiz.getAttribute("data-theme") === tema) return;
+            if (animar) {
+                raiz.classList.add("theme-switching");
+                requestAnimationFrame(() => requestAnimationFrame(() => raiz.classList.remove("theme-switching")));
+            }
+            raiz.setAttribute("data-theme", tema);
+            try { localStorage.setItem("hub_tema", tema); } catch (e) {}
+            retematizar();
+        }
+        window.addEventListener("message", (ev) => {
+            const d = ev.data;
+            if (d && d.tipo === "hub:tema" && (d.tema === "dark" || d.tema === "light")) aplicar(d.tema, true);
+        });
+        window.addEventListener("storage", (ev) => {
+            if (ev.key === "hub_tema" && (ev.newValue === "dark" || ev.newValue === "light")) aplicar(ev.newValue, false);
+        });
+    })();
+    </script>
+    <script>// Dropdown (Menus Suspensos) — combobox custom do Design System
+// Mantém um <select> nativo oculto por trás pra não quebrar leituras de .value existentes no resto do código.
+function toggleGovDropdown(id) {
+    const select = document.getElementById(id);
+    if (select && select.disabled) return;
+    const trigger = document.getElementById(id + '-trigger');
+    const jaAberto = trigger.classList.contains('active');
+    document.querySelectorAll('.dropdown-trigger.active').forEach(t => t.classList.remove('active'));
+    if (!jaAberto) {
+        trigger.classList.add('active');
+        trigger.setAttribute('aria-expanded', 'true');
+    } else {
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+}
+
+function selecionarGovDropdown(id, valor, rotulo) {
+    const select = document.getElementById(id);
+    if (select.multiple) {
+        if (valor === "") {
+            Array.from(select.options).forEach(o => o.selected = false);
+            select.options[0].selected = true;
+        } else {
+            if (select.options.length > 0 && select.options[0].value === "") {
+                select.options[0].selected = false;
+            }
+            const opt = Array.from(select.options).find(o => o.value === valor);
+            if (opt) opt.selected = !opt.selected;
+            if (select.selectedOptions.length === 0 && select.options.length > 0) {
+                select.options[0].selected = true;
+            }
+        }
+        select.dispatchEvent(new Event('change'));
+        sincronizarGovDropdown(id);
+        return;
+    }
+    select.value = valor;
+    select.dispatchEvent(new Event('change'));
+    const label = document.getElementById(id + '-label');
+    label.textContent = rotulo;
+    label.classList.remove('placeholder');
+    document.querySelectorAll('#' + id + '-surface .dropdown-item').forEach(it => {
+        it.classList.toggle('active', it.dataset.valor === valor);
+    });
+    const trigger = document.getElementById(id + '-trigger');
+    trigger.classList.remove('active');
+    trigger.setAttribute('aria-expanded', 'false');
+}
+
+function resetarGovDropdown(id) {
+    const label = document.getElementById(id + '-label');
+    label.textContent = 'Selecione...';
+    label.classList.add('placeholder');
+    document.querySelectorAll('#' + id + '-surface .dropdown-item').forEach(it => it.classList.remove('active'));
+}
+
+function sincronizarGovDropdown(id) {
+    const select = document.getElementById(id);
+    const label = document.getElementById(id + '-label');
+    if (!select || !label) return;
+
+    if (select.multiple) {
+        const selectedOpts = Array.from(select.selectedOptions).filter(o => o.value !== "");
+        document.querySelectorAll('#' + id + '-surface .dropdown-item').forEach(it => {
+            const isSelected = selectedOpts.some(o => o.value === it.dataset.valor) || (selectedOpts.length === 0 && it.dataset.valor === "");
+            it.classList.toggle('active', isSelected);
+        });
+        if (selectedOpts.length === 0) {
+            label.textContent = select.options.length ? select.options[0].textContent : 'Todos';
+            label.classList.add('placeholder');
+        } else if (selectedOpts.length === 1) {
+            label.textContent = selectedOpts[0].textContent;
+            label.classList.remove('placeholder');
+        } else {
+            label.textContent = selectedOpts.length + ' selecionados';
+            label.classList.remove('placeholder');
+        }
+        return;
+    }
+
+    const opt = select.selectedOptions[0];
+    const ehPlaceholder = !opt || opt.disabled;
+    document.querySelectorAll('#' + id + '-surface .dropdown-item').forEach(it => {
+        it.classList.toggle('active', !ehPlaceholder && it.dataset.valor === select.value);
+    });
+    if (ehPlaceholder) {
+        label.textContent = opt ? opt.textContent : (select.options.length ? select.options[0].textContent : 'Selecione...');
+        label.classList.add('placeholder');
+    } else {
+        label.textContent = opt.textContent;
+        label.classList.remove('placeholder');
+    }
+}
+
+function criarGovDropdown(selectId, compacto) {
+    const select = document.getElementById(selectId);
+    if (!select || select.dataset.govDropdown) return;
+    select.dataset.govDropdown = '1';
+    
+    const container = document.createElement('div');
+    container.className = 'dropdown-demo-container' + (compacto ? ' dropdown-compacto' : '');
+    
+    if (select.style.marginBottom) {
+        container.style.marginBottom = select.style.marginBottom;
+        select.style.marginBottom = '';
+    }
+    select.parentNode.insertBefore(container, select);
+    
+    const trigger = document.createElement('div');
+    trigger.className = 'dropdown-trigger';
+    trigger.id = selectId + '-trigger';
+    trigger.tabIndex = 0;
+    trigger.setAttribute('role', 'button');
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.onclick = function () { toggleGovDropdown(selectId); };
+    trigger.onkeydown = function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGovDropdown(selectId); }
+    };
+    
+    const label = document.createElement('span');
+    label.id = selectId + '-label';
+    trigger.appendChild(label);
+    
+    const icone = document.createElement('i');
+    icone.className = 'ph ph-caret-down';
+    icone.setAttribute('aria-hidden', 'true');
+    trigger.appendChild(icone);
+    
+    const surface = document.createElement('div');
+    surface.className = 'dropdown-surface';
+    surface.id = selectId + '-surface';
+    surface.setAttribute('role', 'listbox');
+    
+    container.appendChild(trigger);
+    container.appendChild(surface);
+    container.appendChild(select);
+    select.style.display = 'none';
+    
+    reconstruirGovDropdown(selectId);
+}
+
+function reconstruirGovDropdown(selectId) {
+    const select = document.getElementById(selectId);
+    const surface = document.getElementById(selectId + '-surface');
+    if (!select || !surface) return;
+    surface.innerHTML = '';
+    Array.from(select.options).forEach(op => {
+        if (op.disabled) return;
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.setAttribute('role', 'option');
+        item.dataset.valor = op.value;
+        item.textContent = op.textContent;
+        item.onclick = function () { selecionarGovDropdown(selectId, op.value, op.textContent); };
+        surface.appendChild(item);
+    });
+    sincronizarGovDropdown(selectId);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Busca todos os selects com classe gov-select e aplica o dropdown custom
+    document.querySelectorAll('select.gov-select').forEach(select => {
+        if (select.id) {
+            criarGovDropdown(select.id, false);
+        }
+    });
+});
+
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.dropdown-demo-container')) {
+        document.querySelectorAll('.dropdown-trigger.active').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.dropdown-trigger.active').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+</script>
+    <script>
+        window.addEventListener('scroll', function() {
+            var header = document.querySelector('.premium-header');
+            if (header) {
+                if (window.scrollY > 40) {
+                    header.classList.add('is-scrolled');
+                } else {
+                    header.classList.remove('is-scrolled');
+                }
+            }
+        });
+    </script>
+</head>
+<body class="edicao-mensal">
+    <style>
+        /* Cabeçalho institucional — plano, hairline, régua verde de fechamento
+           (design system "editorial acolhedor": verde é a única cor de marca).
+           Bloco idêntico ao do boletim PSB para manter os dois em paridade. */
+        .premium-header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--hairline);
+            padding: 0;
+            position: relative;
+        }
+        .premium-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+        .premium-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--sp-6);
+            padding-top: var(--sp-4);
+            padding-bottom: var(--sp-4);
+        }
+        .premium-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            flex-wrap: wrap;
+        }
+        .premium-header.is-scrolled .premium-nav {
+            position: fixed;
+            bottom: var(--sp-6);
+            left: var(--sp-6);
+            z-index: 2000;
+            box-shadow: var(--shadow-float);
+            border-radius: var(--radius-md);
+            animation: slideUpNav var(--dur-surface) var(--ease-out) forwards;
+        }
+        @keyframes slideUpNav {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .premium-header.is-scrolled .premium-nav { animation: none; }
+        }
+        .premium-logo img {
+            height: 58px;
+            width: auto;
+            display: block;
+        }
+        .premium-separator {
+            width: 1px;
+            height: 36px;
+            background-color: var(--hairline);
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .premium-separator { display: block; }
+        }
+        .premium-text-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .premium-supertitle {
+            font-family: var(--font-mono);
+            font-size: var(--fs-eyebrow);
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: var(--ink-3);
+            font-weight: 600;
+            margin-bottom: var(--sp-1);
+        }
+        .premium-supertitle span.highlight {
+            color: var(--primary);
+        }
+        .premium-title {
+            font-family: var(--font-serif);
+            font-size: var(--fs-h4);
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0;
+            letter-spacing: -.01em;
+            line-height: 1.2;
+        }
+        .premium-title span {
+            font-weight: 500;
+            color: var(--ink-3);
+        }
+        .premium-nav {
+            display: flex;
+            align-items: center;
+        }
+        .premium-nav .breadcrumb {
+            display: flex;
+            align-items: center;
+            background: var(--surface-2);
+            padding: var(--sp-2) var(--sp-3);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--hairline);
+            margin: 0;
+        }
+        .premium-nav .breadcrumb-sep {
+            margin: 0 var(--sp-2);
+        }
+    </style>
+    <header class="premium-header">
+        <div class="container premium-container">
+            <div class="premium-brand">
+                <div class="premium-logo">
+                    <img src="https://lucstarwork.github.io/VSA-IMAGENS/assets/brasao-completo.png" alt="Prefeitura de Araucária">
+                </div>
+                <div class="premium-separator"></div>
+                <div class="premium-text-group">
+                    <div class="premium-supertitle">
+                        PRODUTO DA <span class="highlight">VIGILÂNCIA SOCIOASSISTENCIAL</span> • SMAS
+                    </div>
+                    <h1 class="premium-title">Boletim Mensal Cadastro Único <span>/ Gestão do CadÚnico</span></h1>
+                    <span class="badge-edicao-mensal">Edição Mensal</span>
+                </div>
+            </div>
+
+            <div class="premium-nav">
+                
+            </div>
+        </div>
+    </header>
+    <div class="container relatorio-layout">
+        <nav class="relatorio-toc" aria-label="Sumário deste boletim">
+            <span class="relatorio-toc-titulo">Neste boletim</span>
+            <ol class="relatorio-toc-lista" id="relatorio-toc-lista"></ol>
+        </nav>
+        <main class="relatorio-conteudo">
+            <style>
+  /* Coluna de conteúdo dentro do grid .relatorio-layout: sem min-width:0 ela
+     não encolhe abaixo da tabela mais larga (.gov-table tem min-width:520px),
+     e no mobile a página inteira passa a rolar na horizontal. */
+  .relatorio-conteudo { min-width: 0; }
+
+  /* A faixa-resumo da capa tem 5 KPIs (o boletim PSB tem 6): sem este
+     override herdaria o repeat(6) do CSS compartilhado, deixando uma coluna
+     órfã e apertando o número-herói a ponto de cortar. */
+  .capa-relatorio .kpi-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  @media (max-width: 1100px) { .capa-relatorio .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 640px)  { .capa-relatorio .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  /* Capa: em telas estreitas a ilustração sai e o título usa a largura toda. */
+  @media (max-width: 560px) {
+    .capa-relatorio .page-header { flex-wrap: wrap; }
+    .capa-relatorio .page-header-ilustracao { display: none; }
+    .capa-relatorio .page-header h1 { font-size: 26px; }
+  }
+
+  /* Cabeçalho institucional em telas estreitas: min-width:0 na cadeia de flex
+     deixa a supertitle (string mono longa em CAIXA-ALTA) quebrar em linha em
+     vez de empurrar a largura da página. Sem reduzir a fonte abaixo do piso
+     de 11px do design system. */
+  @media (max-width: 560px) {
+    .premium-logo img { height: 44px; }
+    .premium-brand { min-width: 0; }
+    .premium-text-group { min-width: 0; flex: 1 1 100%; }
+    .premium-supertitle { white-space: normal; overflow-wrap: anywhere; }
+  }
+
+  /* Nota Técnica: os blocos da .narrativa usam <h3> (não <h4>) para não pular
+     nível depois do <h2> da seção; a regra abaixo espelha o visual que o CSS
+     compartilhado dá a .narrativa-secao h4. */
+  .narrativa-secao h3 {
+    font-family: var(--font-serif);
+    font-size: var(--fs-body-lg);
+    font-weight: 600;
+    color: var(--primary-strong);
+    margin: 0 0 var(--sp-2) 0;
+  }
+  [data-theme="dark"] .narrativa-secao h3 { color: var(--primary); }
+</style>
+
+<div class="capa-relatorio">
+  <div class="page-header" style="margin: var(--sp-2) 0; border-bottom: 1px solid var(--hairline); padding-bottom: var(--sp-3);">
+    <div>
+      <h1 style="font-size: 32px; margin: 0 0 var(--sp-3) 0;">Cadastro Único em Araucária <span style="font-weight: 500; color: var(--hairline-strong); margin: 0 var(--sp-2);">/</span> <span style="color: var(--primary-strong);">Panorama Mensal</span></h1>
+      <p style="font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: .02em; color: var(--ink-3); margin: 0; display: inline-flex; align-items: center; gap: var(--sp-2);"><i class="ph ph-calendar-blank" aria-hidden="true"></i> Período de referência: Agosto de 2026</p>
+    </div>
+    <div class="page-header-ilustracao">
+      <img src="https://lucstarwork.github.io/VSA-IMAGENS/assets/ilustracoes/fundo-01.png" alt="" aria-hidden="true">
+    </div>
+  </div>
+
+  
+  <p style="font-family: var(--font-serif); font-size: var(--fs-body-lg); color: var(--ink-2); margin: var(--sp-5) 0 0 0; max-width: 68ch;">Devolutiva de dados do Cadastro Único para a equipe: como está o fluxo de atendimento no mês (agosto de 2026), quem estamos atendendo e onde a agenda está com mais gente faltando ou esperando. É informação para apoiar o trabalho no dia a dia, não para fiscalizar ninguém.</p>
+  
+  <p style="font-family: var(--font-mono); font-size: var(--fs-label); color: var(--ink-3); margin: var(--sp-3) 0 0 0;">Emitido em Setembro · Fonte: exportações do sistema Cadastro Único (IPM) e histórico do totem de atendimento da unidade central.</p>
+
+  <div class="kpi-grid" style="margin-top: var(--sp-6);">
+    <div class="kpi-tile destaque">
+      <span class="rotulo">Atendimentos no mês</span>
+      <span class="valor">1.015</span>
+    </div>
+    <div class="kpi-tile">
+      <span class="rotulo">Pessoas únicas atendidas</span>
+      <span class="valor">906</span>
+    </div>
+    <div class="kpi-tile">
+      <span class="rotulo">Comparecimento</span>
+      <span class="valor">5,9%</span>
+    </div>
+    <div class="kpi-tile">
+      <span class="rotulo">Espera média (totem)</span>
+      <span class="valor">10,6 min</span>
+    </div>
+    <div class="kpi-tile">
+      <span class="rotulo">Atendimento médio (totem)</span>
+      <span class="valor">23,9 min</span>
+    </div>
+  </div>
+</div>
+
+<h2>Unidade Central — Cadastro Único</h2>
+<p class="periodo">Agosto de 2026</p>
+<div class="alerta-box" style="background: var(--info-bg); border-color: color-mix(in srgb, var(--info) 35%, transparent);">
+  <i class="ph ph-info" aria-hidden="true" style="color: var(--info);"></i>
+  <p>R. Fernando Suckow, 200, Centro, Araucária/PR. É o único espaço do município que efetivamente realiza inclusão e atualização do Cadastro Único. Os CRAS não executam esses procedimentos, só encaminham (agendam) famílias para serem atendidas aqui, como mostra a seção seguinte.</p>
+</div>
+
+<h3>Produção por tipo de atendimento</h3>
+<div class="kpi-grid">
+  <div class="kpi-tile">
+    <span class="rotulo">Atualizações realizadas</span>
+    <span class="valor">543</span>
+  </div>
+  <div class="kpi-tile">
+    <span class="rotulo">Inclusões realizadas</span>
+    <span class="valor">166</span>
+  </div>
+  <div class="kpi-tile">
+    <span class="rotulo">Visitas domiciliares realizadas</span>
+    <span class="valor">61</span>
+  </div>
+</div>
+
+<div class="chart-grid-2">
+  <div class="chart-card categoria-paif">
+    <h3>Atendimentos por mês</h3>
+    <div class="chart-area"><canvas id="grafico-volume-mensal"></canvas></div>
+    <div class="chart-footer">Volume mensal de atendimentos individuais na unidade central. Fonte: <strong>Cadastro Único (IPM)</strong></div>
+  </div>
+  <div class="chart-card categoria-paif">
+    <h3>Pessoas únicas atendidas por mês</h3>
+    <div class="chart-area"><canvas id="grafico-pessoas-unicas-mensal"></canvas></div>
+    <div class="chart-footer">Pessoas distintas atendidas em cada mês. Fonte: <strong>Cadastro Único (IPM)</strong></div>
+  </div>
+</div>
+
+<div class="chart-grid-2">
+  <div class="chart-card categoria-demografia">
+    <h3>Comparecimento a agendamentos</h3>
+    <div class="chart-area"><canvas id="grafico-comparecimento"></canvas></div>
+    <div class="chart-footer">Situação registrada dos agendamentos com data no período. Fonte: <strong>Cadastro Único (IPM)</strong></div>
+  </div>
+  <div class="chart-card categoria-demografia">
+    <h3>Perfil por sexo</h3>
+    <div class="chart-area"><canvas id="grafico-sexo"></canvas></div>
+    <div class="chart-footer">Uma contagem por atendimento realizado no mês. Fonte: <strong>Cadastro Único (IPM)</strong></div>
+  </div>
+</div>
+
+<div class="chart-card categoria-demografia">
+  <h3>Perfil por faixa etária</h3>
+  <div class="chart-area"><canvas id="grafico-faixa-etaria"></canvas></div>
+  <div class="chart-footer">Uma contagem por atendimento realizado no mês. Fonte: <strong>Cadastro Único (IPM)</strong></div>
+</div>
+
+<div class="chart-card categoria-motivos">
+  <h3>Principais motivos de atendimento</h3>
+  <div class="chart-area" style="height: 420px;"><canvas id="grafico-motivos"></canvas></div>
+  <div class="chart-footer">Atendimentos com mais de um motivo somam para cada motivo identificado. Fonte: <strong>Cadastro Único (IPM)</strong></div>
+</div>
+
+<h3>Fila de atendimento — Totem de senhas</h3>
+<p class="periodo">Agosto de 2026</p>
+
+<div class="chart-grid-2">
+  <div class="chart-card categoria-pessoal">
+    <h3>Senhas por tipo de solicitação</h3>
+    <div class="chart-area"><canvas id="grafico-fila-tipo"></canvas></div>
+    <div class="chart-footer">Agendado (via sistema), Encaixe (sem agendamento prévio) ou Informativo. Fonte: <strong>Totem de atendimento</strong></div>
+  </div>
+  <div class="chart-card categoria-pessoal">
+    <h3>Desfecho das senhas</h3>
+    <div class="chart-area"><canvas id="grafico-fila-status"></canvas></div>
+    <div class="chart-footer">Concluído, Ausente, Encerrada, Timeout ou Zerado. Fonte: <strong>Totem de atendimento</strong></div>
+  </div>
+</div>
+
+<div class="gov-table-wrapper">
+  <table class="gov-table">
+    <thead><tr><th>Mesa</th><th>Atendimentos</th><th>Tempo médio</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Mesa 1</td><td>141</td><td>19,8 min</td></tr>
+      
+      <tr><td>Mesa 2</td><td>145</td><td>26,1 min</td></tr>
+      
+      <tr><td>Mesa 3</td><td>139</td><td>24,8 min</td></tr>
+      
+      <tr><td>Mesa 4</td><td>110</td><td>23,0 min</td></tr>
+      
+      <tr><td>Mesa 5</td><td>31</td><td>30,9 min</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+<p class="chart-footer" style="margin-top: calc(var(--sp-8) * -1 + var(--sp-2)); margin-bottom: var(--sp-8);">Tempo médio de atendimento por mesa — só senhas concluídas; a Recepção faz triagem e não entra aqui.</p>
+
+
+
+<h2>Encaminhamentos da Rede de CRAS</h2>
+<p class="periodo">Agosto de 2026</p>
+<div class="alerta-box">
+  <i class="ph ph-warning-circle" aria-hidden="true"></i>
+  <p><strong>Importante:</strong> os CRAS não realizam inclusão, atualização ou visita domiciliar do Cadastro Único: só <strong>encaminham</strong> (agendam) as famílias, que são efetivamente atendidas na Central. Os números abaixo são volume de encaminhamento por unidade de origem, não de atendimento realizado ali. A rede também ainda não tem um sistema de agenda equivalente ao da Central: o log disponível não registra situação de comparecimento e só cobre parte do semestre.</p>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-tile">
+    <span class="rotulo">Pessoas encaminhadas</span>
+    <span class="valor">2.171</span>
+  </div>
+  <div class="kpi-tile">
+    <span class="rotulo">Famílias encaminhadas</span>
+    <span class="valor">982</span>
+  </div>
+</div>
+
+<div class="chart-card categoria-paif">
+  <h3>Encaminhamentos por unidade de origem</h3>
+  <div class="chart-area" style="height: 420px;"><canvas id="grafico-rede-unidade"></canvas></div>
+  <div class="chart-footer">Inclusão, Atualização e Visita Domiciliar encaminhadas por cada CRAS para a Central. Fonte: <strong>Agenda da rede de CRAS</strong></div>
+</div>
+
+<div class="gov-table-wrapper">
+  <table class="gov-table striped">
+    <thead>
+      <tr><th class="sortable" data-type="string">CRAS de origem</th><th class="sortable" data-type="number">Inclusão</th><th class="sortable" data-type="number">Atualização</th><th class="sortable" data-type="number">Visita Domiciliar</th><th class="sortable" data-type="number">Total</th></tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td>CRAS Boqueirão</td>
+        <td>13</td>
+        <td>46</td>
+        <td>1</td>
+        <td>60</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Califórnia</td>
+        <td>6</td>
+        <td>82</td>
+        <td>0</td>
+        <td>88</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Centro</td>
+        <td>44</td>
+        <td>52</td>
+        <td>2</td>
+        <td>98</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Costeira</td>
+        <td>36</td>
+        <td>76</td>
+        <td>2</td>
+        <td>114</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Fazenda Velha</td>
+        <td>6</td>
+        <td>40</td>
+        <td>2</td>
+        <td>48</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Industrial</td>
+        <td>29</td>
+        <td>90</td>
+        <td>2</td>
+        <td>121</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Thomaz Coelho</td>
+        <td>6</td>
+        <td>10</td>
+        <td>2</td>
+        <td>18</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Tupy</td>
+        <td>14</td>
+        <td>89</td>
+        <td>0</td>
+        <td>103</td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+
+<h3>Observatório do Cadastro Único — Base Cadastral por Território</h3>
+<p class="periodo">Situação em 31 de agosto de 2026</p>
+<p style="color: var(--ink-2); margin-bottom: var(--sp-5); max-width: 74ch;">Fotografia do que já está cadastrado, para dar tamanho ao que os números de encaminhamento acima representam. Cadastro desatualizado é o que está sem reentrevista há mais de 24 meses, prazo oficial do CadÚnico, contado até o último dia do mês.</p>
+
+<div class="kpi-grid">
+  <div class="kpi-tile">
+    <span class="rotulo">Famílias cadastradas</span>
+    <span class="valor">23.736</span>
+  </div>
+  <div class="kpi-tile">
+    <span class="rotulo">Cadastros desatualizados</span>
+    <span class="valor">3.593</span>
+    <span class="badge-variacao">15,1% do total cadastrado</span>
+  </div>
+</div>
+
+<div class="gov-table-wrapper">
+  <table class="gov-table striped">
+    <thead>
+      <tr><th class="sortable" data-type="string">CRAS de referência</th><th class="sortable" data-type="number">Famílias Cadastradas</th><th class="sortable" data-type="number">Desatualizadas</th><th class="sortable" data-type="number">% Desatualizadas</th></tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td>CRAS Boqueirão</td>
+        <td>1.947</td>
+        <td>290</td>
+        <td>14,9%</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Califórnia</td>
+        <td>2.956</td>
+        <td>492</td>
+        <td>16,6%</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Centro</td>
+        <td>4.392</td>
+        <td>655</td>
+        <td>14,9%</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Costeira</td>
+        <td>3.211</td>
+        <td>464</td>
+        <td>14,5%</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Fazenda Velha</td>
+        <td>1.757</td>
+        <td>283</td>
+        <td>16,1%</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Industrial</td>
+        <td>4.259</td>
+        <td>611</td>
+        <td>14,3%</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Thomaz Coelho</td>
+        <td>985</td>
+        <td>123</td>
+        <td>12,5%</td>
+      </tr>
+      
+      <tr>
+        <td>CRAS Tupy</td>
+        <td>3.361</td>
+        <td>481</td>
+        <td>14,3%</td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+
+
+
+
+<h2>Avisos sobre os dados</h2>
+<div class="alerta-box">
+  <i class="ph ph-warning" aria-hidden="true"></i>
+  <div>
+    <p><strong>8 pontos de atenção</strong> sobre a base usada neste boletim:</p>
+    <ul>
+      
+      <li>Boletim mensal: os números são do mês fechado. A fila de espera na Central (agendamentos e visitas pendentes) não entra — é estado ao vivo, sem como reconstruir a foto de um mês passado; ela fica no boletim consolidado. A base cadastral do Observatório é lida a partir da extração mais recente, medindo o cadastro desatualizado até o último dia do mês.</li>
+      
+      <li>868 família(s) da base do Observatório não têm CRAS de referência reconhecido (sem informação, Centro Pop ou CREAS) e ficam fora da tabela de base cadastral por CRAS, só no total geral.</li>
+      
+      <li>376 agendamentos da unidade central (59.6% do total) estão com Situação &#34;Pendente&#34; — nunca baixados no sistema para Atendido/Ausente. Não entram no cálculo da taxa de comparecimento e indicam agenda não atualizada pelos profissionais responsáveis.</li>
+      
+      <li>O log de agendamentos da rede de CRAS só tem registros a partir de 03/08/2026 — o panorama da rede neste boletim cobre um período mais curto que o semestre completo.</li>
+      
+      <li>56 linha(s) do log de agendamentos da rede, de famílias com 5 ou mais pessoas, são duplicatas do mesmo agendamento e foram removidas antes de somar o total de pessoas e famílias atendidas.</li>
+      
+      <li>O histórico do totem/fila da unidade central só tem registros a partir de 03/08/2026 — os indicadores de tempo de espera e atendimento cobrem um período mais curto que o semestre completo.</li>
+      
+      <li>7 senha(s) do totem têm horário de início de atendimento anterior ao horário de chamada (inconsistência de relógio do sistema) — tratadas como espera zero nos indicadores.</li>
+      
+      <li>39 dos agendamentos pendentes foram criados diretamente na Central (sem encaminhamento de CRAS) e não aparecem na tabela de pendentes por CRAS, só no total geral.</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+        </main>
+    </div>
+    <footer class="gov-footer">
+        <div class="gov-footer-inner">
+            <div class="gov-footer-brand">
+                <img src="https://lucstarwork.github.io/VSA-IMAGENS/assets/brasao-simples.png" alt="Prefeitura de Araucária" class="gov-footer-logo">
+                <span>Vigilância Socioassistencial — Cadastro Único</span>
+            </div>
+            <div class="gov-footer-info">
+                <p>Boletim Cadastro Único — período de referência: Agosto de 2026. Emitido em 2 de setembro de 2026.</p>
+                <p>Dados de uso interno — Secretaria Municipal de Assistência Social de Araucária.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const kpis = document.querySelectorAll('.kpi-tile .valor');
+
+        kpis.forEach(el => {
+            const textoOriginal = el.innerText.trim();
+            if (textoOriginal === '-' || textoOriginal === '—') return;
+
+            // Remove caracteres de formatação para encontrar o número real
+            let numStr = textoOriginal.replace(/[^\d,.-]/g, '');
+            if (!numStr) return;
+
+            // Converte formato brasileiro (ex: 1.000,50) para float (1000.50)
+            numStr = numStr.replace(/\./g, '').replace(',', '.');
+            const valorFinal = parseFloat(numStr);
+            if (isNaN(valorFinal) || valorFinal === 0) return;
+
+            const isFloat = textoOriginal.includes(',');
+            // Sufixo de unidade (" min", " dias", "%") preservado durante a contagem.
+            const sufixo = textoOriginal.replace(/^[\d.,\s-]+/, '');
+
+            const duracao = 1500; // 1.5 segundos
+            const inicio = performance.now();
+
+            const formatar = (num) => {
+                let parts = num.toFixed(isFloat ? 1 : 0).split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                let formatado = parts.join(',');
+                return sufixo ? formatado + (sufixo.startsWith('%') ? '' : ' ') + sufixo : formatado;
+            };
+
+            const animar = (tempoAtual) => {
+                const progresso = Math.min((tempoAtual - inicio) / duracao, 1);
+                const easeOut = 1 - Math.pow(1 - progresso, 5);
+                if (progresso < 1) {
+                    el.innerText = formatar(valorFinal * easeOut);
+                    requestAnimationFrame(animar);
+                } else {
+                    el.innerText = textoOriginal; // Define exatamente o original no final
+                }
+            };
+
+            el.innerText = formatar(0);
+            requestAnimationFrame(animar);
+        });
+    });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sumário lateral: varre os <h2> já existentes no conteúdo — nenhuma
+        // mudança de estrutura Jinja é necessária, funciona igual em
+        // qualquer página que estenda este layout.
+        const secoes = Array.from(document.querySelectorAll(".relatorio-conteudo h2"));
+        const lista = document.getElementById("relatorio-toc-lista");
+
+        if (secoes.length && lista) {
+            secoes.forEach(function (h2, i) {
+                if (!h2.id) h2.id = "secao-" + (i + 1);
+                const item = document.createElement("li");
+                const link = document.createElement("a");
+                link.href = "#" + h2.id;
+                link.textContent = h2.textContent;
+                link.dataset.alvo = h2.id;
+                item.appendChild(link);
+                lista.appendChild(item);
+            });
+
+            const links = Array.from(lista.querySelectorAll("a"));
+            const observerScrollSpy = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    const link = links.find(function (l) { return l.dataset.alvo === entry.target.id; });
+                    if (!link) return;
+                    if (entry.isIntersecting) {
+                        links.forEach(function (l) { l.classList.remove("ativo"); });
+                        link.classList.add("ativo");
+                    }
+                });
+            }, { rootMargin: "-10% 0px -80% 0px" });
+            secoes.forEach(function (h2) { observerScrollSpy.observe(h2); });
+
+            window.addEventListener('scroll', function() {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+                    links.forEach(function (l) { l.classList.remove("ativo"); });
+                    if (links.length > 0) links[links.length - 1].classList.add("ativo");
+                }
+            });
+        }
+
+        // Revelação suave: cada seção (h2 + irmãos até o próximo h2) entra
+        // com fade + leve deslocamento ao cruzar a viewport, uma vez só.
+        const prefereReducaoMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!prefereReducaoMovimento && secoes.length) {
+            const grupos = secoes.map(function (h2) {
+                const grupo = [h2];
+                let irmao = h2.nextElementSibling;
+                while (irmao && irmao.tagName !== "H2") {
+                    grupo.push(irmao);
+                    irmao = irmao.nextElementSibling;
+                }
+                return grupo;
+            });
+
+            const observerReveal = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("reveal-visivel");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -10% 0px" });
+
+            grupos.forEach(function (grupo) {
+                grupo.forEach(function (el) {
+                    el.classList.add("reveal");
+                    observerReveal.observe(el);
+                });
+            });
+        }
+    });
+    </script>
+    
+<script>
+(function () {
+    // Cores fixas de tema claro; o módulo do HUB (_base.html.j2) retematiza
+    // cada gráfico no load e a cada troca de tema. Toda cor usada aqui está
+    // na tabela PARES do retematizador — do contrário não vira no escuro.
+    var VERDE = "rgba(0, 112, 68, 0.85)";
+    var VERDE_FORTE = "rgba(0, 112, 68, 1)";
+    var PALETA = ["#155bcb", "#007044", "#c2850c", "#6b6b66", "#168821", "#c8210a"];
+    var REDUZ_MOVIMENTO = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function fmt(v) { return new Intl.NumberFormat("pt-BR").format(Math.round(v)); }
+
+    var DATALABEL = {
+        color: "#555",
+        backgroundColor: "rgba(255, 255, 255, 0.85)",
+        borderRadius: 3,
+        padding: 4,
+        font: { family: "'IBM Plex Mono', monospace", size: 11, weight: "600" }
+    };
+    var TOOLTIP = {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        titleFont: { family: "'IBM Plex Sans', sans-serif", size: 13, weight: "600" },
+        bodyFont: { family: "'IBM Plex Sans', sans-serif", size: 13 },
+        padding: 12, cornerRadius: 8, usePointStyle: true
+    };
+
+    function paletaN(n) {
+        var cores = [];
+        for (var i = 0; i < n; i++) cores.push(PALETA[i % PALETA.length]);
+        return cores;
+    }
+
+    function barra(id, dados, horizontal) {
+        var ctx = document.getElementById(id);
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: dados.labels,
+                datasets: dados.datasets.map(function (ds) {
+                    return Object.assign({}, ds, {
+                        backgroundColor: VERDE,
+                        hoverBackgroundColor: VERDE_FORTE,
+                        borderRadius: 4,
+                        maxBarThickness: 44
+                    });
+                })
+            },
+            options: {
+                indexAxis: horizontal ? "y" : "x",
+                responsive: true,
+                maintainAspectRatio: false,
+                locale: "pt-BR",
+                animation: REDUZ_MOVIMENTO ? { duration: 0 } : { duration: 900, easing: "easeOutQuart" },
+                layout: horizontal ? { padding: { right: 44 } } : {},
+                interaction: { mode: "index", intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: Object.assign({}, TOOLTIP, {
+                        callbacks: {
+                            label: function (c) {
+                                var r = c.dataset.label ? c.dataset.label + ": " : "";
+                                return r + fmt(c.parsed[horizontal ? "x" : "y"]);
+                            }
+                        }
+                    }),
+                    datalabels: Object.assign({}, DATALABEL, {
+                        anchor: "end", align: horizontal ? "right" : "top", formatter: fmt
+                    })
+                },
+                scales: {
+                    x: { grid: { color: "#e0e0e0" }, ticks: {}, beginAtZero: true, grace: horizontal ? "10%" : undefined },
+                    y: { grid: { color: "#e0e0e0" }, ticks: {}, beginAtZero: true, grace: horizontal ? undefined : "10%" }
+                }
+            }
+        });
+    }
+
+    function rosca(id, dados) {
+        var ctx = document.getElementById(id);
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: dados.labels,
+                datasets: [{
+                    data: dados.data,
+                    backgroundColor: paletaN(dados.labels.length),
+                    borderWidth: 2,
+                    borderColor: "#ffffff",
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                locale: "pt-BR",
+                cutout: "62%",
+                animation: REDUZ_MOVIMENTO ? { duration: 0 } : { duration: 900, easing: "easeOutQuart" },
+                plugins: {
+                    legend: { position: "bottom", labels: { usePointStyle: true, padding: 14, font: { family: "'IBM Plex Sans', sans-serif" } } },
+                    tooltip: Object.assign({}, TOOLTIP, {
+                        callbacks: {
+                            label: function (c) {
+                                var total = c.dataset.data.reduce(function (a, b) { return a + b; }, 0);
+                                var pct = total ? ((c.parsed / total) * 100).toFixed(1) : 0;
+                                return c.label + ": " + fmt(c.parsed) + " (" + String(pct).replace(".", ",") + "%)";
+                            }
+                        }
+                    }),
+                    datalabels: Object.assign({}, DATALABEL, {
+                        // pílula clara + tinta forte: legível sobre qualquer
+                        // fatia, nos dois temas (o retematizador do HUB troca
+                        // as duas cores conforme o tema).
+                        anchor: "center",
+                        align: "center",
+                        formatter: function (value, context) {
+                            var total = context.chart.data.datasets[0].data.reduce(function (a, b) { return a + b; }, 0);
+                            return total ? Math.round((value / total) * 100) + "%" : "";
+                        },
+                        display: function (context) {
+                            var total = context.chart.data.datasets[0].data.reduce(function (a, b) { return a + b; }, 0);
+                            return total && (context.dataset.data[context.dataIndex] / total) * 100 >= 5;
+                        }
+                    })
+                }
+            }
+        });
+    }
+
+    barra("grafico-volume-mensal", {"labels": ["Agosto/2026"], "datasets": [{"label": "Atendimentos", "data": [1015]}]});
+    barra("grafico-pessoas-unicas-mensal", {"labels": ["Agosto/2026"], "datasets": [{"label": "Pessoas únicas", "data": [906]}]});
+    
+    barra("grafico-faixa-etaria", {"labels": ["0 a 17 anos", "18 a 29 anos", "30 a 44 anos", "45 a 59 anos", "60 anos ou mais"], "datasets": [{"label": "Pessoas", "data": [1, 147, 317, 247, 303]}]});
+    barra("grafico-motivos", {"labels": ["Alteração No Cadastro Único", "Busca Ativa do Cadastro Único", "Inclusão No Cadastro Único", "Recepção / Procura Espontânea / Orientações", "Atualização em Domicílio", "Contato Telefônico", "Averiguação Cadastral - Famílias com Dados Divergentes Cadastro Único", "Inclusão em Domicílio"], "datasets": [{"label": "Atendimentos", "data": [501, 206, 147, 61, 42, 40, 26, 19]}]}, true);
+    barra("grafico-rede-unidade", {"labels": ["CRAS Boqueirão", "CRAS Califórnia", "CRAS Centro", "CRAS Costeira", "CRAS Fazenda Velha", "CRAS Industrial", "CRAS Thomaz Coelho", "CRAS Tupy"], "datasets": [{"label": "Agendamentos", "data": [60, 88, 98, 114, 48, 121, 18, 103]}]}, true);
+    rosca("grafico-comparecimento", {"labels": ["Atendido", "Ausente", "Sem baixa no sistema"], "data": [15, 240, 376]});
+    rosca("grafico-sexo", {"labels": ["Feminino", "Masculino"], "data": [779, 236]});
+    rosca("grafico-fila-tipo", {"labels": ["AGENDADO", "INFORMATIVO", "ENCAIXE"], "data": [1017, 345, 240]});
+    rosca("grafico-fila-status", {"labels": ["TRIAGEM", "CONCLUIDO", "ENCERRADA", "AUSENTE"], "data": [608, 566, 345, 262]});
+
+    // Ordenação de tabela (mesmo comportamento do boletim PSB).
+    function valorCelula(tr, i) { return tr.children[i].innerText || tr.children[i].textContent; }
+    function parseVal(v, tipo) {
+        if (tipo === "number") {
+            var n = parseFloat(v.replace(/\./g, "").replace(",", "."));
+            return isNaN(n) ? 0 : n;
+        }
+        return v.toLowerCase();
+    }
+    function comparador(i, asc, tipo) {
+        return function (a, b) {
+            var va = parseVal(valorCelula(asc ? a : b, i), tipo);
+            var vb = parseVal(valorCelula(asc ? b : a, i), tipo);
+            return tipo === "number" ? va - vb : va.toString().localeCompare(vb.toString(), "pt-BR");
+        };
+    }
+    document.querySelectorAll("th.sortable").forEach(function (th) {
+        th.addEventListener("click", function () {
+            var tabela = th.closest("table");
+            var tbody = tabela.querySelector("tbody");
+            var tipo = th.dataset.type || "string";
+            var idx = Array.from(th.parentNode.children).indexOf(th);
+            var asc = !th.classList.contains("sort-asc");
+            tabela.querySelectorAll("th").forEach(function (t) { t.classList.remove("sort-asc", "sort-desc"); });
+            th.classList.add(asc ? "sort-asc" : "sort-desc");
+            Array.from(tbody.querySelectorAll("tr")).sort(comparador(idx, asc, tipo)).forEach(function (tr) { tbody.appendChild(tr); });
+        });
+    });
+})();
+</script>
+
+</body>
+</html>
