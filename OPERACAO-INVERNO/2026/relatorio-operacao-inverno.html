@@ -4,7 +4,7 @@
 <head>
 <meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<title>Relatório Semanal de Atendimentos — Operação Inverno — Araucária</title>
+<title>Relatório Semanal de Atendimentos · Operação Inverno · Araucária</title>
 
 <!-- Tema resolvido antes da 1a pintura (sem flash). Ordem: HTML pai (se mesma
      origem) > localStorage 'hub_tema' (mesma origem do Hub) > preferência do SO.
@@ -76,6 +76,7 @@
     --primary:var(--green-60); --primary-strong:var(--green-80); --primary-soft:#eaf5ef;
     --on-primary:#ffffff; --brand-ink:var(--navy); --focus:var(--gold);
     --success:#127a1e; --warning:#8a5a00; --danger:#c42b1c; --info:#155bcb;
+    --warning-bg:#fbf0cc;
     --shadow-float:0 4px 16px -4px rgba(20,20,18,.16), 0 1px 3px rgba(20,20,18,.08);
     color-scheme:light;
   }
@@ -88,6 +89,7 @@
     --primary:#54cf93; --primary-strong:#7edca9; --primary-soft:rgba(84,207,147,.12);
     --on-primary:#052b18; --brand-ink:var(--g-ink); --focus:var(--gold-light);
     --success:#5fd07a; --warning:#f0c24a; --danger:#ff9b8e; --info:#8fb6ff;
+    --warning-bg:rgba(240,194,74,.13);
     --shadow-float:0 8px 28px -6px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.5);
     color-scheme:dark;
   }
@@ -232,9 +234,15 @@
 
   /* ===== Notas de leitura ===== */
   .notes{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
-  .note{ background:var(--paper-2); border:1px solid var(--line); border-left:2px solid var(--brand); border-radius:var(--radius-sm); padding:10px 15px; font-size:13px; color:var(--ink-2); line-height:1.5; }
+  .note{ background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 15px 10px 14px; font-size:13px; color:var(--ink-2); line-height:1.5; }
   .note b{ color:var(--ink); font-weight:600; }
   .note:has(> span:empty){ display:none; }
+
+  /* Ressalva de qualidade de dado — usada no registro de pernoite (falha conhecida). */
+  .caveat{ display:flex; gap:10px; align-items:flex-start; background:var(--warning-bg); border:1px solid var(--warning); border-radius:var(--radius-sm); padding:11px 15px; margin-top:14px; font-size:12.5px; line-height:1.5; color:var(--ink-2); }
+  .caveat .ph{ color:var(--warning); font-size:16px; flex:none; margin-top:1px; }
+  .caveat b{ color:var(--ink); font-weight:600; }
+  .caveat[hidden]{ display:none; }
 
   /* ===== Conexão com a rede (cruzamento com a base municipal) ===== */
   .conexao-split{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-2); border:1px solid var(--line-2); border-radius:var(--radius-sm); overflow:hidden; margin-top:6px; }
@@ -257,6 +265,16 @@
   .comp-row .cr-atual{ font-family:var(--mono); font-size:18px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
   .cr-delta{ justify-self:end; font-family:var(--mono); font-size:11px; font-weight:500; padding:2px 7px; border-radius:var(--radius-sm); color:var(--ink-2); background:var(--paper-2); border:1px solid var(--line); font-variant-numeric:tabular-nums; white-space:nowrap; }
 
+  /* ===== Nota técnica (leitura qualitativa; corpo injetado de Nota-Tecnica.md) ===== */
+  .nota-tecnica{ background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius-md); padding:24px 28px; font-family:var(--sans); font-size:14px; line-height:1.68; color:var(--ink-2); max-width:var(--measure-lede, 82ch); }
+  .nota-tecnica > * + *{ margin-top:12px; }
+  .nota-tecnica strong{ color:var(--ink); font-weight:600; }
+  .nota-tecnica h3{ font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:22px; padding-bottom:6px; border-bottom:1px solid var(--line-2); }
+  .nota-tecnica h3:first-child{ margin-top:0; }
+  .nota-tecnica ul{ list-style:none; padding:0; margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+  .nota-tecnica li{ position:relative; padding-left:18px; }
+  .nota-tecnica li::before{ content:''; position:absolute; left:2px; top:10px; width:6px; height:6px; border-radius:1px; background:var(--brand); }
+
   /* ===== Rodapé ===== */
   .foot{ font-size:11px; line-height:1.6; color:var(--ink-3); margin-top:48px; padding-top:16px; border-top:2px solid var(--ink); display:grid; grid-template-columns:1fr auto; gap:24px; align-items:end; }
   .foot .sig{ text-align:right; }
@@ -275,6 +293,7 @@
     .mast h1{ font-size:26px; }
     .foot{ grid-template-columns:1fr; }
     .foot .sig{ text-align:left; }
+    .nota-tecnica{ padding:18px 18px; }
   }
 
   @media print{
@@ -286,11 +305,15 @@
       --hairline:#e2e2dd; --hairline-strong:#c9c9c2; --rule:#1a1a17;
       --primary:#007044; --primary-strong:#00492c; --primary-soft:#eaf5ef;
       --brand-ink:#103858; --success:#127a1e; --warning:#8a5a00; --danger:#c42b1c; --info:#155bcb;
+      --warning-bg:#fbf0cc;
     }
     body{ background:#fff; }
     .viz-root{ max-width:none; padding:0 10mm 12mm; }
     .top-rule{ margin:0; }
     .block, .chart-card, .kpis, .lead, .find{ break-inside:avoid; }
+    /* A nota técnica é corrida e longa: precisa poder quebrar entre páginas. */
+    section[aria-label='Nota técnica']{ break-inside:auto; }
+    .nota-tecnica h3{ break-after:avoid; }
     .wk-select, .skip-link{ display:none; }
   }
 </style>
@@ -308,32 +331,32 @@
     <div class='m-txt'>
       <div class='kicker'>Vigilância Socioassistencial · Araucária-PR</div>
       <h1>Relatório Semanal de Atendimentos<span class='h1-sub'>Operação Inverno</span></h1>
-      <div class='org'>Secretaria Municipal de Assistência Social — Casa de Passagem</div>
+      <div class='org'>Secretaria Municipal de Assistência Social · Casa de Passagem</div>
     </div>
     <dl class='colophon'>
-      <dt>Boletim</dt><dd id='colofNumero'>—</dd>
-      <dt>Período</dt><dd id='colofPeriodo'>—</dd>
-      <dt>Emissão</dt><dd id='dataEmissao'>—</dd>
+      <dt id='colofRotulo'>Boletim</dt><dd id='colofNumero'>–</dd>
+      <dt>Período</dt><dd id='colofPeriodo'>–</dd>
+      <dt>Emissão</dt><dd id='dataEmissao'>–</dd>
     </dl>
   </header>
   <div class='mast-foot'>
-    <span class='tag'>Documento técnico · uso interno</span>
+    <span class='tag' id='tagDocumento'>Documento técnico · uso interno</span>
     <span class='tag'>Prefeitura Municipal de Araucária</span>
   </div>
 
   <div class='lead' id='conteudo'>
     <p class='abstract'>
-      <span class='drop'>A</span> Operação Inverno mantém, na Casa de Passagem, o acolhimento
-      e o atendimento à população em situação de rua durante o período de frio intenso. Este
-      boletim consolida o volume de atendimentos, o perfil das pessoas acolhidas, a ocupação
-      de pernoites e a comparação com a temporada de 2025 — subsídio para a gestão da rede de
-      proteção social e para o redirecionamento das equipes na ponta.
+      <span class='drop'>A</span> Operação Inverno é a resposta sazonal de acolhimento à
+      população em situação de rua na Casa de Passagem, durante o período de frio intenso.
+      Este documento consolida o volume de atendimentos, o perfil das pessoas acolhidas, a
+      ocupação de pernoites e a comparação com a temporada de 2025: subsídio para a gestão
+      da rede de proteção social e para o redirecionamento das equipes na ponta.
     </p>
     <div class='findings'>
-      <div class='find'><span class='fig' id='findTotal'>—</span><span class='txt'><b>atendimentos</b> acumulados desde o início da operação.</span></div>
-      <div class='find'><span class='fig' id='findPessoas'>—</span><span class='txt'><b>pessoas únicas</b> acolhidas no período de referência.</span></div>
-      <div class='find'><span class='fig' id='findDias'>—</span><span class='txt'>dias corridos de operação até a data do boletim.</span></div>
-      <div class='find' id='findComparativoWrap'><span class='fig' id='findComparativo'>—</span><span class='txt'>em <b>pessoas únicas</b> ante o mesmo período de <span id='findComparativoAno'>2025</span>.</span></div>
+      <div class='find'><span class='fig' id='findTotal'>–</span><span class='txt'><b>atendimentos</b> acumulados desde o início da operação.</span></div>
+      <div class='find'><span class='fig' id='findPessoas'>–</span><span class='txt'><b>pessoas únicas</b> acolhidas no período de referência.</span></div>
+      <div class='find'><span class='fig' id='findDias'>–</span><span class='txt' id='findDiasTxt'>dias corridos de operação até a data do boletim.</span></div>
+      <div class='find' id='findComparativoWrap'><span class='fig' id='findComparativo'>–</span><span class='txt'>em <b>pessoas únicas</b> ante o mesmo período de <span id='findComparativoAno'>2025</span>.</span></div>
     </div>
   </div>
 
@@ -389,7 +412,7 @@
 
     <div class='grid2'>
       <div class='chart-card'>
-        <div class='chart-hd'><span class='t'>Comparativo semanal</span><span class='m'>Semanas anteriores</span></div>
+        <div class='chart-hd'><span class='t'>Comparativo semanal</span><span class='m' id='metaComparativoSemanas'>Semanas anteriores</span></div>
         <div class='chart-body'><canvas id='chartComparativoSemanas'></canvas></div>
       </div>
       <div class='chart-card'>
@@ -445,6 +468,11 @@
               <div class='lab'><span class='tick' style='background:var(--gold)'></span>Média diária</div>
               <div class='kpi-corpo'><div class='val' id='valMediaGeral'></div></div>
             </div>
+    </div>
+
+    <div class='caveat' id='caveatPernoite' hidden>
+      <i class='ph ph-warning-circle' aria-hidden='true'></i>
+      <span><b>Registro de pernoite com falha conhecida.</b> A partir da Semana 3 houve falha de lançamento: semanas inteiras sem nenhum pernoite registrado e lançamentos concentrados em bloco num único dia. Os totais de pernoite <b>subestimam a ocupação real</b> da Casa de Passagem. As contagens de pessoas e de atendimentos não são afetadas.</span>
     </div>
 
     <div class='grid3'>
@@ -569,6 +597,7 @@
     <div class='notes'><div class='note'><span id='textoBeneficios'></span></div></div>
   </section>
 
+
   <footer class='foot'>
     <div>Fonte: registros de Atendimentos Individuais filtrados por Operação Inverno. Elaboração: Vigilância Socioassistencial de Araucária. Categorias vazias ou não informadas são omitidas dos gráficos e não alteram os totais oficiais.</div>
     <div class='sig'>
@@ -578,31 +607,31 @@
   </footer>
 </div>
 
-<script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/chart.js@4'></script>
 <script src='https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2'></script>
 <script>
 const dados = {
   "identificacao": {
-    "numero": "10/2026"
+    "numero": "11/2026"
   },
   "semanaAtual": {
-    "inicio": "24/08/2026",
-    "fim": "30/08/2026",
+    "inicio": "31/08/2026",
+    "fim": "04/09/2026",
     "porDia": {
-      "Seg": 50,
-      "Ter": 37,
-      "Qua": 38,
-      "Qui": 35,
-      "Sex": 23,
-      "Sáb": 22,
-      "Dom": 28
+      "Seg": 39,
+      "Ter": 39,
+      "Qua": 39,
+      "Qui": 27,
+      "Sex": 21,
+      "Sáb": 0,
+      "Dom": 0
     },
     "porDiaPernoites": {
-      "Seg": 0,
-      "Ter": 0,
+      "Seg": 39,
+      "Ter": 2,
       "Qua": 0,
-      "Qui": 33,
-      "Sex": 3,
+      "Qui": 0,
+      "Sex": 20,
       "Sáb": 0,
       "Dom": 0
     }
@@ -1127,9 +1156,71 @@ const dados = {
         "Sex": 0,
         "Sáb": 27
       }
+    },
+    "11": {
+      "inicio": "31/08/2026",
+      "fim": "04/09/2026",
+      "pessoasUnicas": 67,
+      "novasPessoas": 56,
+      "pessoasAntigas": 11,
+      "porDia": {
+        "Seg": 39,
+        "Ter": 39,
+        "Qua": 39,
+        "Qui": 27,
+        "Sex": 21,
+        "Sáb": 0,
+        "Dom": 0
+      },
+      "porDiaPessoasUnicas": {
+        "Seg": 39,
+        "Ter": 38,
+        "Qua": 37,
+        "Qui": 27,
+        "Sex": 21,
+        "Sáb": 0,
+        "Dom": 0
+      },
+      "porDiaPernoites": {
+        "Seg": 39,
+        "Ter": 2,
+        "Qua": 0,
+        "Qui": 0,
+        "Sex": 20,
+        "Sáb": 0,
+        "Dom": 0
+      },
+      "pernoites": {
+        "total": 61,
+        "pessoasComPernoite": 52,
+        "mediaPorPessoa": 1.17
+      },
+      "pernoitesFrequencia": {
+        "umaNoite": 43,
+        "maisDeDuasNoites": 0
+      },
+      "porDiaPessoasUnicas2025": {
+        "Dom": 29,
+        "Seg": 39,
+        "Ter": 43,
+        "Qua": 25,
+        "Qui": 26,
+        "Sex": 37,
+        "Sáb": 0
+      }
     }
   },
   "ultimasSemanas": [
+    {
+      "label": "S1",
+      "total": 160,
+      "totalAnterior": 316
+    },
+    {
+      "label": "S2",
+      "total": 169,
+      "totalAnterior": 343
+    },
     {
       "label": "S3",
       "total": 259,
@@ -1169,48 +1260,64 @@ const dados = {
       "label": "S10",
       "total": 233,
       "totalAnterior": 193
+    },
+    {
+      "label": "S11",
+      "total": 165,
+      "totalAnterior": 200
     }
   ],
+  "janelaSemanasGrafico": 8,
   "pernoites": {
-    "total": 36,
-    "pessoasComPernoite": 36,
-    "mediaPorPessoa": 1.0
+    "total": 61,
+    "pessoasComPernoite": 52,
+    "mediaPorPessoa": 1.17
   },
   "periodoOperacao": {
     "inicio": "22/06/2026",
-    "fimReferencia": "30/08/2026",
-    "diasCorridos": 70
+    "fimReferencia": "04/09/2026",
+    "diasCorridos": 75
   },
-  "totalAcumulado": 2532,
-  "pessoasUnicasAcumulado": 228,
-  "pessoasComPernoiteAcumulado": 181,
+  "totalAcumulado": 2697,
+  "pessoasUnicasAcumulado": 245,
+  "pessoasComPernoiteAcumulado": 195,
   "faixaEtaria": {
-    "0–17": 0,
-    "18–29": 62,
-    "30–44": 119,
-    "45–59": 43,
+    "0–17": 1,
+    "18–29": 67,
+    "30–44": 127,
+    "45–59": 46,
     "60+": 4
   },
   "sexo": {
-    "Masculino": 202,
-    "Feminino": 26
+    "Masculino": 216,
+    "Feminino": 29
   },
   "raca": {
-    "Branca": 94,
-    "Parda": 74,
-    "Não Informado": 41,
-    "Preta": 19
+    "Branca": 102,
+    "Parda": 77,
+    "Não Informado": 44,
+    "Preta": 22
   },
-  "idadeMedia": 36.51,
-  "novasPessoas": 188,
-  "pessoasAntigas": 40,
+  "idadeMedia": 36.39,
+  "novasPessoas": 204,
+  "pessoasAntigas": 41,
   "pernoitesFrequencia": {
-    "semana1Noite": 36,
+    "semana1Noite": 43,
     "semanaMais2Noites": 0,
-    "total1Noite": 66,
-    "totalMais2Noites": 102
+    "total1Noite": 71,
+    "totalMais2Noites": 104
   },
   "dadosBrutosAcumulados": [
+    {
+      "id": "786",
+      "sexo": "Feminino",
+      "raca": "Não Informado",
+      "faixaEtaria": "45–59",
+      "idade": 46,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
     {
       "id": "1066",
       "sexo": "Masculino",
@@ -1226,7 +1333,7 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Parda",
       "faixaEtaria": "30–44",
-      "idade": 32,
+      "idade": 33,
       "pernoites": 12,
       "inedito": true,
       "totalAtendimentos": 25
@@ -1249,7 +1356,7 @@ const dados = {
       "idade": 32,
       "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 21
     },
     {
       "id": "15771",
@@ -1297,9 +1404,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 48,
-      "pernoites": 1,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 7
+      "totalAtendimentos": 9
     },
     {
       "id": "27512",
@@ -1307,9 +1414,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 30,
-      "pernoites": 9,
+      "pernoites": 10,
       "inedito": true,
-      "totalAtendimentos": 37
+      "totalAtendimentos": 39
     },
     {
       "id": "28555",
@@ -1319,7 +1426,7 @@ const dados = {
       "idade": 45,
       "pernoites": 8,
       "inedito": true,
-      "totalAtendimentos": 33
+      "totalAtendimentos": 34
     },
     {
       "id": "50280",
@@ -1347,9 +1454,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 31,
-      "pernoites": 16,
+      "pernoites": 17,
       "inedito": true,
-      "totalAtendimentos": 47
+      "totalAtendimentos": 49
     },
     {
       "id": "71033",
@@ -1357,9 +1464,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 25,
-      "pernoites": 0,
+      "pernoites": 2,
       "inedito": false,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 6
     },
     {
       "id": "76633",
@@ -1397,9 +1504,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 24,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 18
+      "totalAtendimentos": 20
     },
     {
       "id": "83405",
@@ -1422,6 +1529,16 @@ const dados = {
       "totalAtendimentos": 7
     },
     {
+      "id": "88083",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 24,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
       "id": "94811",
       "sexo": "Masculino",
       "raca": "Parda",
@@ -1437,9 +1554,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 23,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 20
     },
     {
       "id": "100791",
@@ -1546,7 +1663,7 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "30–44",
-      "idade": 31,
+      "idade": 32,
       "pernoites": 19,
       "inedito": true,
       "totalAtendimentos": 43
@@ -1586,7 +1703,7 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "45–59",
-      "idade": 45,
+      "idade": 46,
       "pernoites": 4,
       "inedito": true,
       "totalAtendimentos": 11
@@ -1596,10 +1713,20 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Parda",
       "faixaEtaria": "45–59",
-      "idade": 45,
+      "idade": 46,
       "pernoites": 1,
       "inedito": true,
       "totalAtendimentos": 3
+    },
+    {
+      "id": "137110",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 43,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "141624",
@@ -1607,9 +1734,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 40,
-      "pernoites": 11,
+      "pernoites": 12,
       "inedito": false,
-      "totalAtendimentos": 22
+      "totalAtendimentos": 25
     },
     {
       "id": "147155",
@@ -1622,6 +1749,16 @@ const dados = {
       "totalAtendimentos": 8
     },
     {
+      "id": "148263",
+      "sexo": "Feminino",
+      "raca": "Parda",
+      "faixaEtaria": "18–29",
+      "idade": 21,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
       "id": "158383",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -1632,14 +1769,24 @@ const dados = {
       "totalAtendimentos": 8
     },
     {
+      "id": "160507",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "0–17",
+      "idade": 17,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "163173",
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 59,
-      "pernoites": 5,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 25
+      "totalAtendimentos": 29
     },
     {
       "id": "163762",
@@ -1647,9 +1794,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 57,
-      "pernoites": 9,
+      "pernoites": 10,
       "inedito": true,
-      "totalAtendimentos": 22
+      "totalAtendimentos": 23
     },
     {
       "id": "167490",
@@ -1657,9 +1804,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 34,
-      "pernoites": 1,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 9
+      "totalAtendimentos": 11
     },
     {
       "id": "168013",
@@ -1677,9 +1824,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 27,
-      "pernoites": 7,
+      "pernoites": 8,
       "inedito": true,
-      "totalAtendimentos": 18
+      "totalAtendimentos": 21
     },
     {
       "id": "171960",
@@ -1696,7 +1843,7 @@ const dados = {
       "sexo": "Feminino",
       "raca": "Branca",
       "faixaEtaria": "45–59",
-      "idade": 47,
+      "idade": 48,
       "pernoites": 1,
       "inedito": true,
       "totalAtendimentos": 11
@@ -1727,9 +1874,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 25,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 7
     },
     {
       "id": "190324",
@@ -1767,9 +1914,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 33,
-      "pernoites": 4,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 24
     },
     {
       "id": "222583",
@@ -1809,7 +1956,7 @@ const dados = {
       "idade": 36,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 4
     },
     {
       "id": "250378",
@@ -1867,9 +2014,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 39,
-      "pernoites": 3,
+      "pernoites": 4,
       "inedito": true,
-      "totalAtendimentos": 9
+      "totalAtendimentos": 12
     },
     {
       "id": "303191",
@@ -1886,7 +2033,7 @@ const dados = {
       "sexo": "Feminino",
       "raca": "Branca",
       "faixaEtaria": "18–29",
-      "idade": 23,
+      "idade": 24,
       "pernoites": 0,
       "inedito": true,
       "totalAtendimentos": 1
@@ -1937,9 +2084,19 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 31,
-      "pernoites": 6,
+      "pernoites": 7,
       "inedito": false,
-      "totalAtendimentos": 26
+      "totalAtendimentos": 29
+    },
+    {
+      "id": "341770",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "45–59",
+      "idade": 54,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "346318",
@@ -1967,9 +2124,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 27,
-      "pernoites": 5,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 10
+      "totalAtendimentos": 11
     },
     {
       "id": "415034",
@@ -2012,6 +2169,16 @@ const dados = {
       "totalAtendimentos": 25
     },
     {
+      "id": "421456",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 40,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 3
+    },
+    {
       "id": "421738",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -2039,7 +2206,7 @@ const dados = {
       "idade": 44,
       "pernoites": 6,
       "inedito": false,
-      "totalAtendimentos": 17
+      "totalAtendimentos": 18
     },
     {
       "id": "428881",
@@ -2057,9 +2224,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 40,
-      "pernoites": 3,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 19
+      "totalAtendimentos": 24
     },
     {
       "id": "432413",
@@ -2067,9 +2234,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "18–29",
       "idade": 29,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 7
     },
     {
       "id": "434712",
@@ -2106,10 +2273,10 @@ const dados = {
       "sexo": "Feminino",
       "raca": "Parda",
       "faixaEtaria": "18–29",
-      "idade": 25,
-      "pernoites": 6,
+      "idade": 26,
+      "pernoites": 7,
       "inedito": false,
-      "totalAtendimentos": 21
+      "totalAtendimentos": 25
     },
     {
       "id": "455114",
@@ -2117,9 +2284,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "18–29",
       "idade": 22,
-      "pernoites": 4,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 16
+      "totalAtendimentos": 19
     },
     {
       "id": "458751",
@@ -2166,10 +2333,10 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "18–29",
-      "idade": 23,
-      "pernoites": 9,
+      "idade": 24,
+      "pernoites": 10,
       "inedito": true,
-      "totalAtendimentos": 33
+      "totalAtendimentos": 36
     },
     {
       "id": "468075",
@@ -2227,9 +2394,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 38,
-      "pernoites": 1,
+      "pernoites": 2,
       "inedito": false,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 8
     },
     {
       "id": "488970",
@@ -2247,9 +2414,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "45–59",
       "idade": 50,
-      "pernoites": 7,
+      "pernoites": 8,
       "inedito": false,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 15
     },
     {
       "id": "489602",
@@ -2257,9 +2424,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 0,
+      "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 2
+      "totalAtendimentos": 4
     },
     {
       "id": "489833",
@@ -2297,9 +2464,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "45–59",
       "idade": 47,
-      "pernoites": 4,
+      "pernoites": 6,
       "inedito": true,
-      "totalAtendimentos": 15
+      "totalAtendimentos": 20
     },
     {
       "id": "492413",
@@ -2309,6 +2476,16 @@ const dados = {
       "idade": 44,
       "pernoites": 1,
       "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "492783",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 26,
+      "pernoites": 0,
+      "inedito": false,
       "totalAtendimentos": 1
     },
     {
@@ -2377,9 +2554,19 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 34,
-      "pernoites": 6,
+      "pernoites": 7,
       "inedito": false,
-      "totalAtendimentos": 21
+      "totalAtendimentos": 24
+    },
+    {
+      "id": "502157",
+      "sexo": "Masculino",
+      "raca": "Branca",
+      "faixaEtaria": "30–44",
+      "idade": 31,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 3
     },
     {
       "id": "503778",
@@ -2502,6 +2689,16 @@ const dados = {
       "totalAtendimentos": 6
     },
     {
+      "id": "513972",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 36,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "514051",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -2509,7 +2706,7 @@ const dados = {
       "idade": 27,
       "pernoites": 0,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 5
     },
     {
       "id": "514644",
@@ -2552,6 +2749,16 @@ const dados = {
       "totalAtendimentos": 30
     },
     {
+      "id": "518083",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 39,
+      "pernoites": 0,
+      "inedito": true,
+      "totalAtendimentos": 2
+    },
+    {
       "id": "519111",
       "sexo": "Masculino",
       "raca": "Branca",
@@ -2587,9 +2794,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 34,
-      "pernoites": 1,
+      "pernoites": 3,
       "inedito": false,
-      "totalAtendimentos": 9
+      "totalAtendimentos": 14
     },
     {
       "id": "522331",
@@ -2657,9 +2864,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 10,
+      "pernoites": 11,
       "inedito": false,
-      "totalAtendimentos": 24
+      "totalAtendimentos": 29
     },
     {
       "id": "526835",
@@ -2697,9 +2904,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 27,
-      "pernoites": 1,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 15
+      "totalAtendimentos": 16
     },
     {
       "id": "529212",
@@ -2777,9 +2984,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 23,
-      "pernoites": 15,
+      "pernoites": 16,
       "inedito": true,
-      "totalAtendimentos": 45
+      "totalAtendimentos": 49
     },
     {
       "id": "533609",
@@ -2792,14 +2999,24 @@ const dados = {
       "totalAtendimentos": 2
     },
     {
+      "id": "534313",
+      "sexo": "Masculino",
+      "raca": "Parda",
+      "faixaEtaria": "30–44",
+      "idade": 39,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "534612",
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "30–44",
-      "idade": 40,
-      "pernoites": 3,
+      "idade": 41,
+      "pernoites": 5,
       "inedito": true,
-      "totalAtendimentos": 18
+      "totalAtendimentos": 23
     },
     {
       "id": "534937",
@@ -2807,9 +3024,9 @@ const dados = {
       "raca": "Branca",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 6,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 18
+      "totalAtendimentos": 22
     },
     {
       "id": "534939",
@@ -2819,7 +3036,7 @@ const dados = {
       "idade": 37,
       "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 14
     },
     {
       "id": "535258",
@@ -2856,7 +3073,7 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Branca",
       "faixaEtaria": "30–44",
-      "idade": 42,
+      "idade": 43,
       "pernoites": 0,
       "inedito": true,
       "totalAtendimentos": 7
@@ -2870,6 +3087,16 @@ const dados = {
       "pernoites": 4,
       "inedito": true,
       "totalAtendimentos": 8
+    },
+    {
+      "id": "536513",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "45–59",
+      "idade": 45,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "536514",
@@ -2902,14 +3129,24 @@ const dados = {
       "totalAtendimentos": 1
     },
     {
+      "id": "538809",
+      "sexo": "Masculino",
+      "raca": "Preta",
+      "faixaEtaria": "30–44",
+      "idade": 36,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "538823",
       "sexo": "Masculino",
       "raca": "Parda",
       "faixaEtaria": "45–59",
       "idade": 49,
-      "pernoites": 1,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 5
+      "totalAtendimentos": 6
     },
     {
       "id": "539141",
@@ -2937,9 +3174,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 43,
-      "pernoites": 6,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 22
+      "totalAtendimentos": 25
     },
     {
       "id": "540278",
@@ -2957,9 +3194,19 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 19,
-      "pernoites": 10,
+      "pernoites": 12,
       "inedito": true,
-      "totalAtendimentos": 20
+      "totalAtendimentos": 25
+    },
+    {
+      "id": "540499",
+      "sexo": "Feminino",
+      "raca": "Branca",
+      "faixaEtaria": "18–29",
+      "idade": 23,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
     },
     {
       "id": "540511",
@@ -2989,7 +3236,7 @@ const dados = {
       "idade": 68,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 3
+      "totalAtendimentos": 5
     },
     {
       "id": "540840",
@@ -3009,7 +3256,7 @@ const dados = {
       "idade": 45,
       "pernoites": 11,
       "inedito": true,
-      "totalAtendimentos": 29
+      "totalAtendimentos": 30
     },
     {
       "id": "541031",
@@ -3017,9 +3264,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 35,
-      "pernoites": 11,
+      "pernoites": 12,
       "inedito": true,
-      "totalAtendimentos": 36
+      "totalAtendimentos": 38
     },
     {
       "id": "541037",
@@ -3087,9 +3334,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 13,
+      "pernoites": 15,
       "inedito": true,
-      "totalAtendimentos": 48
+      "totalAtendimentos": 53
     },
     {
       "id": "541381",
@@ -3099,7 +3346,7 @@ const dados = {
       "idade": 29,
       "pernoites": 1,
       "inedito": true,
-      "totalAtendimentos": 12
+      "totalAtendimentos": 13
     },
     {
       "id": "541399",
@@ -3127,9 +3374,9 @@ const dados = {
       "raca": "Parda",
       "faixaEtaria": "18–29",
       "idade": 29,
-      "pernoites": 6,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 19
+      "totalAtendimentos": 23
     },
     {
       "id": "541516",
@@ -3197,9 +3444,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "18–29",
       "idade": 28,
-      "pernoites": 6,
+      "pernoites": 7,
       "inedito": true,
-      "totalAtendimentos": 14
+      "totalAtendimentos": 15
     },
     {
       "id": "541977",
@@ -3216,7 +3463,7 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Não Informado",
       "faixaEtaria": "45–59",
-      "idade": 47,
+      "idade": 48,
       "pernoites": 1,
       "inedito": true,
       "totalAtendimentos": 2
@@ -3347,9 +3594,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "30–44",
       "idade": 32,
-      "pernoites": 1,
+      "pernoites": 2,
       "inedito": true,
-      "totalAtendimentos": 6
+      "totalAtendimentos": 9
     },
     {
       "id": "542784",
@@ -3367,9 +3614,9 @@ const dados = {
       "raca": "Não Informado",
       "faixaEtaria": "45–59",
       "idade": 52,
-      "pernoites": 1,
+      "pernoites": 3,
       "inedito": true,
-      "totalAtendimentos": 4
+      "totalAtendimentos": 9
     },
     {
       "id": "542945",
@@ -3462,6 +3709,16 @@ const dados = {
       "totalAtendimentos": 7
     },
     {
+      "id": "543266",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "30–44",
+      "idade": 35,
+      "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
       "id": "543267",
       "sexo": "Masculino",
       "raca": "Não Informado",
@@ -3486,16 +3743,26 @@ const dados = {
       "sexo": "Masculino",
       "raca": "Não Informado",
       "faixaEtaria": "18–29",
-      "idade": 27,
+      "idade": 28,
       "pernoites": 1,
+      "inedito": true,
+      "totalAtendimentos": 1
+    },
+    {
+      "id": "543720",
+      "sexo": "Masculino",
+      "raca": "Não Informado",
+      "faixaEtaria": "18–29",
+      "idade": 24,
+      "pernoites": 0,
       "inedito": true,
       "totalAtendimentos": 1
     }
   ],
   "motivos": {
-    "Pernoite Casa de Passagem": 810,
-    "Escuta": 98,
-    "Orientação Social": 87,
+    "Pernoite Casa de Passagem": 871,
+    "Escuta": 100,
+    "Orientação Social": 89,
     "Demanda Espontânea": 24,
     "Contato Telefônico": 2,
     "Orientação e Encaminhamentos para a Habitação": 1,
@@ -3503,21 +3770,21 @@ const dados = {
     "Acompanhamento e Monitoramento dos Encaminhamentos Realizados": 1
   },
   "profissionais": {
-    "Gabriely Celestino Cardoso": 1797,
-    "Leandro Ferreira Schonrock": 697,
-    "Walmor Jose Ruhr": 676,
-    "Fernanda de Fatima Czerban": 673,
-    "Josney Garcia dos Santos": 655,
-    "Jefferson Vanderlei Chiarello": 597,
-    "Marcos Augusto Carvalho": 596,
-    "Claudia Portella Macedo Fuchner": 565,
-    "Bernardo Paim Cunha Masson": 551,
-    "Eva da Silva Vieira": 531,
-    "Alexandre Lima Costa Ferreira": 506,
+    "Gabriely Celestino Cardoso": 1960,
+    "Leandro Ferreira Schonrock": 735,
+    "Walmor Jose Ruhr": 717,
+    "Fernanda de Fatima Czerban": 709,
+    "Josney Garcia dos Santos": 693,
+    "Jefferson Vanderlei Chiarello": 624,
+    "Claudia Portella Macedo Fuchner": 624,
+    "Marcos Augusto Carvalho": 623,
+    "Eva da Silva Vieira": 593,
+    "Bernardo Paim Cunha Masson": 587,
+    "Alexandre Lima Costa Ferreira": 542,
+    "Jose Eugenio do Nascimento": 518,
     "Jhenyfer Maciel da Silva": 465,
-    "Jose Eugenio do Nascimento": 456,
-    "Deivit Cristian Ramos": 330,
-    "Jucelma Silveira Martinatto Bueno da Silva": 70,
+    "Deivit Cristian Ramos": 357,
+    "Jucelma Silveira Martinatto Bueno da Silva": 72,
     "Felix da Silva Neto": 58,
     "Fernanda Laverde Torres": 1
   },
@@ -3528,31 +3795,31 @@ const dados = {
     "03h": 0,
     "04h": 0,
     "05h": 0,
-    "06h": 4,
+    "06h": 6,
     "07h": 0,
     "08h": 0,
     "09h": 0,
     "10h": 0,
     "11h": 0,
     "12h": 0,
-    "13h": 1,
+    "13h": 2,
     "14h": 0,
     "15h": 2,
     "16h": 0,
-    "17h": 40,
-    "18h": 63,
-    "19h": 379,
-    "20h": 908,
-    "21h": 599,
-    "22h": 210,
+    "17h": 41,
+    "18h": 64,
+    "19h": 397,
+    "20h": 968,
+    "21h": 674,
+    "22h": 217,
     "23h": 314
   },
   "conexaoRede": {
     "disponivel": true,
-    "totalPublico": 228,
-    "comRedeAmpliada": 41,
-    "comCentroPop": 157,
-    "soOperacao": 64,
+    "totalPublico": 245,
+    "comRedeAmpliada": 43,
+    "comCentroPop": 160,
+    "soOperacao": 76,
     "porUnidade": {
       "CRAS Centro": 14,
       "Plantão Social": 13,
@@ -3560,27 +3827,29 @@ const dados = {
       "Cram - Centro de Referência de Atendimento à Mulher em Situação de Violência": 5,
       "CRAS Fazenda Velha": 4,
       "Cadastro Único": 4,
-      "Uai - Famílias": 3,
       "Secretaria de Assistência Social de Araucária": 3,
       "CRAS Califórnia": 3,
-      "Acolhimento Familiar": 2,
+      "Uai - Famílias": 3,
       "CREAS - Centro de Referência Especializado de Assistência Social": 2,
-      "CRAS Boqueirão": 1,
+      "Acolhimento Familiar": 2,
+      "CRAS Tupy": 2,
       "CRAS Thomaz Coelho": 1,
-      "CRAS Tupy": 1
+      "CRAS Boqueirão": 1,
+      "Comse - Centro Operacional de Medidas Socioeducativas": 1,
+      "Uai - Crianças e Adolescentes": 1
     }
   },
   "beneficios": {
     "disponivel": true,
-    "pessoas": 96,
-    "totalItens": 184,
+    "pessoas": 100,
+    "totalItens": 191,
     "porBeneficio": {
-      "Cobertor": 96,
+      "Cobertor": 97,
       "2ª Via Certidão de Nascimento [fora do Município]": 26,
-      "Triar": 24,
-      "Rc - Prato Cheio Item i": 14,
-      "Documentação - 2ª Via Rg": 9,
-      "2ª Via Certidão de Nascimento": 8,
+      "Triar": 26,
+      "Rc - Prato Cheio Item i": 15,
+      "Documentação - 2ª Via Rg": 10,
+      "2ª Via Certidão de Nascimento": 10,
       "2ª Via Certidão de Casamento [fora do Município]": 5,
       "Benefício Eventual para Moradia": 2
     }
@@ -3589,25 +3858,25 @@ const dados = {
     "disponivel": true,
     "anoAtual": 2026,
     "anoAnterior": 2025,
-    "diasComparados": 70,
+    "diasComparados": 75,
     "pessoas": {
-      "atual": 228,
-      "anterior": 250,
-      "delta": -8.8
+      "atual": 245,
+      "anterior": 255,
+      "delta": -3.9
     },
     "atendimentos": {
-      "atual": 2532,
-      "anterior": 2551,
-      "delta": -0.7
+      "atual": 2697,
+      "anterior": 2714,
+      "delta": -0.6
     },
     "mediaDiaria": {
-      "atual": 36.2,
-      "anterior": 36.4,
-      "delta": -0.7
+      "atual": 36.0,
+      "anterior": 36.2,
+      "delta": -0.6
     },
     "idadeMedia": {
-      "atual": 36.51,
-      "anterior": 38.23
+      "atual": 36.39,
+      "anterior": 38.34
     },
     "faixaEtaria": {
       "labels": [
@@ -3618,24 +3887,24 @@ const dados = {
         "60+"
       ],
       "atual": [
-        0,
-        62,
-        119,
-        43,
+        1,
+        67,
+        127,
+        46,
         4
       ],
       "anterior": [
         0,
         62,
-        125,
-        53,
+        128,
+        55,
         10
       ]
     },
     "retorno": {
-      "recorrentes": 40,
-      "ineditas": 188,
-      "pctRecorrente": 17.5
+      "recorrentes": 41,
+      "ineditas": 204,
+      "pctRecorrente": 16.7
     },
     "temporadaAnterior": {
       "pessoas": 259,
@@ -3795,21 +4064,65 @@ function soma(obj){ return Object.values(obj).reduce((a,b)=>a+b,0); }
 const hoje = new Date();
 document.getElementById("dataEmissao").textContent = hoje.toLocaleDateString("pt-BR");
 document.getElementById("tituloAcumulado").textContent = `${dados.periodoOperacao.inicio} – ${dados.periodoOperacao.fimReferencia}`;
-document.getElementById("colofNumero").textContent = dados.identificacao.numero;
+// Enquadramento: enquanto a data de fim da operação não passou, é um boletim em
+// curso; depois dela, o mesmo painel é a leitura consolidada de encerramento.
+const _fimOperacao = (() => {
+  const [d, m, a] = dados.periodoOperacao.fimReferencia.split("/").map(Number);
+  return new Date(a, m - 1, d);
+})();
+const _operacaoEncerrada = hoje > _fimOperacao;
+document.getElementById("colofRotulo").textContent = _operacaoEncerrada ? "Edição" : "Boletim";
+document.getElementById("colofNumero").textContent = _operacaoEncerrada
+  ? `Encerramento · ${dados.identificacao.numero}`
+  : dados.identificacao.numero;
 document.getElementById("colofPeriodo").textContent = `${dados.periodoOperacao.inicio} – ${dados.periodoOperacao.fimReferencia}`;
 document.getElementById("findTotal").textContent = fmt(dados.totalAcumulado);
 document.getElementById("findPessoas").textContent = fmt(dados.pessoasUnicasAcumulado);
 document.getElementById("findDias").textContent = dados.periodoOperacao.diasCorridos;
+document.getElementById("findDiasTxt").textContent = _operacaoEncerrada
+  ? `dias de operação, do início ao encerramento em ${dados.periodoOperacao.fimReferencia}.`
+  : "dias corridos de operação até a data do boletim.";
+if (_operacaoEncerrada) {
+  document.getElementById("tagDocumento").textContent =
+    `Operação encerrada · ${dados.periodoOperacao.fimReferencia}`;
+}
 document.getElementById("dataEmissaoFoot").textContent = hoje.toLocaleDateString("pt-BR");
 
+// Janela do gráfico de trajetória: a temporada inteira na edição de encerramento;
+// as últimas MAX_SEMANAS_GRAFICO semanas enquanto a operação está em curso.
+const _serieSemanal = dados["ultimasSemanas"] || [];
+const semanasGrafico = _operacaoEncerrada
+  ? _serieSemanal
+  : _serieSemanal.slice(-(dados.janelaSemanasGrafico || 8));
 
-const mediaUltimasSemanas = dados.ultimasSemanas.length > 0 ? (soma(Object.fromEntries(dados.ultimasSemanas.map((s,i)=>[i,s.total]))) / dados.ultimasSemanas.length) : 0;
+// Encerrada, a leitura de temporada abre o documento e o recorte semanal desce.
+if (_operacaoEncerrada) {
+  const secSemana = document.querySelector("section.block[aria-label='Semana']");
+  const secAcumulado = document.querySelector("section.block[aria-label='Acumulado']");
+  if (secSemana && secAcumulado) {
+    secSemana.parentNode.insertBefore(secAcumulado, secSemana);
+  }
+}
+// Numera os cabeçalhos de seção pela ordem real no DOM (após o reordenamento e
+// já contando a ausência da nota técnica quando ela não é fornecida).
+document.querySelectorAll("section.block .sec-eyebrow .num").forEach((el, i) => {
+  el.textContent = String(i + 1).padStart(2, "0");
+});
+const _metaComp = document.getElementById("metaComparativoSemanas");
+if (_metaComp && _operacaoEncerrada) _metaComp.textContent = "Temporada completa";
+
+// Ressalva de pernoite: relevante assim que a operação passa da Semana 3, ponto
+// em que a falha de lançamento começa (ver rótulo do KPI de pernoite na semana).
+const _caveatPernoite = document.getElementById("caveatPernoite");
+if (_caveatPernoite && _serieSemanal.length >= 3) _caveatPernoite.hidden = false;
+
+const mediaUltimasSemanas = semanasGrafico.length > 0 ? (soma(Object.fromEntries(semanasGrafico.map((s,i)=>[i,s.total]))) / semanasGrafico.length) : 0;
 
 // Rótulos de ano p/ os gráficos comparados (fallback se não houver export 2025).
 const _ca = dados.comparativoAnual || {};
 const anoAnt = _ca.anoAnterior || 2025;
 const anoAtu = _ca.anoAtual || 2026;
-const temAnterior2025 = dados.ultimasSemanas.some(s => s.totalAnterior != null);
+const temAnterior2025 = semanasGrafico.some(s => s.totalAnterior != null);
 
 // ===== Estilo base dos gráficos (Design System v2.0) =====
 // Tipografia mono para número, tooltip com a superfície/hairline do DS, grade
@@ -3890,7 +4203,7 @@ if(document.getElementById("chartComparativoSemanas")) {
   if (temAnterior2025) {
     dsComparativo.push({
       label: String(anoAnt),
-      data: dados.ultimasSemanas.map(s => s.totalAnterior ?? null),
+      data: semanasGrafico.map(s => s.totalAnterior ?? null),
       backgroundColor: CINZA_COMP, borderRadius: 4, maxBarThickness: 26
     });
   }
@@ -3898,13 +4211,13 @@ if(document.getElementById("chartComparativoSemanas")) {
   // para destacar a semana selecionada (lê data.datasets[length-1]).
   dsComparativo.push({
     label: String(anoAtu),
-    data: dados.ultimasSemanas.map(s => s.total),
+    data: semanasGrafico.map(s => s.total),
     backgroundColor: paleta[0], borderRadius: 4, maxBarThickness: temAnterior2025 ? 26 : 40
   });
   chartComparativo = new Chart(document.getElementById("chartComparativoSemanas"), {
     type: "bar",
     data: {
-      labels: dados.ultimasSemanas.map(s=>s.label),
+      labels: semanasGrafico.map(s=>s.label),
       datasets: dsComparativo
     },
     options: {
@@ -3913,7 +4226,7 @@ if(document.getElementById("chartComparativoSemanas")) {
       onClick: (e, activeElements) => {
         if (activeElements.length > 0) {
           const index = activeElements[0].index;
-          const label = dados.ultimasSemanas[index].label; // Ex: "S3"
+          const label = semanasGrafico[index].label; // Ex: "S3"
           const numeroSemana = parseInt(label.replace(/\D/g, ''));
           const seletor = document.getElementById("seletorSemana");
           if (numeroSemana && seletor) {
@@ -4140,14 +4453,14 @@ function renderizarSemana(n){
     // foco usa o verde cheio e as demais um verde esmaecido. 2025 segue cinza.
     const dsAtual = chartComparativo.data.datasets[chartComparativo.data.datasets.length - 1];
     dsAtual.backgroundColor =
-      dados.ultimasSemanas.map(sem => sem.label === `S${n}` ? paleta[0] : paleta[0] + "59");
+      semanasGrafico.map(sem => sem.label === `S${n}` ? paleta[0] : paleta[0] + "59");
     chartComparativo.update();
   }
 
   const deltaEl = document.getElementById("deltaTotalSemana");
   const captionEl = document.getElementById("captionTotalSemana");
   if (deltaEl && captionEl) {
-    if (dados.ultimasSemanas.length > 1) {
+    if (semanasGrafico.length > 1) {
       const deltaMedia = ((totalSemana - mediaUltimasSemanas) / (mediaUltimasSemanas || 1)) * 100;
       const subiu = deltaMedia >= 0;
       deltaEl.textContent = (subiu ? "▲ " : "▼ ") + dec(Math.abs(deltaMedia), 1) + "%";
@@ -4160,10 +4473,10 @@ function renderizarSemana(n){
     }
   }
 
-  document.getElementById("textoInsightSemanal").innerHTML = dados.ultimasSemanas.length>1
+  document.getElementById("textoInsightSemanal").innerHTML = semanasGrafico.length>1
     ? (() => {
         const deltaMedia = ((totalSemana-mediaUltimasSemanas)/(mediaUltimasSemanas||1))*100;
-        return `<b>${fmt(totalSemana)} atendimentos</b> na Semana ${n} — ${deltaMedia>=0?'<b>'+dec(Math.abs(deltaMedia),1)+'% acima</b>':'<b>'+dec(Math.abs(deltaMedia),1)+'% abaixo</b>'} da média das últimas ${dados.ultimasSemanas.length} semanas (${fmt(mediaUltimasSemanas)}).`;
+        return `<b>${fmt(totalSemana)} atendimentos</b> na Semana ${n} — ${deltaMedia>=0?'<b>'+dec(Math.abs(deltaMedia),1)+'% acima</b>':'<b>'+dec(Math.abs(deltaMedia),1)+'% abaixo</b>'} da média das últimas ${semanasGrafico.length} semanas (${fmt(mediaUltimasSemanas)}).`;
       })()
     : `<b>${fmt(totalSemana)} atendimentos</b> na 1ª semana da Operação Inverno — ainda não há semanas anteriores para comparação.`;
 }
