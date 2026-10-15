@@ -87,6 +87,7 @@ let camadaUnidades;
 let camadaContexto;
 let camadaFundo;
 let camadaCalor;
+let quadroPendente = null;
 
 const nf = new Intl.NumberFormat('pt-BR');
 const nf1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -321,6 +322,30 @@ function rotuloFeicao(propriedades) {
 }
 
 /* ------------------------------------------------------------------ mapa -- */
+/* Enquadrar exige container medido. Dentro do HUB o painel nasce num iframe
+   com display:none -- o bloco do mapa mede 0x0, o Leaflet calcula zoom a
+   partir desse tamanho, chega em infinito e estoura "Invalid LatLng object:
+   (NaN, NaN)" no meio de carregar(). O throw derrubava a carga inteira: sem
+   seletor de indicador, sem tabela, sem ficha. Enquanto nao ha tamanho o mapa
+   recebe centro valido e zoom fixo, o enquadramento fica guardado, e o
+   ResizeObserver aplica no quadro em que a moldura aparece. */
+const ZOOM_SEM_MEDIDA = 11;
+
+function mapaMedido() {
+  const tamanho = mapa.getSize();
+  return tamanho.x > 0 && tamanho.y > 0;
+}
+
+function ajustarQuadro(limites, opcoes) {
+  if (mapaMedido()) {
+    quadroPendente = null;
+    mapa.fitBounds(limites, opcoes);
+    return;
+  }
+  quadroPendente = { limites, opcoes };
+  mapa.setView(L.latLngBounds(limites).getCenter(), ZOOM_SEM_MEDIDA);
+}
+
 function montarMapa() {
   mapa = L.map('mapa', {
     // Renderer SVG (padrao do Leaflet), nao Canvas: com 247 setores mais
@@ -357,6 +382,15 @@ function montarMapa() {
   mapa.createPane('calor');
   mapa.getPane('calor').style.zIndex = 450;
   mapa.getPane('calor').style.pointerEvents = 'none';
+
+  // O Leaflet so escuta resize da janela, e trocar display:none por block no
+  // iframe do HUB nao gera resize nenhum. Quem ve o bloco mudar de tamanho e
+  // o observador do proprio elemento.
+  new ResizeObserver(() => {
+    if (!mapaMedido()) return;
+    mapa.invalidateSize();
+    if (quadroPendente) ajustarQuadro(quadroPendente.limites, quadroPendente.opcoes);
+  }).observe(document.getElementById('mapa'));
 }
 
 function escuro() {
@@ -1078,8 +1112,8 @@ const QUADRO_POR_ESCALA = { setor: 'municipio', bairro: 'urbano', cras: 'urbano'
 
 function enquadrar(quadro) {
   estado.quadro = quadro;
-  if (quadro === 'urbano') mapa.fitBounds(painel.enquadramento_urbano, { padding: [20, 20] });
-  else mapa.fitBounds(L.geoJSON(estado.geo.limite).getBounds(), { padding: [12, 12] });
+  if (quadro === 'urbano') ajustarQuadro(painel.enquadramento_urbano, { padding: [20, 20] });
+  else ajustarQuadro(L.geoJSON(estado.geo.limite).getBounds(), { padding: [12, 12] });
   document.getElementById('botao-urbano').setAttribute('aria-pressed', String(quadro === 'urbano'));
   document.getElementById('botao-municipio').setAttribute('aria-pressed', String(quadro !== 'urbano'));
 }
@@ -1316,7 +1350,7 @@ function carregar() {
   desenharHidrografia();
   desenharUnidades();
   desenharDados();
-  mapa.fitBounds(L.geoJSON(estado.geo.limite).getBounds(), { padding: [12, 12] });
+  ajustarQuadro(L.geoJSON(estado.geo.limite).getBounds(), { padding: [12, 12] });
   if (document.getElementById('cam-hidro').checked) estado.camadas.hidrografia.addTo(mapa);
   camadaDados.bringToFront();
 
