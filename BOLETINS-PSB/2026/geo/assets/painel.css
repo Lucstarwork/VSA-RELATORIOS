@@ -59,25 +59,36 @@
 
   /* Paleta cartográfica. Token próprio, e não reaproveitamento de
      --danger/--warning: semântico de feedback carrega juízo fixo ("erro",
-     "alerta") e não serve para graduar magnitude estatística. Matiz quente
-     única variando sobretudo em luminosidade -- a ordenação não depende de
-     distinguir matiz, então sobrevive a qualquer tipo de daltonismo. Não usa o
-     verde da marca (reservado a ação) nem o dourado isolado (reservado ao anel
-     de foco).
+     "alerta") e não serve para graduar magnitude estatística. Não usa o verde
+     da marca (reservado a ação) nem o dourado isolado (reservado ao anel de
+     foco).
 
-     Os cinco tons não foram escolhidos a olho: a luminância relativa de cada um
-     foi resolvida para que o contraste entre classes vizinhas seja CONSTANTE,
-     1,85:1 em todo o percurso. Nenhuma rampa sequencial de cinco classes chega
-     aos 3:1 do WCAG 1.4.11 entre vizinhas -- exigiria 3^4 = 81:1 entre os
-     extremos, e preto sobre branco dá 21:1. 1,85 é o máximo possível com passo
-     uniforme nesta faixa; o resto da carga de acessibilidade fica onde ela
-     funciona de fato: contagem e corte numérico na legenda, valor exato no
-     tooltip, tabela alternativa completa e contorno de 2,5px na seleção. */
-  /* Rampa para desenhar sobre fundo CLARO. O tema claro le daqui em vez de
-     repetir os valores, e o tema escuro tambem a usa quando o fundo escolhido
-     e uma imagem clara -- ver tokenDoMapa em painel.js. Duas copias dos mesmos
-     hexadecimais divergem na primeira vez que alguem mexe em uma delas. */
-  --mapc-1:#fbe9c6; --mapc-2:#e0b073; --mapc-3:#bf7739; --mapc-4:#93451a; --mapc-5:#5d1e11;
+     Rampa amarelo->vermelho, construída em paleta.py e não escolhida no olho.
+     DIREÇÃO: amarelo é a classe de MENOR vulnerabilidade, vermelho a de maior,
+     e isso vale igual nos dois temas. Croma no limite do gamute sRGB (0,137
+     médio), passo de luminosidade uniforme (0,153 a 0,156) e matiz monotônico
+     de 100 para 25 graus, sem entrar no roxo. A ordenação segue dependendo
+     sobretudo de luminosidade, então sobrevive a qualquer tipo de daltonismo.
+
+     Continua SEQUENCIAL de propriedade única, e isso não é detalhe: o índice é
+     uma régua de magnitude, não uma disputa. Rampa divergente de dois polos --
+     o padrão dos painéis de apuração eleitoral -- sugeriria que existe um lado
+     bom e um lado ruim do mapa, e alguém na sala perguntaria qual é qual.
+     Aqui não há dois lados: há mais e menos vulnerabilidade.
+
+     Nenhuma rampa sequencial de cinco classes chega aos 3:1 do WCAG 1.4.11
+     entre vizinhas -- exigiria 3^4 = 81:1 entre os extremos, e preto sobre
+     branco dá 21:1. O que se garante aqui é distância PERCEPTUAL constante,
+     0,162 a 0,172 em OKLab, mais de cinco vezes o limiar para mancha grande; o
+     resto da carga de acessibilidade fica onde ela funciona de fato: contagem e
+     corte numérico na legenda, valor exato no tooltip, tabela alternativa
+     completa e contorno de 2,5px na seleção.
+
+     O tema claro lê daqui em vez de repetir os valores, e o tema escuro também
+     a usa quando o fundo escolhido é uma imagem clara -- ver tokenDoMapa em
+     painel.js. Duas cópias dos mesmos hexadecimais divergem na primeira vez que
+     alguém mexe em uma delas. */
+  --mapc-1:#fff2a5; --mapc-2:#f3b106; --mapc-3:#cb7603; --mapc-4:#9f3e02; --mapc-5:#6c000c;
   --mapc-vazio:#c8cdd1; --mapc-vazio-traco:#a6aeb4;
 
   /* Paleta QUALITATIVA, para indicador de categoria (unidade de referência).
@@ -89,7 +100,12 @@
      daltonismo; a defesa é a legenda nomeada, o tooltip e a tabela. */
   --mapc-cat-1:#ce655f; --mapc-cat-2:#bc7806; --mapc-cat-3:#879219; --mapc-cat-4:#1da16c;
   --mapc-cat-5:#049ba8; --mapc-cat-6:#408dd7; --mapc-cat-7:#9077d2; --mapc-cat-8:#be66a3;
-  --mapc-traco:#ffffff; --mapc-contorno:#1a1a17;
+  /* Traco entre feicoes ESCURO, nao branco. Medido: contra a rampa saturada o
+     branco colapsa justamente na classe mais baixa -- 0,11 de distancia OKLab
+     contra #fff2a5, que e amarelo bem claro -- e a malha some onde ela e mais
+     densa. O traco escuro fica a 0,18 da classe mais proxima e a 0,74 da mais
+     distante, separando em todo o percurso. */
+  --mapc-traco:#1a1a17; --mapc-contorno:#1a1a17;
 
   --map-1:var(--mapc-1); --map-2:var(--mapc-2); --map-3:var(--mapc-3);
   --map-4:var(--mapc-4); --map-5:var(--mapc-5);
@@ -124,12 +140,16 @@
   --shadow-float:0 8px 28px -6px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.5);
   --scrim:rgba(0,0,0,.68);
 
-  /* No escuro a rampa não é invertida por filtro: ela é recalibrada tom a tom,
-     com o mesmo passo uniforme de contraste (1,75:1 entre vizinhas). Inverter
-     a ordem seria pior que inútil -- sobre fundo preto, "mais escuro" deixa de
-     significar "mais intenso", então a direção da escala sobe em luminosidade
-     e mantém a leitura "mais claro e saturado = mais vulnerável". */
-  --map-1:#5c3a2b; --map-2:#92572b; --map-3:#be7f3a; --map-4:#dfad65; --map-5:#f8dfa8;
+  /* MESMA DIREÇÃO do tema claro: amarelo na classe baixa, vermelho na alta. A
+     versão anterior invertia a ordem no escuro, seguindo a regra "sobre fundo
+     preto, mais claro = mais intenso". Essa regra vale para rampa de matiz
+     neutro, e a rampa daqui não é mais neutra: amarelo e vermelho carregam
+     significado próprio, e inverter a ordem punha o amarelo marcando o pior
+     território e o vermelho marcando o melhor. Trocar luminosidade é leitura
+     cartográfica; trocar o que o vermelho significa é erro.
+     Só a luminosidade foi recalibrada para o fundo #1a1e21 -- passo de L de
+     0,119 a 0,121 e 0,131 de distância OKLab constante entre vizinhas. */
+  --map-1:#f2e075; --map-2:#ebab08; --map-3:#d17a07; --map-4:#b54702; --map-5:#90101a;
   --map-vazio:#2a3035; --map-vazio-traco:#3f474d;
   /* Mesmos matizes do tema claro, luminosidade subida para o fundo escuro. */
   --map-cat-1:#e27e76; --map-cat-2:#d08f3c; --map-cat-3:#9ca743; --map-cat-4:#4ab683;
@@ -312,6 +332,11 @@ a{text-underline-offset:.18em;text-decoration-thickness:1px}
 }
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
 @media (hover:hover){.seg button:not([aria-pressed="true"]):hover{color:var(--ink)}}
+/* Fundo fora de alcance (ver conferirOrtofoto). Risco no rotulo porque so
+   esmaecer a cor nao basta: o cinza de desabilitado nao chega ao contraste de
+   texto, e quem enxerga pouco leria um botao normal que nao responde. */
+.seg button:disabled{color:var(--ink-3);cursor:not-allowed;text-decoration:line-through}
+@media (hover:hover){.seg button:disabled:hover{color:var(--ink-3)}}
 
 .chip-row{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
 .chip{
@@ -604,16 +629,251 @@ dl.defs dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nu
   .escada-item{grid-template-columns:96px 1fr 64px}
 }
 
+/* ---- 10b. APRESENTAÇÃO CONDUZIDA ------------------------------------------ */
+/* Camada que só existe durante o modo apresentação. Três regras governam tudo
+   aqui e valem reler antes de acrescentar qualquer coisa:
+
+   1. Nada é decorativo. Cada elemento carrega número ou nome. O painel é
+      instrumento de Vigilância, não vitrine: efeito sem informação em cima de
+      dado do SUAS deprecia o dado.
+   2. O mapa continua sendo o protagonista. O cartão ocupa uma faixa lateral e
+      deixa o restante do quadro livre; nada cobre o centro.
+   3. Movimento tem origem e destino declarados. O voo entre territórios é a
+      própria transição geográfica, não um floreio -- é o que deixa o
+      espectador entender que saiu de um lugar e chegou em outro. */
+.mapa-palco{position:relative;flex:1 1 auto;display:flex;min-height:0}
+.mapa-palco > #mapa{flex:1 1 auto}
+
+/* Cena 3D da abertura: WebGL por cima do Leaflet, entre o mapa (z-index padrão
+   do Leaflet, até 700 nos panes) e a camada da apresentação (500). Fica acima
+   do mapa e abaixo do cartão -- a narração continua legível durante a órbita.
+   Some por opacidade, não por display: o corte seco entre 3D e 2D denunciava a
+   troca de motor, e a ideia é que a passagem não apareça. */
+/* Seletor com o pai de propósito, e não `.cena3d` sozinho. O maplibre-gl.css é
+   injetado no <head> depois desta folha e traz `.maplibregl-map{position:
+   relative}`; na mesma especificidade quem vem por último vence, o container
+   voltava ao fluxo flex ao lado do #mapa e colapsava para largura ZERO. O
+   canvas então nascia com 400px de fallback e a cena não aparecia. Dois níveis
+   de classe passam na frente sem precisar de !important. */
+.mapa-palco .cena3d{
+  position:absolute;inset:0;width:auto;height:auto;z-index:480;opacity:0;
+  pointer-events:none;transition:opacity .7s var(--ease-out);background:var(--map-fundo)
+}
+.mapa-palco .cena3d.visivel{opacity:1}
+.cena3d .maplibregl-canvas{outline:none}
+/* O MapLibre injeta os próprios controles e marca d'água; na apresentação nada
+   disso é operado e tudo disputa o canto com a trilha. */
+.cena3d .maplibregl-control-container{display:none}
+
+.cinema{position:absolute;inset:0;pointer-events:none;z-index:500}
+
+/* Trilha das 8 paradas. É sumário e relógio ao mesmo tempo: mostra quantos
+   territórios faltam e quanto resta da parada atual. */
+.cinema-trilha{
+  position:absolute;top:0;left:0;right:0;height:3px;display:flex;gap:2px;
+  padding:0 2px;background:color-mix(in srgb,var(--ink) 12%,transparent);
+}
+.cinema-passo{flex:1 1 0;background:color-mix(in srgb,var(--ink) 16%,transparent);overflow:hidden}
+.cinema-passo.vista{background:color-mix(in srgb,var(--primary) 55%,transparent)}
+.cinema-passo .cinema-pulso{
+  display:block;height:100%;width:100%;background:var(--primary);
+  transform:scaleX(0);transform-origin:left center;
+}
+.cinema-passo.atual .cinema-pulso{animation:cinema-avanco linear forwards}
+.cinema.pausado .cinema-passo.atual .cinema-pulso{animation-play-state:paused}
+@keyframes cinema-avanco{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.cinema-cartao{
+  position:absolute;left:var(--sp-5);top:50%;transform:translateY(-50%);
+  width:min(360px,38vw);padding:var(--sp-5);
+  border:var(--hair) solid var(--hairline-strong);border-radius:var(--radius-lg);
+  /* Translúcido com desfoque: o cartão precisa ser legível sobre ortofoto de
+     telhado branco e sobre a classe mais escura da rampa, e ainda assim deixar
+     ver que há mapa embaixo dele. Fundo chapado resolveria a legibilidade e
+     mentiria sobre a continuidade do território. */
+  background:color-mix(in srgb,var(--surface) 86%,transparent);
+  backdrop-filter:blur(10px) saturate(1.1);
+}
+@supports not (backdrop-filter:blur(1px)){
+  .cinema-cartao{background:var(--surface)}
+}
+
+/* DESFOQUE DESLIGADO ENQUANTO O MAPA SE MOVE. Este era o gargalo: backdrop-filter
+   obriga o compositor a reamostrar tudo o que está atrás do painel a cada
+   quadro, e atrás dele há um mapa inteiro mudando de escala durante o voo.
+   Dois painéis grandes com desfoque sobre 247 polígonos em transformação é o
+   que fazia a apresentação engasgar justo no movimento -- exatamente onde ela
+   precisa parecer fluida.
+   Parado, o desfoque volta: é lá que ele é visto, e é lá que não custa nada. */
+.cinema.movendo .cinema-cartao,
+.cinema.movendo .cinema-apuracao{
+  backdrop-filter:none;
+  background:var(--surface)
+}
+
+.cinema-ordem{
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:.18em;
+  text-transform:uppercase;color:var(--primary);margin:0 0 var(--sp-2)
+}
+.cinema-nome{font-size:var(--fs-h3);line-height:1.15;margin:0 0 var(--sp-4)}
+
+.cinema-kpis{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-4)}
+.cinema-kpi-valor{
+  font-family:var(--font-mono);font-size:26px;line-height:1.05;font-weight:600;
+  color:var(--ink);font-variant-numeric:tabular-nums;display:block
+}
+.cinema-kpi-rotulo{
+  font-size:var(--fs-label);color:var(--ink-2);display:block;margin-top:2px
+}
+.cinema-leitura{
+  font-size:var(--fs-caption);line-height:1.5;color:var(--ink-2);margin:0;
+  padding-top:var(--sp-3);border-top:var(--hair) solid var(--hairline)
+}
+/* Texto só para leitor de tela. Aqui serve ao contador: o valor que sobe fica
+   aria-hidden e este gêmeo carrega o número final. Sem isso o role="status" do
+   cartão anunciaria cada quadro da contagem -- dezenas de interrupções por
+   parada, que é pior que não ter contador nenhum. */
+.sr-so{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0
+}
+
+/* Faixa de apuração, no topo. O formato é o da barra de apuração eleitoral
+   porque ele resolve o mesmo problema: distribuir um total entre categorias
+   mutuamente exclusivas e deixar a proporção legível de longe. A diferença é o
+   que está sendo distribuído -- aqui é população por classe de vulnerabilidade,
+   e não voto entre candidatos, então os segmentos seguem a ordem da rampa e não
+   disputam lado. */
+.cinema-apuracao{
+  position:absolute;top:var(--sp-4);left:50%;transform:translateX(-50%);
+  width:min(740px,calc(100% - var(--sp-8)));padding:var(--sp-3) var(--sp-4) var(--sp-3);
+  border:var(--hair) solid var(--hairline-strong);border-radius:var(--radius-lg);
+  background:color-mix(in srgb,var(--surface) 86%,transparent);
+  backdrop-filter:blur(10px) saturate(1.1);
+}
+@supports not (backdrop-filter:blur(1px)){ .cinema-apuracao{background:var(--surface)} }
+
+.cinema-apuracao-titulo{
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 var(--sp-2)
+}
+.cinema-barra{
+  display:flex;height:30px;border-radius:var(--radius-sm);overflow:hidden;
+  background:var(--surface-2)
+}
+/* A barra se revela da esquerda para a direita por clip-path, e não animando a
+   largura de cada fatia. Animar width recalcula o layout a cada quadro -- com
+   quatro fatias de texto centralizado isso são quatro reflows por frame, e o
+   número dentro delas treme enquanto cresce. clip-path roda no compositor: a
+   geometria final é a mesma do primeiro quadro, só vai sendo descoberta. */
+.cinema-barra.revelando{animation:cinema-apura .9s var(--ease-emphasis) backwards}
+@keyframes cinema-apura{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.cinema-fatia{
+  display:flex;align-items:center;justify-content:center;min-width:0;
+  font-family:var(--font-mono);font-size:var(--fs-label);font-weight:600;
+  font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;
+  /* 2px de superfície entre fatias: sem o respiro, duas classes vizinhas da
+     rampa encostadas leem como uma faixa só. */
+  box-shadow:inset -2px 0 0 var(--surface)
+}
+.cinema-fatia:last-child{box-shadow:none}
+.cinema-apuracao-pe{
+  font-size:var(--fs-label);color:var(--ink-2);margin:var(--sp-2) 0 0;
+  display:flex;gap:var(--sp-4);flex-wrap:wrap
+}
+.cinema-apuracao-pe b{font-family:var(--font-mono);color:var(--ink);font-weight:600}
+
+/* Rótulo de território no mapa: chip com nome e valor, pintado na cor da classe
+   e com a tinta escolhida por contraste medido (ver tintaSobre). Mesma função
+   do rótulo de estado num painel de apuração -- nomear o polígono e dar o
+   número sem obrigar a ida à legenda. Sem linha-guia: ela existe para unidade
+   pequena demais para caber o rótulo, e os 8 territórios de CRAS são grandes o
+   bastante para receber o chip dentro de si. */
+.rot-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:3px 8px;
+  border-radius:var(--radius-sm);border:1.5px solid var(--surface);
+  font-size:var(--fs-label);font-weight:600;white-space:nowrap;
+  box-shadow:0 1px 4px rgba(0,0,0,.28)
+}
+.rot-chip b{font-weight:600}
+.rot-chip .rot-val{font-family:var(--font-mono);font-variant-numeric:tabular-nums;opacity:.85}
+.leaflet-pane .rot-marcador{display:flex;align-items:center;justify-content:center}
+
+/* A dica fica sobre o mapa, e sobre ortofoto ou sobre a cena 3D o texto solto
+   em --ink-3 desaparecia. Pílula própria com superfície atrás: o fundo garante
+   o contraste em vez de torcer para que o pixel debaixo coopere. */
+.cinema-ajuda{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:var(--sp-4);
+  margin:0;text-align:center;font-size:var(--fs-label);color:var(--ink-2);
+  padding:5px var(--sp-3);border-radius:var(--radius-pill);
+  border:var(--hair) solid var(--hairline);
+  background:color-mix(in srgb,var(--surface) 88%,transparent);
+  backdrop-filter:blur(8px);white-space:nowrap
+}
+@supports not (backdrop-filter:blur(1px)){ .cinema-ajuda{background:var(--surface)} }
+.cinema.movendo .cinema-ajuda{backdrop-filter:none;background:var(--surface)}
+.cinema-ajuda kbd{
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);color:var(--ink);
+  border:var(--hair) solid var(--hairline-strong);border-radius:var(--radius-sm);
+  padding:1px 5px;background:var(--surface-2)
+}
+.cinema-ajuda span{opacity:.5;margin:0 2px}
+
+/* Entrada do cartão a cada parada: sobe 10px e revela. Direção constante --
+   o cartão sempre chega do mesmo lado, senão vira ruído entre as paradas. */
+.cinema-cartao.entrando{animation:cinema-entrada var(--dur-surface) var(--ease-emphasis)}
+@keyframes cinema-entrada{
+  from{opacity:0;transform:translateY(calc(-50% + 10px))}
+  to{opacity:1;transform:translateY(-50%)}
+}
+
+/* Durante a apresentação o zoom nativo sai do caminho: ninguém opera o mouse
+   numa sala de reunião, e o controle disputa o canto com a trilha. */
+.mapa-bloco.apresentando .leaflet-control-zoom{display:none}
+/* Cascata de entrada do coroplético. O atraso por feição é posto em linha pelo
+   JS, na ordem do índice -- o setor mais vulneravel acende primeiro, e a onda
+   desce a rampa. Quem olha vê a hierarquia se formar em vez de receber o mapa
+   pronto e ter que procurar. */
+.mapa-bloco.apresentando .feicao-dado{animation:cinema-acende .5s var(--ease-out) backwards}
+@keyframes cinema-acende{from{opacity:0}to{opacity:1}}
+
+@media (max-width:860px){
+  .cinema-apuracao{
+    left:var(--sp-3);right:var(--sp-3);width:auto;transform:none;
+    top:var(--sp-3);padding:var(--sp-3)
+  }
+  .cinema-apuracao-pe{display:none}
+  .cinema-cartao{
+    left:var(--sp-3);right:var(--sp-3);width:auto;top:auto;bottom:var(--sp-6);
+    transform:none;padding:var(--sp-4)
+  }
+  .cinema-cartao.entrando{animation:cinema-entrada-base var(--dur-surface) var(--ease-emphasis)}
+  @keyframes cinema-entrada-base{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .cinema-ajuda{display:none}
+}
+
 /* ---- 11. MOVIMENTO -------------------------------------------------------- */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  /* A trilha da apresentação perde o relógio junto com a animação, e uma barra
+     que enche de uma vez diz "acabou" quando a parada mal começou. Sem
+     movimento ela vira marcador de posição: o segmento atual fica chapado e o
+     pulso sai de cena. As paradas continuam avançando pelo temporizador, com o
+     intervalo mais longo de CINEMA_PARADA_CALMA_MS. */
+  .cinema-passo .cinema-pulso{display:none}
+  .cinema-passo.atual{background:var(--primary)}
 }
 
 /* ---- 12. IMPRESSÃO -------------------------------------------------------- */
 @media print{
   :root{--paper:#fff;--surface:#fff}
   body{font-size:11pt}
-  .appbar-right,.mapa-barra .seg,.leaflet-control-zoom,.btn{display:none!important}
+  /* Controle nao vai para o papel, e rotulo de controle tambem nao: .btn ja
+     levava os seletores embora e deixava "FUNDO", "MAPA DE CALOR" e agora
+     "DIVISORIAS" pendurados sozinhos. #orto-indisponivel pela mesma razao --
+     explicaria um botao que nao esta na folha. */
+  .appbar-right,.mapa-barra .seg,.mapa-barra .rotulo,#orto-indisponivel,
+  .cinema,.leaflet-control-zoom,.btn{display:none!important}
   .shell{max-width:none;padding:0}
   .secao{break-inside:avoid;margin-top:var(--sp-8)}
   .card{break-inside:avoid;border-color:#bbb}
@@ -623,3 +883,10 @@ dl.defs dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nu
   .dtable thead th{position:static}
   a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555;word-break:break-all}
 }
+
+/* Controles do Leaflet somem enquanto a cena 3D está no ar. A barra de escala
+   e a atribuição continuavam desenhadas por cima do canvas, e a escala estava
+   MENTINDO: ela mede o zoom do Leaflet, enquanto o que está na tela é a câmera
+   do MapLibre, em outro zoom e com inclinação. Régua errada sobre mapa é pior
+   que régua nenhuma. */
+.mapa-palco:has(.cena3d.visivel) .leaflet-control-container{opacity:0;transition:opacity .3s}

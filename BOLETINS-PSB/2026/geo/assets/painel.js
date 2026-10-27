@@ -29,7 +29,33 @@ const WMS_MUNICIPAL = 'https://geonovo.araucaria.pr.gov.br/geoserver/ows';
    16 e devolve "Map data not yet available" acima disso -- inutil num mapa
    onde o tecnico vai procurar a quadra. Tile direto de tile.openstreetmap.org
    continua fora pela politica de uso da OSMF, e Google esta fora porque o ToS
-   veda consumo fora do SDK proprio. */
+   veda consumo fora do SDK proprio.
+
+   maxNativeZoom em vez de maxZoom nas duas camadas globais. Com maxZoom o
+   Leaflet rebaixa o teto do MAPA inteiro para 19 -- o botao de zoom morre ali,
+   e trocar da ortofoto (nativa ate 21) para o satelite puxava o leitor para
+   tras sem aviso. maxNativeZoom para de pedir tile acima de 19, que e onde o
+   World Imagery devolve o quadro cinza "Map data not yet available", e deixa o
+   Leaflet ampliar o ultimo tile bom. Ampliado e borrado, mas borrado e honesto:
+   mostra onde a fonte acaba em vez de fingir que o mapa acabou. */
+/* Opcoes comuns aos tres fundos de imagem, e o conserto do travamento medido.
+
+   O voo entre territorios atravessa varios niveis de zoom, e por padrao o
+   Leaflet pede tile de CADA nivel atravessado: medido no fundo de satelite com
+   a apresentacao rodando, deram 474 requisicoes em 45 segundos. Cada imagem
+   que chega e decodificada na thread principal, e era dali que vinham os
+   engasgos -- 117 quadros acima de 100 ms com o quadro mediano ainda em 60 fps,
+   que e a assinatura de tarefa longa pontual, nao de carga continua.
+
+   updateWhenZooming: false faz o Leaflet escalar por transform durante a
+   animacao e so buscar tile ao pousar. keepBuffer menor corta o anel de tiles
+   fora de tela, que no voo e desperdicio puro: ele e descartado antes de
+   aparecer. */
+const TILES_FLUIDOS = { updateWhenZooming: false, keepBuffer: 1 };
+
+const ZOOM_MAXIMO = 21;      // teto nativo da ortofoto municipal (7,3 cm/px)
+const ZOOM_NATIVO_GLOBAL = 19;  // teto real do Esri sobre Araucaria
+
 const FUNDOS = {
   proprio: { rotulo: 'Mapa do território', imagem: false, fonte: 'geoportal municipal' },
   ruas: {
@@ -39,7 +65,8 @@ const FUNDOS = {
     fonte: 'Esri World Street Map',
     claro: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
     opcoes: {
-      maxZoom: 19,
+      maxZoom: ZOOM_MAXIMO, maxNativeZoom: ZOOM_NATIVO_GLOBAL,
+      ...TILES_FLUIDOS,
       attribution: 'Ruas: Esri, HERE, Garmin e colaboradores do '
         + '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     },
@@ -49,7 +76,19 @@ const FUNDOS = {
     imagem: true,
     fonte: 'Esri World Imagery',
     claro: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    opcoes: { maxZoom: 19, attribution: 'Imagem: Esri, Maxar, Earthstar Geographics' },
+    opcoes: {
+      maxZoom: ZOOM_MAXIMO, maxNativeZoom: ZOOM_NATIVO_GLOBAL,
+      ...TILES_FLUIDOS,
+      // A data da cena vai na barra de procedencia, onde ja moram as outras
+      // fontes -- e nao no rotulo do cabecalho, que fica curto como os demais
+      // fundos. "Parece desatualizado" e a primeira suspeita de quem olha
+      // imagem de satelite, e sem a data ninguem tem como conferir. Conferida
+      // no identify do proprio servico sobre o nucleo urbano: GeoEye-1, Vivid
+      // Advanced, 30 cm, 26/12/2025. O mosaico e por cena, entao a data vale
+      // para o nucleo e nao para a area rural -- por isso o rotulo diz onde.
+      attribution: 'Satélite: Esri, Vantor/Maxar, Earthstar Geographics '
+        + '— cena de 26/12/2025 no núcleo urbano',
+    },
   },
   ortofoto: {
     rotulo: 'Ortofoto municipal',
@@ -58,11 +97,29 @@ const FUNDOS = {
     wms: true,
     opcoes: {
       layers: 'Araucaria:ORTO', format: 'image/png', transparent: true, version: '1.3.0',
-      maxZoom: 21, attribution: 'Ortofoto: Prefeitura de Araucária (núcleo urbano)',
+      maxZoom: ZOOM_MAXIMO, ...TILES_FLUIDOS, attribution: 'Ortofoto: Prefeitura de Araucária (núcleo urbano)',
       bounds: L.latLngBounds([-25.650736, -49.443689], [-25.520990, -49.336521]),
     },
   },
 };
+
+/* A ortofoto municipal so existe dentro da rede da Prefeitura:
+   geonovo.araucaria.pr.gov.br resolve para 172.20.10.67, endereco privado
+   (RFC 1918). O painel servido pelo HUB vem de origem publica, e dali o
+   navegador barra a requisicao antes de ela sair -- politica de acesso a rede
+   privada -- enquanto o GeoServer nao devolve cabecalho CORS nenhum para o
+   preflight ter como passar. Pela linha de comando, de dentro da rede, o mesmo
+   tile volta em 0,09 s: por isso o defeito nao aparecia em nenhum teste de
+   servidor. O que o leitor via era o botao ligado e o mapa cinza, sem erro.
+
+   A sonda pede o menor tile possivel pelo mesmo caminho dos tiles reais (<img>
+   sem CORS, para falhar e acertar exatamente como eles) e so entao decide se o
+   botao fica de pe. */
+const ORTO_SONDA = `${WMS_MUNICIPAL}?service=WMS&request=GetMap&version=1.3.0`
+  + '&layers=Araucaria:ORTO&styles=&format=image/png&transparent=true'
+  + '&crs=EPSG:3857&width=1&height=1'
+  + '&bbox=-5498574,-2949858,-5493682,-2944966';
+const ORTO_ESPERA_MS = 6000;
 
 const ESCALAS = {
   setor: { arquivo: 'setores.geojson', chave: 'CD_SETOR', rotulo: 'Setor censitário' },
@@ -75,6 +132,7 @@ const estado = {
   indicador: 'ivt',
   fundo: 'proprio',
   calor: 'nenhum',
+  divisoria: 'todos',
   selecionado: null,
   camadas: {},
   geo: {},
@@ -87,6 +145,8 @@ let camadaUnidades;
 let camadaContexto;
 let camadaFundo;
 let camadaCalor;
+let camadaDivisorias;
+let camadaRotulos;
 let quadroPendente = null;
 
 const nf = new Intl.NumberFormat('pt-BR');
@@ -94,13 +154,13 @@ const nf1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFr
 
 const token = (nome) => getComputedStyle(document.documentElement).getPropertyValue(nome).trim();
 /* Token da rampa cartografica, escolhido pelo que esta ATRAS do coropletico e
-   nao pelo tema da interface. O tema escuro inverte a luminancia da rampa --
-   no escuro e o tom claro que significa "mais intenso" -- e isso so se sustenta
-   sobre fundo escuro. O mapa de ruas e cor de creme nos dois temas, e sobre ele
-   as classes altas do tema escuro desaparecem: justo as que precisam saltar.
-   Sobre imagem clara o mapa desenha com a rampa clara, qualquer que seja o tema
-   da pagina. Os graficos do painel lateral continuam no tema, porque o fundo
-   deles e a interface. */
+   nao pelo tema da interface. As duas rampas tem a MESMA direcao -- amarelo na
+   classe baixa, vermelho na alta -- e diferem so na luminosidade, calibrada
+   uma para fundo claro e outra para fundo escuro. O mapa de ruas e cor de
+   creme nos dois temas, e sobre ele a rampa escura perde separacao do fundo:
+   sobre imagem clara o mapa desenha com a rampa clara, qualquer que seja o
+   tema da pagina. Os graficos do painel lateral continuam no tema, porque o
+   fundo deles e a interface. */
 const tokenDoMapa = (nome) =>
   token(escuro() && FUNDOS[estado.fundo].imagemClara ? `--mapc-${nome}` : `--map-${nome}`);
 const rampa = () => ['1', '2', '3', '4', '5'].map(tokenDoMapa);
@@ -216,25 +276,35 @@ function corDe(valor) {
   return cores[Math.round((indice / Math.max(total - 1, 1)) * (cores.length - 1))];
 }
 
-/* Value-by-alpha: a opacidade acompanha a densidade populacional do setor.
-   Sem isso o mapa de Araucaria mede area, nao vulnerabilidade -- os 23 setores
-   rurais cobrem 82% do territorio com 6% da populacao e dominariam a leitura.
-   O piso subiu de 0,45 para 0,55 depois de medir o que o alfa faz com a cor.
-   Em 0,45 a classe mais alta do tema claro chegava a tela com 34% do croma
-   que a legenda mostra -- a mesma classe aparecia no mapa em duas cores
-   diferentes conforme a densidade do setor, e a legenda deixava de descrever
-   o mapa. Em 0,55 sobram 45% no tema claro e 58% no escuro, e as duas classes
-   mais altas continuam separadas por 0,083 em OKLab, bem acima do limiar de
-   percepcao. A transparencia continua fazendo o que tem que fazer, e agora
-   esta dita na legenda em vez de ficar implicita.
-   So vale na escala de setor: bairro e territorio de CRAS ja agregam
-   populacoes comparaveis. */
-function opacidadeDe(propriedades) {
-  if (estado.escala !== 'setor') return 0.90;
-  const peso = propriedades.peso_visual;
-  if (peso === null || peso === undefined) return 0.75;
-  return 0.55 + peso * 0.45;
-}
+/* Value-by-alpha SAIU. A opacidade acompanhava a densidade populacional do
+   setor (peso_visual, rank percentil de densidade), e isso punha dois dados
+   diferentes no mesmo canal: o matiz carregava o indice, o alfa carregava
+   densidade, e o olho le os dois como "intensidade de cor". O piso de 0,55 era
+   uma tentativa de limitar o estrago, e nao foi suficiente -- medido em OKLab
+   sobre o fundo real do mapa:
+
+     espalhamento DENTRO de uma classe, so pelo alfa   0,273 (claro vetorial)
+     menor passo ENTRE classes vizinhas                0,077
+     ou seja: o ruido era 3,5x o sinal
+
+   Na pratica um setor da classe 5 com baixa densidade chegava a tela na mesma
+   cor de um classe 3 com alta densidade. Com alfa fixo o passo minimo sobe
+   para 0,138 no claro e 0,121 no escuro -- 4x o limiar de percepcao para
+   mancha grande -- e o ruido vai a zero.
+
+   O motivo original continua valido: os setores rurais cobrem 82% do
+   territorio com 6% da populacao e dominam a leitura de area. So que a
+   resposta a isso nao e sujar o unico canal que carrega o indice. O painel ja
+   responde em tres outros lugares -- o mapa de calor por densidade de
+   familias, a contagem por classe na legenda e a tabela ligada com o valor
+   exato. Qualquer coroplético publicado no mundo tem essa propriedade.
+
+   peso_visual continua viajando no GeoJSON (publicar.py:478). Nada no painel
+   le mais. Nao arranquei de la para nao forcar re-publicacao do pipeline
+   inteiro por 247 floats inertes. */
+const ALFA_COM_DADO = 0.90;
+const ALFA_SEM_DADO = 0.75;
+const RECUO_SOBRE_IMAGEM = 0.78;  // ver o comentario de trocarFundo
 
 /* Hachura do setor sem valor publicavel.
 
@@ -293,16 +363,36 @@ function estiloFeicao(feicao) {
   const semDado = valor === null || valor === undefined;
   const selecionada = estado.selecionado === feicao.properties[ESCALAS[estado.escala].chave];
   const sobreImagem = FUNDOS[estado.fundo].imagem;
-  const base = semDado ? 0.75 : opacidadeDe(feicao.properties);
+  // Fora do recorte a feição some por ESTILO, não por remoção do DOM. Antes o
+  // recorte reconstruía a camada inteira -- 247 paths SVG destruídos e criados
+  // de novo a cada uma das nove paradas, quase 2.300 elementos, e cada lote
+  // desses é uma tarefa longa na thread principal no meio da animação. Agora a
+  // camada nasce uma vez por escala e o recorte é um setStyle.
+  if (!noRecorte(feicao.properties)) {
+    return { fillOpacity: 0, opacity: 0, fill: false, stroke: false };
+  }
+
+  // Na apresentação o coroplético fica CHAPADO. Numa projeção vista de seis
+  // metros, translucidez vira cor lavada: os 10% de fundo que atravessam o
+  // polígono custam saturação que a sala inteira precisa enxergar. Na tela de
+  // trabalho os 0,90 continuam, porque ali a referência do fundo ainda serve.
+  const base = semDado ? ALFA_SEM_DADO : (cinema.ligado ? 1 : ALFA_COM_DADO);
   // Com calor ligado o coroplético recua para contexto: duas superfícies
   // contínuas disputando a mesma leitura não somam, se anulam.
-  const recuo = (sobreImagem ? 0.62 : 1) * (estado.calor !== 'nenhum' ? 0.45 : 1);
+  const recuoImagem = cinema.ligado ? 0.88 : RECUO_SOBRE_IMAGEM;
+  const recuo = (sobreImagem ? recuoImagem : 1) * (estado.calor !== 'nenhum' ? 0.45 : 1);
   return {
     fillColor: semDado ? (hachuraSemDado() || tokenDoMapa('vazio')) : corDe(valor),
     fillOpacity: base * recuo,
     color: selecionada ? tokenDoMapa('contorno') : (semDado ? token('--ink-3') : tokenDoMapa('traco')),
+    // Malha mais marcada na apresentação: 0,6px de traço desaparece numa
+    // projeção, e sem o traço os setores vizinhos de mesma classe viram uma
+    // mancha só -- a densidade da malha urbana some justo onde ela é o
+    // argumento. É a mesma decisão dos painéis de apuração, onde o contorno
+    // entre municípios é o que deixa a mancha legível.
     weight: selecionada ? 2.5
-      : (sobreImagem ? 1.1 : (semDado ? 0.9 : (estado.escala === 'setor' ? 0.6 : 1.4))),
+      : (cinema.ligado ? (estado.escala === 'setor' ? 1.2 : 2)
+        : (sobreImagem ? 1.1 : (semDado ? 0.9 : (estado.escala === 'setor' ? 0.6 : 1.4)))),
     // Tracejado marca o que nao tem dado: o leitor precisa distinguir "nao
     // medimos aqui" de "aqui o valor e baixo", e cor sozinha nao faz isso.
     dashArray: semDado ? '2 3' : null,
@@ -339,6 +429,18 @@ function mapaMedido() {
 function ajustarQuadro(limites, opcoes) {
   if (mapaMedido()) {
     quadroPendente = null;
+    // Voo em vez de salto durante a apresentação: entre dois territórios o
+    // fitBounds troca o quadro num corte seco e quem assiste perde a noção de
+    // onde estava. O flyToBounds afasta, desloca e aproxima -- a trajetória é
+    // a própria informação "saímos daqui e chegamos ali". Fora da
+    // apresentação continua salto, que é o certo para quem está operando.
+    if (cinema.ligado && !movimentoReduzido()) {
+      // 1,1s em vez de 1,6s. O voo longo parecia arrastado justamente por ser o
+      // trecho mais caro de desenhar: meio segundo a menos sob carga é meio
+      // segundo a menos de queda de quadro, e a trajetória continua legível.
+      mapa.flyToBounds(limites, { ...opcoes, duration: 1.1, easeLinearity: 0.3 });
+      return;
+    }
     mapa.fitBounds(limites, opcoes);
     return;
   }
@@ -356,6 +458,10 @@ function montarMapa() {
     renderer: L.svg({ padding: 0.3 }),
     zoomControl: true,
     attributionControl: true,
+    // Teto fixo no mapa, nao herdado da camada de fundo. Sem isto o Leaflet
+    // recalcula o maximo a cada troca de fundo e o leitor perde zoom ao sair
+    // da ortofoto, no meio de uma leitura de quadra.
+    maxZoom: ZOOM_MAXIMO,
     // Rolagem sobre o mapa é zoom, e só: com o ponteiro dentro do mapa a
     // página não sobe nem desce. Quem precisa rolar a página passa por fora do
     // mapa, e quem não usa roda continua com os botões e com o teclado.
@@ -383,6 +489,33 @@ function montarMapa() {
   mapa.getPane('calor').style.zIndex = 450;
   mapa.getPane('calor').style.pointerEvents = 'none';
 
+  // Divisoria de CRAS e linha de referencia: tem que ficar legivel por cima do
+  // coropletico E por cima da mancha de calor. No overlayPane ela viveria a
+  // merce do proximo bringToFront do coropletico -- mesmo problema que levou o
+  // calor a ganhar painel proprio. 460 fica acima do calor (450) e abaixo do
+  // marcador de unidade (600), que continua sendo o que o leitor clica.
+  mapa.createPane('divisorias');
+  mapa.getPane('divisorias').style.zIndex = 460;
+  mapa.getPane('divisorias').style.pointerEvents = 'none';
+
+  // Rótulo de território acima de tudo, inclusive do marcador de unidade: ele
+  // é texto, e texto coberto por um ponto de 8px fica ilegível sem que ninguém
+  // perceba a causa.
+  mapa.createPane('rotulos');
+  mapa.getPane('rotulos').style.zIndex = 620;
+  mapa.getPane('rotulos').style.pointerEvents = 'none';
+
+  // Enquanto o mapa se move, os painéis da apresentação largam o desfoque de
+  // fundo (ver .cinema.movendo). Preso ao evento do Leaflet e não a um
+  // temporizador: o voo tem duração própria e qualquer palpite erraria para
+  // mais ou para menos.
+  const marcarMovimento = (movendo) => {
+    const camada = document.getElementById('cinema');
+    if (camada) camada.classList.toggle('movendo', movendo);
+  };
+  mapa.on('movestart zoomstart', () => marcarMovimento(true));
+  mapa.on('moveend zoomend', () => marcarMovimento(false));
+
   // O Leaflet so escuta resize da janela, e trocar display:none por block no
   // iframe do HUB nao gera resize nenhum. Quem ve o bloco mudar de tamanho e
   // o observador do proprio elemento.
@@ -399,17 +532,42 @@ function escuro() {
 
 /* O fundo de imagem muda o que o coropletico pode fazer por cima dele: cheio,
    ele apaga a imagem e o leitor perde a ancora que foi buscar; apagado demais,
-   a classificacao some. 0,55 com contorno reforcado e o ponto em que os dois
-   continuam legiveis -- conferido sobre telhado claro, que e o pior caso. */
+   a classificacao some.
+
+   O recuo era 0,62 e foi para 0,78. O 0,62 nasceu quando a opacidade ainda
+   variava por densidade (ver ALFA_COM_DADO): naquele regime 0,62 era o TETO,
+   que so o setor mais denso alcancava, e o ponto de equilibrio foi medido
+   nesse teto. Com alfa fixo o recuo deixou de ser teto e virou o valor de
+   todo poligono, e 0,62 x 0,90 = 0,558 jogava as tres primeiras classes uma
+   em cima da outra -- a mesma mancha lavada que o value-by-alpha produzia.
+
+   Remedido compondo a rampa sobre tile real da ortofoto, no pior caso
+   (telhado branco, 255,254,255):
+
+     recuo  alfa   passo min  foto visivel
+     0,62   0,558    0,079       44%
+     0,70   0,630    0,091       37%
+     0,78   0,702    0,103       30%   <- escolhido
+     0,86   0,774    0,116       23%
+
+   Em 0,86 a classe mais alta apaga a quadra, que e justo o que o tecnico foi
+   buscar na imagem. Em 0,78 as cinco classes separam (3,4x o limiar) e rua,
+   lote e edificacao continuam legiveis sob todas elas. */
 function trocarFundo(nome) {
   estado.fundo = nome;
   if (camadaFundo) { camadaFundo.remove(); camadaFundo = null; }
 
   const fundo = FUNDOS[nome];
   if (fundo.imagem) {
+    // updateWhenIdle SÓ na apresentação. Medido: updateWhenZooming não alcança o
+    // flyTo -- ele não é uma animação de zoom, é movimento contínuo, e o
+    // GridLayer segue pedindo tile a cada quadro do trajeto. updateWhenIdle
+    // segura tudo até o mapa pousar. No uso diário ele ficaria ruim, porque o
+    // tile só apareceria ao soltar o arrasto; na apresentação ninguém arrasta.
+    const opcoes = { ...fundo.opcoes, updateWhenIdle: cinema.ligado };
     camadaFundo = fundo.wms
-      ? L.tileLayer.wms(WMS_MUNICIPAL, fundo.opcoes)
-      : L.tileLayer(escuro() && fundo.escuro ? fundo.escuro : fundo.claro, fundo.opcoes);
+      ? L.tileLayer.wms(WMS_MUNICIPAL, opcoes)
+      : L.tileLayer(escuro() && fundo.escuro ? fundo.escuro : fundo.claro, opcoes);
     camadaFundo.addTo(mapa);
     camadaFundo.bringToBack();
   }
@@ -421,6 +579,11 @@ function trocarFundo(nome) {
   // esta na tela.
   document.getElementById('fonte-fundo').textContent = `Fundo cartográfico: ${fundo.fonte}`;
   desenharContexto();
+  // A divisoria e o chip de rotulo leem tokenDoMapa, que muda com o fundo
+  // (imagem clara inverte a rampa) e com o tema. aplicarTema entra por aqui,
+  // entao este e o unico ponto que precisa redesenhar.
+  desenharDivisorias();
+  desenharRotulos();
   if (camadaDados) {
     camadaDados.setStyle(estiloFeicao);
     camadaDados.bringToFront();
@@ -433,6 +596,244 @@ function trocarFundo(nome) {
   }
   if (camadaUnidades) camadaUnidades.bringToFront();
   atualizarHash();
+}
+
+/* Pergunta ao geoportal se ele esta ao alcance DESTE navegador. Promessa que
+   nunca rejeita: indisponibilidade de fundo nao e erro de carga do painel, e
+   nao pode derrubar o resto da tela. */
+function sondarOrtofoto() {
+  return new Promise((resolve) => {
+    const imagem = new Image();
+    const prazo = setTimeout(() => { imagem.src = ''; resolve(false); }, ORTO_ESPERA_MS);
+    const responder = (alcancavel) => { clearTimeout(prazo); resolve(alcancavel); };
+    imagem.onload = () => responder(true);
+    imagem.onerror = () => responder(false);
+    // Sem o parametro de corte o navegador pode responder do cache -- inclusive
+    // o cache de uma falha anterior, de outra rede.
+    imagem.src = `${ORTO_SONDA}&_=${Date.now()}`;
+  });
+}
+
+/* Botao de fundo que nao entrega fundo tem que sair do caminho. Desligar e
+   dizer por que e melhor do que deixar o leitor concluir que a ortofoto nao
+   existe, ou que o mapa quebrou. */
+async function conferirOrtofoto() {
+  const botao = document.querySelector('[data-fundo="ortofoto"]');
+  const aviso = document.getElementById('orto-indisponivel');
+  if (await sondarOrtofoto()) return;
+
+  botao.disabled = true;
+  aviso.textContent = 'Ortofoto só na rede da Prefeitura';
+  // Fundo vindo do hash: o leitor chegou com ortofoto na URL e ficaria preso
+  // num fundo que nao pinta nada.
+  if (estado.fundo === 'ortofoto') trocarFundo('satelite');
+}
+
+/* Divisorias de CRAS sobre qualquer escala.
+
+   O painel ja tinha territorio de CRAS como ESCALA, mas escala troca o que o
+   mapa mede: para ver o indice por setor E a fronteira do territorio ao mesmo
+   tempo nao havia jeito. Quem trabalha na ponta precisa exatamente disso --
+   "esse setor vermelho cai no meu territorio?".
+
+   Linha com casing (duas passadas, clara por baixo e escura por cima, ou o
+   contrario no tema escuro) porque uma unica passada nao resolve: sobre a
+   classe 1 so a escura aparece, sobre a classe 5 so a clara. Casing e a saida
+   cartografica padrao para fronteira que precisa ser lida sobre qualquer
+   preenchimento, e aqui ela ainda tem que sobreviver a foto de satelite. */
+function desenharDivisorias() {
+  if (camadaDivisorias) { camadaDivisorias.remove(); camadaDivisorias = null; }
+  if (estado.divisoria === 'nenhuma') return;
+
+  const feicoes = estado.geo.cras.features.filter((f) =>
+    estado.divisoria === 'todos' || f.properties.cras === estado.divisoria);
+  if (!feicoes.length) return;
+
+  camadaDivisorias = L.layerGroup().addTo(mapa);
+  const colecao = { type: 'FeatureCollection', features: feicoes };
+  // Ordem importa: a passada larga vai primeiro e fica por baixo.
+  [
+    { color: tokenDoMapa('traco'), weight: 5.5, opacity: 0.85 },
+    { color: tokenDoMapa('contorno'), weight: 2, opacity: 1 },
+  ].forEach((traco) => {
+    L.geoJSON(colecao, {
+      interactive: false,
+      pane: 'divisorias',
+      style: { ...traco, fill: false, lineJoin: 'round' },
+    }).addTo(camadaDivisorias);
+  });
+}
+
+/* A lista sai da geometria, em ordem alfabetica -- a ordem de feicao no arquivo
+   e a do GeoServer, que nao significa nada para quem procura o proprio CRAS. */
+function preencherDivisorias() {
+  const seletor = document.getElementById('seletor-divisoria');
+  const nomes = estado.geo.cras.features
+    .map((f) => f.properties.cras)
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  nomes.forEach((nome) => {
+    seletor.add(new Option(nome, nome));
+  });
+}
+
+/* O seletor de divisoria nao desenha so a linha: ele RECORTA o mapa. Escolhido
+   um CRAS, o painel desenha apenas o que pertence aquele territorio e o resto
+   do municipio fica limpo -- fundo e nada mais. "Todos" e "Sem divisorias"
+   mostram o municipio inteiro, mudando so a linha.
+
+   O pertencimento vem do campo `cras`, que publicar.py agora grava em setor e
+   bairro pela mesma regra de indice.py. No bairro ele pode ser uma LISTA: a
+   divisa Califórnia/Industrial passa dentro de Capela Velha, entao o bairro
+   pertence aos dois e aparece nos dois recortes. Fingir dono unico ali faria
+   Capela Velha sumir justamente dos dois CRAS que trabalham nele. */
+function noRecorte(propriedades) {
+  if (estado.divisoria === 'nenhuma' || estado.divisoria === 'todos') return true;
+  const dono = propriedades.cras;
+  return Array.isArray(dono) ? dono.includes(estado.divisoria) : dono === estado.divisoria;
+}
+
+function feicoesNoRecorte() {
+  return estado.geo[estado.escala].features.filter((f) => noRecorte(f.properties));
+}
+
+/* Chip de rótulo por território, no estilo do rótulo de estado num painel de
+   apuração: nome e valor pintados na cor da própria classe. Resolve o vaivém
+   entre mapa e legenda -- quem olha de longe, numa projeção, não tem como
+   cruzar tom de laranja com faixa numérica no rodapé.
+
+   Só na visão de todos os territórios. Recortado num CRAS, oito chips seriam
+   sete mentiras sobre o que está na tela; na escala de setor seriam 247 chips
+   sobrepostos. */
+function desenharRotulos() {
+  if (camadaRotulos) { camadaRotulos.remove(); camadaRotulos = null; }
+  if (estado.divisoria !== 'todos') return;
+  // Na escala de território o chip é 1:1 com o polígono, então vale no uso
+  // diário. Na apresentação ele entra por cima da malha de setor, que é o
+  // arranjo dos painéis de apuração: a unidade fina pintada e a unidade de
+  // gestão nomeada em cima. Na escala de bairro ficaria 8 chips sobre 19
+  // polígonos de outro recorte -- rótulo apontando para o que não está ali.
+  if (!cinema.ligado && estado.escala !== 'cras') return;
+
+  camadaRotulos = L.layerGroup().addTo(mapa);
+  estado.geo.cras.features.forEach((feicao) => {
+    const valor = feicao.properties[estado.indicador];
+    if (valor === null || valor === undefined) return;
+    const fundo = corDe(valor);
+    const info = indicadorAtual();
+    const chip = `<span class="rot-chip" style="background:${fundo};color:${tintaSobre(fundo)}">`
+      + `<b>${feicao.properties.cras.replace('CRAS ', '')}</b>`
+      + `<span class="rot-val">${formatar(valor, info.unidade, estado.indicador)}</span></span>`;
+    L.marker(L.geoJSON(feicao).getBounds().getCenter(), {
+      pane: 'rotulos',
+      interactive: false,
+      keyboard: false,
+      icon: L.divIcon({ className: 'rot-marcador', html: chip, iconSize: null }),
+    }).addTo(camadaRotulos);
+  });
+}
+
+/* Faixa de apuração: distribui a POPULAÇÃO entre as classes do indicador em
+   tela. É a correção que o coroplético sozinho não dá -- no mapa a área manda,
+   e os 23 setores rurais cobrem 82% do território com 6% da gente. Aqui cada
+   classe ocupa a largura das pessoas que vivem nela.
+
+   Lê as mesmas quebras e as mesmas cores do mapa, via corDe/classeDe: se a
+   barra tivesse classificação própria ela acabaria discordando da legenda ao
+   lado, que é o pior defeito possível num painel. */
+function renderizarApuracao(feicoes, titulo) {
+  const quebras = quebrasAtuais();
+  const info = indicadorAtual();
+  const alvo = document.getElementById('cinema-barra');
+  document.getElementById('cinema-apuracao-titulo').textContent = titulo;
+
+  if (ehNominal(info) || !quebras || quebras.length < 2) {
+    // Escala nominal não tem classe ordenada para empilhar, e empilhar mesmo
+    // assim sugeriria uma progressão que não existe.
+    document.getElementById('cinema-apuracao').hidden = true;
+    return;
+  }
+  document.getElementById('cinema-apuracao').hidden = false;
+
+  const faixas = new Map();
+  let semDado = 0;
+  let total = 0;
+  feicoes.forEach((f) => {
+    const pop = f.properties.pop || 0;
+    total += pop;
+    const indice = classeDe(f.properties[estado.indicador], quebras);
+    if (indice < 0) { semDado += pop; return; }
+    faixas.set(indice, (faixas.get(indice) || 0) + pop);
+  });
+  const medido = total - semDado;
+  if (!medido) { document.getElementById('cinema-apuracao').hidden = true; return; }
+
+  const ordenadas = [...faixas.entries()].sort((a, b) => a[0] - b[0]);
+  alvo.innerHTML = ordenadas
+    .map(([indice, pop]) => {
+      const cor = corDe((quebras[indice] + quebras[indice + 1]) / 2);
+      const pct = (pop / medido) * 100;
+      const rotulo = `${nf1.format(quebras[indice])}–${nf1.format(quebras[indice + 1])}`;
+      // Percentual só na fatia que o comporta. Abaixo disso o número sai
+      // cortado pelo overflow, e metade de um algarismo é pior que nenhum --
+      // o valor continua no title e no rodapé.
+      return `<span class="cinema-fatia" style="color:${tintaSobre(cor)};background:${cor};`
+        + `width:${pct}%" title="${rotulo}: ${nf.format(pop)} moradores">`
+        + `${pct >= 7 ? `${nf1.format(pct)}%` : ''}</span>`;
+    })
+    .join('');
+  // Reinicia a revelação a cada parada. A largura final já está no markup: o
+  // que anima é o recorte do container, não a geometria das fatias.
+  alvo.classList.remove('revelando');
+  void alvo.offsetWidth;
+  alvo.classList.add('revelando');
+
+  // A faixa do rodapé vem NOMEADA. Quatro territórios não têm ninguém na
+  // classe crítica, e "na classe mais alta" apontaria para a terceira faixa
+  // deles como se fosse a pior do município -- superlativo relativo ao recorte
+  // lido como absoluto é o mesmo erro que a narração já teve uma vez.
+  const [indiceTopo, popTopo] = ordenadas[ordenadas.length - 1];
+  const faixaTopo = `${nf1.format(quebras[indiceTopo])}–${nf1.format(quebras[indiceTopo + 1])}`;
+  const ehTopoAbsoluto = indiceTopo === quebras.length - 2;
+  document.getElementById('cinema-apuracao-pe').innerHTML =
+    `<span>Moradores medidos <b>${nf.format(medido)}</b></span>`
+    + `<span>${ehTopoAbsoluto ? 'Na classe mais alta' : 'Na faixa mais alta presente'} `
+    + `(${faixaTopo}) <b>${nf.format(popTopo)}</b> `
+    + `(${nf1.format((popTopo / medido) * 100)}%)</span>`
+    + (semDado ? `<span>Em setor sem valor publicável <b>${nf.format(semDado)}</b></span>` : '');
+}
+
+function trocarDivisoria(valor) {
+  estado.divisoria = valor;
+
+  // A ficha lateral pode estar aberta num setor que acabou de sair do recorte.
+  const chave = ESCALAS[estado.escala].chave;
+  if (estado.selecionado
+      && !feicoesNoRecorte().some((f) => f.properties[chave] === estado.selecionado)) {
+    estado.selecionado = null;
+  }
+
+  // setStyle em vez de desenharDados: a geometria não mudou, só quem aparece.
+  camadaDados.setStyle(estiloFeicao);
+  camadaDados.bringToFront();
+  desenharDivisorias();
+  desenharRotulos();
+  if (camadaUnidades) camadaUnidades.bringToFront();
+  aplicarCalor();
+  // Ficha lateral e tabela estão fora da tela em modo apresentação -- redesenhar
+  // os dois a cada parada era trabalho invisível, oito vezes.
+  if (!cinema.ligado) {
+    renderizarDetalhe();
+    destacarLinhaTabela();
+  }
+
+  // Enquadra so ao ENTRAR num territorio: recortado para um CRAS no zoom do
+  // municipio o leitor veria uma mancha de selo postal cercada de vazio.
+  // Voltar para todos/sem nao reenquadra -- tirar o zoom de quem estava
+  // examinando uma quadra seria pior que manter o enquadramento apertado.
+  if (valor !== 'nenhuma' && valor !== 'todos') {
+    const alvo = estado.geo.cras.features.find((f) => f.properties.cras === valor);
+    if (alvo) ajustarQuadro(L.geoJSON(alvo).getBounds(), { padding: [12, 12] });
+  }
 }
 
 function desenharContexto() {
@@ -497,7 +898,17 @@ function desenharDados() {
   const chave = ESCALAS[estado.escala].chave;
   camadaDados = L.geoJSON(estado.geo[estado.escala], {
     style: estiloFeicao,
+    // Classe própria nos polígonos de dado. A cascata de entrada era endereçada
+    // a .leaflet-interactive, que pega também os 224 traços de hidrografia e os
+    // marcadores de unidade: 480 elementos animando onde 247 bastam, e a
+    // hidrografia nem deveria cascatear -- rio não tem classe de índice.
+    className: 'feicao-dado',
     onEachFeature: (feicao, camada) => {
+      // Na apresentação não se passa o mouse nem se clica no mapa: o controle
+      // é teclado e temporizador. Montar 247 tooltips e 247 ouvintes de clique
+      // a cada parada era trabalho jogado fora oito vezes seguidas, e é parte
+      // do engasgo na virada.
+      if (cinema.ligado) return;
       const propriedades = feicao.properties;
       const info = indicadorAtual();
       camada.bindTooltip(
@@ -505,7 +916,9 @@ function desenharDados() {
         `${info.rotulo}: <span class="tt-val">${formatar(propriedades[estado.indicador], info.unidade, estado.indicador)}</span>`,
         { className: 'tt-mapa', sticky: true }
       );
-      camada.on('click', () => selecionar(propriedades[chave]));
+      // A feição fora do recorte continua no DOM, apenas transparente: sem esta
+      // guarda um clique no vazio selecionaria um setor que não está na tela.
+      camada.on('click', () => { if (noRecorte(propriedades)) selecionar(propriedades[chave]); });
     },
   }).addTo(mapa);
 
@@ -513,6 +926,7 @@ function desenharDados() {
     estado.camadas.hidrografia.addTo(mapa);
   }
   if (camadaUnidades && document.getElementById('cam-unidades').checked) camadaUnidades.addTo(mapa);
+  escalonarEntrada();
 }
 
 function selecionar(chave) {
@@ -1127,7 +1541,14 @@ function trocarEscala(escala) {
     botao.setAttribute('aria-pressed', String(botao.dataset.escala === escala));
   });
   desenharDados();
-  enquadrar(QUADRO_POR_ESCALA[escala] || 'municipio');
+  desenharDivisorias();
+  desenharRotulos();
+  // Com recorte ativo o quadro segue o territorio, nao o padrao da escala:
+  // voltar para o municipio inteiro desfaria o recorte que o leitor acabou de
+  // pedir, so porque ele trocou de setor para bairro.
+  const alvo = estado.geo.cras.features.find((f) => f.properties.cras === estado.divisoria);
+  if (alvo) ajustarQuadro(L.geoJSON(alvo).getBounds(), { padding: [12, 12] });
+  else enquadrar(QUADRO_POR_ESCALA[escala] || 'municipio');
   renderizarLegenda();
   renderizarDetalhe();
   renderizarTabela();
@@ -1145,6 +1566,7 @@ function trocarIndicador(campo) {
       `${info.rotulo}: <span class="tt-val">${formatar(p[estado.indicador], info.unidade, estado.indicador)}</span>`
     );
   });
+  desenharRotulos();
   renderizarLegenda();
   atualizarHash();
 }
@@ -1222,6 +1644,9 @@ function ligarControles() {
   document.querySelectorAll('[data-fundo]').forEach((botao) => {
     botao.addEventListener('click', () => trocarFundo(botao.dataset.fundo));
   });
+  document.getElementById('seletor-divisoria')
+    .addEventListener('change', (e) => trocarDivisoria(e.target.value));
+
   document.getElementById('seletor-calor').addEventListener('change', (e) => {
     estado.calor = e.target.value;
     aplicarCalor();
@@ -1244,6 +1669,8 @@ function ligarControles() {
 
   ouvirTemaDoHub();
   ligarMaximizar();
+  ligarCinema();
+  preCarregarCena();
 }
 
 /* Maximizar o mapa.
@@ -1259,6 +1686,9 @@ function ligarControles() {
    dentro da moldura nova. */
 const ICONE_EXPANDIR = `<path d="M216,48V96a8,8,0,0,1-16,0V67.31l-42.34,42.35a8,8,0,0,1-11.32-11.32L188.69,56H160a8,8,0,0,1,0-16h48A8,8,0,0,1,216,48ZM98.34,146.34,56,188.69V160a8,8,0,0,0-16,0v48a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16H67.31l42.35-42.34a8,8,0,0,0-11.32-11.32ZM208,152a8,8,0,0,0-8,8v28.69l-42.34-42.35a8,8,0,0,0-11.32,11.32L188.69,200H160a8,8,0,0,0,0,16h48a8,8,0,0,0,8-8V160A8,8,0,0,0,208,152ZM67.31,56H96a8,8,0,0,0,0-16H48a8,8,0,0,0-8,8V96a8,8,0,0,0,16,0V67.31l42.34,42.35a8,8,0,0,0,11.32-11.32Z"/>`;
 const ICONE_RESTAURAR = `<path d="M144,104V64a8,8,0,0,1,16,0V84.69l42.34-42.35a8,8,0,0,1,11.32,11.32L171.31,96H192a8,8,0,0,1,0,16H152A8,8,0,0,1,144,104Zm-40,40H64a8,8,0,0,0,0,16H84.69L42.34,202.34a8,8,0,0,0,11.32,11.32L96,171.31V192a8,8,0,0,0,16,0V152A8,8,0,0,0,104,144Zm67.31,16H192a8,8,0,0,0,0-16H152a8,8,0,0,0-8,8v40a8,8,0,0,0,16,0V171.31l42.34,42.35a8,8,0,0,0,11.32-11.32ZM104,56a8,8,0,0,0-8,8V84.69L53.66,42.34A8,8,0,0,0,42.34,53.66L84.69,96H64a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V64A8,8,0,0,0,104,56Z"/>`;
+
+const ICONE_TOCAR = `<path d="M232,128a15.76,15.76,0,0,1-7.86,13.57L88.27,222.79A15.94,15.94,0,0,1,64,209.22V46.78A15.94,15.94,0,0,1,88.27,33.21l135.87,81.22A15.76,15.76,0,0,1,232,128Z"/>`;
+const ICONE_PAUSAR = `<path d="M216,48V208a16,16,0,0,1-16,16H164a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h36A16,16,0,0,1,216,48ZM92,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H92a16,16,0,0,0,16-16V48A16,16,0,0,0,92,32Z"/>`;
 
 function maximizado() {
   return document.getElementById('mapa-bloco').classList.contains('expandido');
@@ -1299,10 +1729,668 @@ function ligarMaximizar() {
   // Esc sai. Quando a tela cheia nativa está ativa, o navegador consome o Esc
   // e avisa por fullscreenchange; fora dela, o atalho é nosso.
   document.addEventListener('keydown', (evento) => {
-    if (evento.key === 'Escape' && maximizado()) alternarMaximizar();
+    // Durante a apresentação o Esc é dela: sairDoCinema desmaximiza no fim.
+    // Sem esta guarda os dois ouvintes disputam a mesma tecla e o resultado
+    // passa a depender da ordem de registro.
+    if (evento.key === 'Escape' && maximizado() && !cinema.ligado) alternarMaximizar();
   });
   document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement && maximizado()) aplicarMaximizacao(false);
+    if (document.fullscreenElement || !maximizado()) return;
+    // Esc consumido pelo navegador: sem isto a apresentação continuava rodando
+    // por cima do mapa já restaurado ao tamanho pequeno.
+    if (cinema.ligado) encerrarCinema();
+    aplicarMaximizacao(false);
+  });
+}
+
+/* ------------------------------------------------------------ cena 3D -- */
+/* Abertura da apresentação em relevo: os setores viram prismas com altura
+   proporcional ao indicador e a câmera orbita a malha urbana, inclinada.
+
+   Por que um segundo motor de mapa. O Leaflet é 2D por construção -- não tem
+   pitch nem bearing, e não existe truque de CSS que lhe dê relevo de verdade:
+   inclinar o container inclina um plano, e prisma exige geometria. O MapLibre
+   desenha em WebGL e faz extrusão nativa (`fill-extrusion`), então a órbita
+   custa menos ao navegador do que o nosso coroplético em SVG custa hoje.
+
+   Por que não trocar o painel inteiro para MapLibre: o Leaflet entrega um nó de
+   DOM por feição, e é isso que sustenta anel de foco por teclado e rótulo
+   acessível em cada setor. Em WebGL tudo isso teria de ser reconstruído à mão.
+   A cena 3D não precisa disso -- ninguém tabula por 247 prismas -- então ela
+   fica onde serve e o painel de trabalho continua onde funciona.
+
+   O download só acontece se a apresentação for usada. São ~200 KB comprimidos
+   que não têm por que pesar em quem abre o painel para consultar um setor. */
+const MAPLIBRE_JS = 'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js';
+const MAPLIBRE_CSS = 'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css';
+// Altura do prisma na classe mais alta. Começou em 2.200 m e isso era errado
+// por uma razão simples de escala: setor urbano tem 300 a 800 m de largura, e
+// 2.200 m de altura sobre 500 m de base é proporção de arranha-céu -- um único
+// prisma tapava metade da cidade e a órbita virava um passeio entre torres. Em
+// 700 m o setor mais alto fica na proporção de uma quadra deitada em pé, que
+// com 58 graus de inclinação já se lê como relevo sem engolir a vizinhança.
+const CENA_ALTURA_MAX_M = 700;
+const CENA_PITCH = 58;            // inclinação da câmera, em graus
+const CENA_GIRO_MS = 15000;       // uma volta completa
+
+let cena3d = null;
+let cenaPromessa = null;
+
+function carregarMapLibre() {
+  if (window.maplibregl) return Promise.resolve(window.maplibregl);
+  if (cenaPromessa) return cenaPromessa;
+  cenaPromessa = new Promise((resolve, reject) => {
+    const folha = document.createElement('link');
+    folha.rel = 'stylesheet';
+    folha.href = MAPLIBRE_CSS;
+    document.head.appendChild(folha);
+    const script = document.createElement('script');
+    script.src = MAPLIBRE_JS;
+    script.crossOrigin = '';
+    script.onload = () => resolve(window.maplibregl);
+    script.onerror = () => reject(new Error('MapLibre não carregou'));
+    document.head.appendChild(script);
+  });
+  return cenaPromessa;
+}
+
+/* Altura do prisma. Normalizada pelo MAIOR valor do indicador na malha, não por
+   um teto fixo: indicador em pontos (0 a 65) e indicador em porcentagem (0 a
+   100) produziriam relevos de escala incomparável com a mesma fórmula. O que o
+   relevo comunica é hierarquia relativa, e a legenda com o corte numérico
+   continua ao lado para quem precisar do valor. */
+function geometriaDaCena() {
+  // estado.geo é indexado pela ESCALA ('setor', 'bairro', 'cras'), não pelo
+  // nome do arquivo de origem -- ver o mapa `nomes` em carregar().
+  const feicoes = estado.geo.setor.features;
+  const valores = feicoes
+    .map((f) => f.properties[estado.indicador])
+    .filter((v) => typeof v === 'number');
+  const maximo = Math.max(...valores, 1);
+  return {
+    type: 'FeatureCollection',
+    features: feicoes
+      .filter((f) => typeof f.properties[estado.indicador] === 'number')
+      .map((f) => ({
+        type: 'Feature',
+        geometry: f.geometry,
+        properties: {
+          cor: corDe(f.properties[estado.indicador]),
+          altura: (f.properties[estado.indicador] / maximo) * CENA_ALTURA_MAX_M,
+        },
+      })),
+  };
+}
+
+function montarCena(maplibregl) {
+  const [[sulLat, oesteLon], [norteLat, lesteLon]] = painel.enquadramento_urbano;
+  cena3d = new maplibregl.Map({
+    container: 'cena3d',
+    // Estilo mínimo próprio: nenhum provedor de basemap vetorial é consumido
+    // aqui. O fundo é o mesmo satélite Esri que o painel já cita na barra de
+    // procedência, e nada mais entra -- sem rótulo de terceiro na tela.
+    style: {
+      version: 8,
+      sources: {
+        satelite: {
+          type: 'raster',
+          // Mesma URL do fundo de satélite do painel, sem adaptação: o Esri
+          // serve z/linha/coluna e os dois motores substituem o marcador onde
+          // ele está, então {z}/{y}/{x} vale igual no Leaflet e no MapLibre.
+          tiles: [FUNDOS.satelite.claro],
+          tileSize: 256,
+          maxzoom: ZOOM_NATIVO_GLOBAL,
+          attribution: FUNDOS.satelite.opcoes.attribution,
+        },
+      },
+      layers: [
+        { id: 'fundo', type: 'background', paint: { 'background-color': token('--map-fundo') } },
+        { id: 'satelite', type: 'raster', source: 'satelite' },
+      ],
+    },
+    center: [(oesteLon + lesteLon) / 2, (sulLat + norteLat) / 2],
+    zoom: 11.2,
+    pitch: 0,
+    bearing: 0,
+    attributionControl: false,
+    interactive: false,
+    canvasContextAttributes: { antialias: false },   // MSAA não paga o custo em órbita
+  });
+  return new Promise((resolve) => cena3d.on('load', resolve));
+}
+
+function pintarCena() {
+  if (cena3d.getLayer('setores3d')) cena3d.removeLayer('setores3d');
+  if (cena3d.getSource('setores')) cena3d.removeSource('setores');
+  cena3d.addSource('setores', { type: 'geojson', data: geometriaDaCena() });
+  cena3d.addLayer({
+    id: 'setores3d',
+    type: 'fill-extrusion',
+    source: 'setores',
+    paint: {
+      'fill-extrusion-color': ['get', 'cor'],
+      'fill-extrusion-height': ['get', 'altura'],
+      'fill-extrusion-base': 0,
+      // 0,92 e não 1: a aresta onde dois prismas se encostam fica visível, e é
+      // ela que impede a malha de virar um bloco maciço quando vizinhos caem na
+      // mesma classe. Opaco demais apaga a densidade; translúcido demais deixa
+      // ver através de três quadras e confunde a leitura de altura.
+      'fill-extrusion-opacity': 0.92,
+      // Degradê vertical DESLIGADO. Ele é bonito e custa por fragmento: com 220
+      // prismas em órbita, numa máquina sem GPU dedicada vira o maior item da
+      // conta. A aresta entre prismas vizinhos já separa a malha sem ele.
+      'fill-extrusion-vertical-gradient': false,
+    },
+  });
+}
+
+/* Guarda de desempenho. A sala de reunião pode ter um notebook com vídeo
+   integrado, e a órbita precisa parecer boa lá ou não serve para nada. Em vez
+   de apostar na GPU, a cena MEDE os próprios quadros: se a média dos primeiros
+   não sustentar uma animação decente, ela se desliga sozinha e a apresentação
+   segue em 2D, que é liso em qualquer máquina.
+   40 ms é o corte -- 25 quadros por segundo. Abaixo disso o giro não parece
+   câmera, parece defeito, e defeito é pior que não ter o recurso. */
+const CENA_QUADRO_LIMITE_MS = 40;
+const CENA_AMOSTRA_QUADROS = 20;
+
+function cenaAguentaOrbitar(amostra) {
+  if (amostra.length < CENA_AMOSTRA_QUADROS) return null;   // ainda medindo
+  const media = amostra.reduce((a, b) => a + b, 0) / amostra.length;
+  return media <= CENA_QUADRO_LIMITE_MS;
+}
+
+/* A órbita. Um único requestAnimationFrame governando bearing e pitch: o
+   easeTo do MapLibre encadeado produziria paradas entre trechos, e parada no
+   meio de um giro parece travamento, não pausa. */
+function orbitar(inicio, amostra = [], ultimo = performance.now()) {
+  if (!cinema.ligado || cinema.roteiro[cinema.parada].tipo !== 'municipio') return;
+  const agora = performance.now();
+
+  // Mede, decide uma vez, e nunca mais mede: a verificação não pode virar ela
+  // própria um custo por quadro.
+  if (amostra.length <= CENA_AMOSTRA_QUADROS) {
+    amostra.push(agora - ultimo);
+    const aguenta = cenaAguentaOrbitar(amostra);
+    if (aguenta === false) {
+      const media = Math.round(amostra.reduce((a, b) => a + b, 0) / amostra.length);
+      console.warn(`cena 3D a ${media} ms por quadro: desligando e seguindo em 2D`);
+      cinema.sem3d = true;
+      fecharCena3d();
+      return;
+    }
+  }
+
+  const t = Math.min((agora - inicio) / CENA_GIRO_MS, 1);
+  // Entrada da câmera concentrada no primeiro terço: ela levanta e aproxima
+  // enquanto já está girando, em vez de fazer as duas coisas em sequência.
+  const entrada = Math.min(t / 0.33, 1);
+  const suave = 1 - (1 - entrada) ** 3;
+  cena3d.jumpTo({
+    bearing: t * 360,
+    pitch: CENA_PITCH * suave,
+    // Chega em 12,4 e não em 13,1: no zoom mais fechado a câmera entrava dentro
+    // da malha e perdia a cidade de vista. A aproximação tem que deixar ver o
+    // conjunto -- é dele que a apresentação está falando.
+    zoom: 11.0 + 1.4 * suave,
+  });
+  if (t < 1) requestAnimationFrame(() => orbitar(inicio, amostra, agora));
+}
+
+async function abrirCena3d() {
+  const painelCena = document.getElementById('cena3d');
+  // Reprovada na medição uma vez, não se tenta de novo na mesma sessão: repetir
+  // o teste a cada apresentação é repetir o engasgo que ele existe para evitar.
+  if (cinema.sem3d) return false;
+  try {
+    const maplibregl = await carregarMapLibre();
+    if (!cinema.ligado) return false;
+    const precisaPintar = !cena3d;
+    if (!cena3d) await montarCena(maplibregl);
+    // O MapLibre mede o container no construtor, e nessa hora o bloco do mapa
+    // ainda está no layout de duas colunas -- a maximização acabou de ser
+    // pedida e o navegador não repintou. Sem este resize o canvas nasce com a
+    // largura antiga e a cena aparece espremida num terço da tela.
+    cena3d.resize();
+    // A pré-carga normalmente já pintou. Repintar aqui refaria o trabalho caro
+    // justo no quadro do clique, que é o que se quer evitar.
+    if (precisaPintar || !cena3d.getLayer('setores3d')) pintarCena();
+    painelCena.classList.add('visivel');
+    orbitar(performance.now());
+    return true;
+  } catch (erro) {
+    // Rede ruim ou WebGL indisponível não podem derrubar a apresentação: ela
+    // segue em 2D, que é o que já funcionava.
+    console.warn('cena 3D indisponível, seguindo em 2D:', erro.message);
+    painelCena.classList.remove('visivel');
+    return false;
+  }
+}
+
+function fecharCena3d() {
+  const painelCena = document.getElementById('cena3d');
+  if (painelCena) painelCena.classList.remove('visivel');
+}
+
+/* ------------------------------------------------ apresentação conduzida -- */
+/* O mapa percorre os 8 territórios sozinho, do mais vulnerável ao menos, e
+   narra cada um com número que veio da base. Existe para sala de reunião: lá
+   ninguém opera o mouse, e a janela de atenção de quem decide orçamento é de
+   um minuto, não de uma tarde de exploração.
+
+   O que NÃO entra aqui, e a recusa é deliberada: partícula, brilho, parallax,
+   gradiente animado, número girando sem razão. Tudo isso é barato de escrever
+   e deprecia o dado -- em cima de indicador do SUAS, efeito decorativo diz que
+   a Vigilância tinha tempo sobrando. Todo movimento desta camada carrega
+   informação: o voo é a mudança de território, a cascata é a hierarquia do
+   índice se formando, a trilha é o relógio e o sumário. */
+const CINEMA_PARADA_MS = 9000;
+const CINEMA_PARADA_CALMA_MS = 13000;  // sem movimento, a leitura é só texto
+
+function movimentoReduzido() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/* A abertura dura o giro inteiro mais um respiro. Cortar a órbita no meio para
+   entrar no primeiro território é pior que não ter órbita: o movimento fica
+   sem resolução e parece defeito. Com movimento reduzido não há órbita, então
+   a abertura volta ao tempo das outras paradas. */
+function duracaoDaParada() {
+  if (movimentoReduzido()) return CINEMA_PARADA_CALMA_MS;
+  const parada = cinema.roteiro[cinema.parada];
+  if (parada && parada.tipo === 'municipio') return CENA_GIRO_MS + 1500;
+  return CINEMA_PARADA_MS;
+}
+
+const cinema = { ligado: false, parada: 0, pausado: false, relogio: null, roteiro: [], sem3d: false };
+
+/* Posto do território no indicador, em palavra. A primeira versão destas frases
+   afirmava superlativo direto ("a maior do município") a partir do escore
+   padronizado, e isso era FALSO: o escore diz que o território se destaca, não
+   que ele é o extremo. O CRAS Thomaz Coelho saía narrado como "a menor
+   cobertura do município" com o Fazenda Velha abaixo dele. Afirmação errada
+   num painel apresentado a quem decide orçamento custa mais que a apresentação
+   inteira -- agora o superlativo só aparece quando o posto é de fato o 1º. */
+function posto(ranque, palavra) {
+  return ranque === 1 ? `a ${palavra}` : `a ${ranque}ª ${palavra}`;
+}
+
+/* Leituras candidatas para a frase de destaque. `direcao` diz de que lado está
+   a notícia: +1 quando valor alto é o que chama atenção, -1 quando é o baixo
+   (cobertura e alcance de rede são oferta -- ali o problema é faltar). */
+const LEITURAS_CINEMA = [
+  {
+    campo: 'amplitude_interna', direcao: 1,
+    frase: (c, r) => `A média esconde o território: dentro dele o índice vai de `
+      + `${nf1.format(c.ivt_min)} a ${nf1.format(c.ivt_max)} — `
+      + `${nf1.format(c.amplitude_interna)} pontos entre o setor em melhor e em pior situação, `
+      + `${posto(r, 'maior')} desigualdade interna entre os oito territórios.`,
+  },
+  {
+    campo: 'pct_extrema_pobreza', direcao: 1,
+    frase: (c, r) => `${nf1.format(c.pct_extrema_pobreza)}% das famílias cadastradas vivem com até `
+      + `R$ 218 por pessoa: ${posto(r, 'maior')} concentração de extrema pobreza entre os territórios.`,
+  },
+  {
+    campo: 'cobertura_cadunico', direcao: -1,
+    // A sentença sobre família não conhecida só entra nos dois primeiros postos.
+    // Ela vale aritmeticamente para qualquer cobertura abaixo de 100%, mas dita
+    // sobre um 4º lugar empresta ao dado um peso que ele não tem.
+    frase: (c, r) => `O Cadastro Único alcança ${nf1.format(c.cobertura_cadunico)}% da população daqui `
+      + `— ${posto(r, 'menor')} cobertura do município.`
+      + (r <= 2 ? ' Há família elegível que o SUAS ainda não conhece.' : ''),
+  },
+  {
+    campo: 'pct_moradia_precaria', direcao: 1,
+    frase: (c, r) => `${nf1.format(c.pct_moradia_precaria)}% das famílias cadastradas estão em domicílio `
+      + `sem água de rede, esgoto ou coleta de lixo: ${posto(r, 'maior')} proporção do município.`,
+  },
+  {
+    campo: 'pct_monoparental_feminina', direcao: 1,
+    frase: (c, r) => `${nf1.format(c.pct_monoparental_feminina)}% das famílias são monoparentais `
+      + `chefiadas por mulher, ${posto(r, 'maior')} proporção do município — perfil que concentra `
+      + `demanda de creche e de acompanhamento PAIF.`,
+  },
+  {
+    campo: 'alcance_rede', direcao: -1,
+    // "é onde a oferta chega menos" afirmava mínimo e contradizia o próprio
+    // ordinal que vinha antes na mesma frase. O posto já diz a posição; o resto
+    // da sentença agora explica o que a medida é, não repete a classificação.
+    frase: (c, r) => `Alcance da rede em ${nf1.format(c.alcance_rede)} — ${posto(r, 'menor')} do `
+      + `município. Mede acompanhamento PAIF e cobertura cadastral: é o eixo de oferta, `
+      + `o que a rede entrega, e não o risco que a população vive.`,
+  },
+];
+
+/* Escolhe, para cada território, a leitura em que ele MAIS se afasta dos outros
+   sete. É o que torna a apresentação defensável: nenhuma frase foi escrita para
+   um CRAS específico -- o destaque é calculado, e muda sozinho quando a base
+   muda. Escore padronizado sobre n=8 serve para ordenar relevância entre
+   candidatas, não para inferência; por isso a frase sempre vem acompanhada do
+   número que a sustenta. */
+function destaqueDoTerritorio(alvo) {
+  let melhor = null;
+  LEITURAS_CINEMA.forEach((leitura) => {
+    const valores = painel.cras.map((c) => c[leitura.campo]).filter((v) => typeof v === 'number');
+    if (valores.length < 3 || typeof alvo[leitura.campo] !== 'number') return;
+    const media = valores.reduce((a, b) => a + b, 0) / valores.length;
+    const desvio = Math.sqrt(valores.reduce((s, v) => s + (v - media) ** 2, 0) / valores.length);
+    if (!desvio) return;
+    const escore = ((alvo[leitura.campo] - media) / desvio) * leitura.direcao;
+    // Posto no indicador, medido e não deduzido do escore. Ordenado pelo lado
+    // que a leitura trata: direcao -1 ordena crescente, porque ali o 1o lugar
+    // e o MENOR valor.
+    const ranque = valores
+      .slice()
+      .sort((a, b) => (leitura.direcao > 0 ? b - a : a - b))
+      .indexOf(alvo[leitura.campo]) + 1;
+    if (!melhor || escore > melhor.escore) melhor = { escore, leitura, ranque };
+  });
+  // Corte em 0,8 desvio. Em 0,4 o Thomaz Coelho passava com 0,41 e recebia uma
+  // frase de destaque para um desvio que não existe -- narrar como notável algo
+  // que está na média é o começo do dado inflado. Abaixo do corte, a frase de
+  // reserva diz justamente isso: aqui nada se descola.
+  return melhor && melhor.escore > 0.8 ? melhor.leitura.frase(alvo, melhor.ranque) : null;
+}
+
+/* Primeira parada: o município inteiro. Entrar direto no território mais
+   vulnerável tiraria a referência de quem assiste -- sem o todo antes, "32,4"
+   não quer dizer nada. Aqui a faixa de apuração mostra como a população se
+   reparte entre as classes e os oito chips nomeiam os territórios no mapa. */
+function paradaDeAbertura() {
+  const critico = painel.cras.reduce((a, b) => ((b.ivt || 0) > (a.ivt || 0) ? b : a));
+  return {
+    tipo: 'municipio',
+    posicao: 0,
+    titulo: painel.municipio,
+    ordem: `Visão geral · ${painel.cras.length} territórios de CRAS`,
+    // Mesma quantidade de KPIs das paradas de território, de propósito: o grid
+    // mantém a altura e o cartão não salta de tamanho ao virar a parada.
+    kpis: [
+      { rotulo: 'Moradores (Censo 2022)', valor: painel.populacao_censo_2022, fmt: (v) => nf.format(Math.round(v)) },
+      { rotulo: 'Pessoas no CadÚnico', valor: painel.pessoas_cadunico, fmt: (v) => nf.format(Math.round(v)) },
+      { rotulo: 'Famílias no CadÚnico', valor: painel.familias_cadunico, fmt: (v) => nf.format(Math.round(v)) },
+      { rotulo: 'Cobertura cadastral', valor: (painel.pessoas_cadunico / painel.populacao_censo_2022) * 100, fmt: (v) => `${nf1.format(v)}%` },
+      { rotulo: 'Domicílios (Censo 2022)', valor: painel.domicilios_censo_2022, fmt: (v) => nf.format(Math.round(v)) },
+      { rotulo: 'Setores censitários', valor: painel.cras.reduce((s, c) => s + (c.setores || 0), 0), fmt: (v) => nf.format(Math.round(v)) },
+    ],
+    leitura: `${nf1.format((painel.pessoas_cadunico / painel.populacao_censo_2022) * 100)}% da população `
+      + `está no Cadastro Único. O índice é calculado por setor censitário e agregado daqui para cima — `
+      + `o território mais vulnerável é ${critico.cras.replace('CRAS ', '')}, e é por ele que começamos.`,
+  };
+}
+
+function montarRoteiro() {
+  const territorios = painel.cras
+    .slice()
+    .sort((a, b) => (b.ivt || 0) - (a.ivt || 0))
+    .map((c, i) => ({
+      tipo: 'territorio',
+      dados: c,
+      posicao: i + 1,
+      titulo: c.cras,
+      ordem: `${i + 1}º de ${painel.cras.length} em vulnerabilidade`,
+      // Pessoas e famílias no CadÚnico aparecem juntas porque respondem a
+      // perguntas diferentes: família é a unidade do benefício e do
+      // acompanhamento, pessoa é quem está coberto. Só famílias deixava sem
+      // resposta "quanta gente da cidade o SUAS conhece aqui", e é essa que se
+      // compara com a população do Censo -- a cobertura sai dessa razão.
+      kpis: [
+        { rotulo: 'Índice de vulnerabilidade', valor: c.ivt, fmt: (v) => nf1.format(v) },
+        { rotulo: 'Moradores (Censo 2022)', valor: c.pop, fmt: (v) => nf.format(Math.round(v)) },
+        { rotulo: 'Pessoas no CadÚnico', valor: c.pessoas_cad, fmt: (v) => nf.format(Math.round(v)) },
+        { rotulo: 'Famílias no CadÚnico', valor: c.familias_cad, fmt: (v) => nf.format(Math.round(v)) },
+        { rotulo: 'Cobertura cadastral', valor: c.cobertura_cadunico, fmt: (v) => `${nf1.format(v)}%` },
+        { rotulo: 'Em extrema pobreza', valor: c.pct_extrema_pobreza, fmt: (v) => `${nf1.format(v)}%` },
+      ],
+      leitura: destaqueDoTerritorio(c)
+        || `${nf.format(c.setores)} setores censitários e ${nf.format(c.pop)} moradores sob referência `
+           + `de uma única unidade. Nenhum indicador de risco se descola da média municipal aqui — `
+           + `é território de acompanhamento regular, não de prioridade imediata.`,
+    }));
+  return [paradaDeAbertura(), ...territorios];
+}
+
+function montarTrilha() {
+  const trilha = document.getElementById('cinema-trilha');
+  trilha.innerHTML = cinema.roteiro
+    .map(() => '<span class="cinema-passo"><span class="cinema-pulso"></span></span>')
+    .join('');
+}
+
+/* Contagem do número até o valor final. Vale a pena porque a cifra fica legível
+   durante a subida (tabular-nums, sem reflow) e porque dá ao olho tempo de
+   chegar nela antes de ela parar -- numa projeção, número que aparece pronto
+   não é lido. Com movimento reduzido, entra direto no valor. */
+function animarNumero(elemento, ate, formatar) {
+  if (movimentoReduzido() || !Number.isFinite(ate)) {
+    elemento.textContent = formatar(ate);
+    return;
+  }
+  const inicio = performance.now();
+  const dura = 900;
+  const passo = (agora) => {
+    const t = Math.min((agora - inicio) / dura, 1);
+    const suave = 1 - (1 - t) ** 3;
+    elemento.textContent = formatar(ate * suave);
+    if (t < 1 && cinema.ligado) requestAnimationFrame(passo);
+    else elemento.textContent = formatar(ate);
+  };
+  requestAnimationFrame(passo);
+}
+
+function preencherCartao(parada) {
+  document.getElementById('cinema-ordem').textContent = parada.ordem;
+  document.getElementById('cinema-nome').textContent = parada.titulo;
+  document.getElementById('cinema-leitura').textContent = parada.leitura;
+
+  const kpis = parada.kpis;
+  // O valor que sobe fica fora da árvore de acessibilidade e um gêmeo invisível
+  // carrega o número já pronto. O cartão é role="status": sem essa separação o
+  // leitor de tela anunciaria cada quadro da contagem.
+  const caixa = document.getElementById('cinema-kpis');
+  caixa.innerHTML = kpis
+    .map((k) => '<div><span class="cinema-kpi-valor" aria-hidden="true"></span>'
+      + `<span class="sr-so">${k.rotulo}: ${k.fmt(k.valor)}</span>`
+      + `<span class="cinema-kpi-rotulo" aria-hidden="true">${k.rotulo}</span></div>`)
+    .join('');
+  caixa.querySelectorAll('.cinema-kpi-valor').forEach((el, i) => {
+    animarNumero(el, kpis[i].valor, kpis[i].fmt);
+  });
+
+  const cartao = document.getElementById('cinema-cartao');
+  cartao.classList.remove('entrando');
+  void cartao.offsetWidth;  // reinicia a animação na parada seguinte
+  cartao.classList.add('entrando');
+}
+
+function marcarTrilha() {
+  const passos = document.querySelectorAll('.cinema-passo');
+  passos.forEach((passo, i) => {
+    passo.classList.toggle('vista', i < cinema.parada);
+    passo.classList.toggle('atual', i === cinema.parada);
+    const pulso = passo.querySelector('.cinema-pulso');
+    if (i === cinema.parada) {
+      pulso.style.animationDuration = `${duracaoDaParada()}ms`;
+      pulso.style.animation = 'none';
+      void pulso.offsetWidth;
+      pulso.style.animation = '';
+    }
+  });
+}
+
+function irParaParada(indice) {
+  cinema.parada = (indice + cinema.roteiro.length) % cinema.roteiro.length;
+  const parada = cinema.roteiro[cinema.parada];
+  const destino = parada.tipo === 'municipio' ? 'todos' : parada.dados.cras;
+
+  document.getElementById('seletor-divisoria').value = destino;
+  trocarDivisoria(destino);
+  // trocarDivisoria só reenquadra ao ENTRAR num território; a abertura precisa
+  // pedir o município por conta própria.
+  if (parada.tipo === 'municipio') {
+    enquadrar('municipio');
+    abrirCena3d();
+  } else {
+    fecharCena3d();
+  }
+
+  preencherCartao(parada);
+  renderizarApuracao(
+    feicoesNoRecorte(),
+    parada.tipo === 'municipio'
+      ? `Moradores por classe — ${indicadorAtual().rotulo}`
+      : `Moradores por classe em ${parada.titulo.replace('CRAS ', '')}`
+  );
+  marcarTrilha();
+  agendarProximaParada();
+}
+
+function agendarProximaParada() {
+  clearTimeout(cinema.relogio);
+  if (!cinema.ligado || cinema.pausado) return;
+  cinema.relogio = setTimeout(() => irParaParada(cinema.parada + 1), duracaoDaParada());
+}
+
+function pausarCinema(pausar) {
+  cinema.pausado = pausar;
+  document.getElementById('cinema').classList.toggle('pausado', pausar);
+  document.getElementById('botao-cinema').setAttribute('aria-pressed', String(!pausar));
+  document.getElementById('icone-cinema').innerHTML = pausar ? ICONE_TOCAR : ICONE_PAUSAR;
+  if (pausar) clearTimeout(cinema.relogio);
+  else agendarProximaParada();
+}
+
+function entrarNoCinema() {
+  cinema.ligado = true;
+  cinema.pausado = false;
+  cinema.roteiro = montarRoteiro();
+  montarTrilha();
+  document.getElementById('cinema').hidden = false;
+  document.getElementById('mapa-bloco').classList.add('apresentando');
+  // O botão vira pausa assim que a apresentação começa. Sem isto ele ficava
+  // mostrando "tocar" com a apresentação em curso, e o aria-pressed mentia.
+  document.getElementById('botao-cinema').setAttribute('aria-pressed', 'true');
+  document.getElementById('icone-cinema').innerHTML = ICONE_PAUSAR;
+  trocarFundo(estado.fundo);   // recria o fundo já com updateWhenIdle ligado
+  escalonarEntrada();
+  if (!maximizado()) alternarMaximizar();
+  // Dois quadros: o maximizar remede o container, e só depois o voo tem
+  // destino certo. Enquadrar antes mandaria o mapa para o quadro antigo.
+  requestAnimationFrame(() => requestAnimationFrame(() => irParaParada(0)));
+}
+
+/* Desliga só a camada da apresentação, sem tocar no quadro nem na maximização.
+   Separado de sairDoCinema porque o navegador tem o próprio caminho de saída:
+   na tela cheia nativa o Esc é consumido por ele, que avisa por
+   fullscreenchange. Nesse caminho a apresentação precisa parar sem tentar
+   desmaximizar de novo -- isso já aconteceu -- e sem reenquadrar por cima de
+   uma transição de layout que ainda está em curso. */
+function encerrarCinema() {
+  clearTimeout(cinema.relogio);
+  cinema.ligado = false;
+  cinema.pausado = false;
+  const camada = document.getElementById('cinema');
+  camada.hidden = true;
+  camada.classList.remove('pausado');
+  document.getElementById('mapa-bloco').classList.remove('apresentando');
+  document.getElementById('botao-cinema').setAttribute('aria-pressed', 'false');
+  document.getElementById('icone-cinema').innerHTML = ICONE_TOCAR;
+  fecharCena3d();
+  trocarFundo(estado.fundo);   // devolve o fundo ao comportamento de trabalho
+  // Os chips são da apresentação (salvo na escala de território, onde valem
+  // sozinhos). Sem este redesenho eles ficavam na tela depois do Esc.
+  desenharRotulos();
+}
+
+function sairDoCinema() {
+  encerrarCinema();
+  document.getElementById('seletor-divisoria').value = 'todos';
+  trocarDivisoria('todos');
+  enquadrar('municipio');
+  if (maximizado()) alternarMaximizar();
+}
+
+/* Pré-carga do MapLibre em tempo ocioso. Medido com PerformanceObserver: o
+   download e a compilação dos 275 KB custavam 2,5 s de tarefa longa, e ela caía
+   exatamente nos primeiros 500 ms depois do clique no play -- no quadro em que
+   a sala inteira está olhando. Somada à montagem do contexto WebGL davam 4,9 s
+   de engasgo concentrados na abertura, enquanto as oito paradas de território
+   somavam 114 ms: o voo nunca foi o problema.
+
+   requestIdleCallback entrega isso quando a thread está livre, muito antes de
+   alguém apertar o play. O hover é a segunda rede: quem mira o botão antes de a
+   ociosidade acontecer já dispara a carga. Quem nunca abre a apresentação numa
+   sessão curta segue sem baixar nada. */
+async function preCarregarCena() {
+  const pedir = window.requestIdleCallback || ((fn) => setTimeout(fn, 4000));
+  pedir(async () => {
+    try {
+      const maplibregl = await carregarMapLibre();
+      // Monta e pinta já aqui, não no play. Medido: a criação do contexto WebGL
+      // mais a compilação dos shaders custava mais do que o download, e caía no
+      // clique. Parado, o MapLibre não repinta -- ele só desenha quando a
+      // câmera muda ou chega tile --, então uma cena montada e imóvel atrás de
+      // um container transparente custa memória e nada de CPU.
+      if (!cena3d) await montarCena(maplibregl);
+      pintarCena();
+    } catch (erro) {
+      console.warn('cena 3D não pôde ser preparada, a apresentação seguirá em 2D:', erro.message);
+    }
+  }, { timeout: 10000 });
+}
+
+function ligarCinema() {
+  const botao = document.getElementById('botao-cinema');
+  ['pointerenter', 'focus'].forEach((evento) => {
+    botao.addEventListener(evento, () => carregarMapLibre().catch(() => {}), { once: true });
+  });
+
+  document.getElementById('botao-cinema').addEventListener('click', () => {
+    if (!cinema.ligado) entrarNoCinema();
+    else pausarCinema(!cinema.pausado);
+  });
+
+  document.addEventListener('keydown', (evento) => {
+    if (!cinema.ligado) return;
+    // Teclado só responde fora de campo de formulário: o apresentador costuma
+    // usar controle remoto, que manda seta e espaço exatamente como o teclado.
+    if (evento.target.closest('input, select, textarea')) return;
+    const atalhos = {
+      ' ': () => pausarCinema(!cinema.pausado),
+      ArrowRight: () => irParaParada(cinema.parada + 1),
+      ArrowLeft: () => irParaParada(cinema.parada - 1),
+      Escape: sairDoCinema,
+    };
+    const acao = atalhos[evento.key];
+    if (!acao) return;
+    evento.preventDefault();
+    acao();
+  });
+}
+
+/* Cascata de entrada do coroplético: o setor de índice mais alto acende
+   primeiro e a onda desce a rampa. Não é enfeite -- é a hierarquia se formando
+   diante de quem assiste, em vez de um mapa pronto onde o olho tem que
+   procurar sozinho onde está o pior. Só roda em apresentação; no uso diário,
+   quem abre o painel quer o mapa já desenhado. */
+/* Cascata de entrada, UMA vez por apresentação. Antes ela era refeita a cada
+   parada, e isso deixou de ser possível quando os paths passaram a persistir
+   entre recortes -- a animação CSS dispara na entrada da classe, não a cada
+   setStyle. A perda é só aparente: a mesma cascata nove vezes seguidas vira
+   tique; uma vez, na abertura, é o gesto que ela sempre quis ser. */
+function escalonarEntrada() {
+  if (!cinema.ligado || movimentoReduzido() || !camadaDados) return;
+  const feicoes = camadaDados.getLayers()
+    .filter((camada) => typeof camada.getElement === 'function' && camada.getElement());
+
+  feicoes.sort((a, b) =>
+    (b.feature.properties[estado.indicador] || 0) - (a.feature.properties[estado.indicador] || 0));
+  // Janela fixa de 700ms, dividida pelo número de feições: a cascata leva o
+  // mesmo tempo seja qual for a escala em tela.
+  const passo = feicoes.length > 1 ? 700 / feicoes.length : 0;
+  feicoes.forEach((camada, i) => {
+    camada.getElement().style.animationDelay = `${Math.round(i * passo)}ms`;
   });
 }
 
@@ -1345,6 +2433,9 @@ function carregar() {
   Object.entries(nomes).forEach(([destino, origem]) => { estado.geo[destino] = geo[origem]; });
 
   montarMapa();
+  // Antes de trocarFundo: ele ja chama desenharDivisorias, e a lista precisa
+  // existir antes de qualquer leitura do seletor.
+  preencherDivisorias();
   trocarFundo(estado.fundo);
   desenharContexto();
   desenharHidrografia();
@@ -1355,6 +2446,8 @@ function carregar() {
   camadaDados.bringToFront();
 
   ligarControles();
+  // Sem await: a sonda e uma ida a rede e o resto da tela nao depende dela.
+  conferirOrtofoto();
   document.getElementById('seletor-calor').value = estado.calor;
   trocarEscala(estado.escala);
   aplicarCalor();
