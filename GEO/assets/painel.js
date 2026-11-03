@@ -55,6 +55,11 @@ const TILES_FLUIDOS = { updateWhenZooming: false, keepBuffer: 1 };
 
 const ZOOM_MAXIMO = 21;      // teto nativo da ortofoto municipal (7,3 cm/px)
 const ZOOM_NATIVO_GLOBAL = 19;  // teto real do Esri sobre Araucaria
+// Zoom a partir do qual o nome de rua entra sobre a imagem. Abaixo dele a
+// cidade inteira cabe na tela e o rotulo vira ruido; daqui para cima a escala
+// e de quarteirao e o nome da via e o que confirma o endereco.
+const ZOOM_DOS_ROTULOS = 16;
+const ZOOM_MAXIMO_DOS_ROTULOS = 18;
 
 const FUNDOS = {
   proprio: { rotulo: 'Mapa do território', imagem: false, fonte: 'geoportal municipal' },
@@ -88,6 +93,29 @@ const FUNDOS = {
       // para o nucleo e nao para a area rural -- por isso o rotulo diz onde.
       attribution: 'Satélite: Esri, Vantor/Maxar, Earthstar Geographics '
         + '— cena de 26/12/2025 no núcleo urbano',
+    },
+    // Camada de nome de rua por cima da imagem, como o híbrido do Google. Só
+    // a partir de ZOOM_DOS_ROTULOS: na escala do município a imagem é a
+    // mancha urbana e o rótulo de rua vira ruído ilegível sobre ela; na
+    // escala do quarteirão o nome da rua é a única coisa que confirma que a
+    // pessoa está olhando o endereço certo. O `minZoom` do tileLayer faz esse
+    // corte sozinho, sem listener de zoom.
+    // A faixa de zoom e estreita de proposito: 16 a 18.
+    //
+    // Abaixo de 16 o rotulo de rua e ruido sobre a mancha urbana. Acima de 18
+    // a cartografia da Esri deixa de servir: ela passa a desenhar numero
+    // predial espalhado sobre os telhados e a posicionar o nome da via fora do
+    // leito da rua, e o que era referencia vira sujeira em cima da imagem --
+    // exatamente onde a imagem e a informacao. Entao a camada simplesmente
+    // sai de cena ali; quem esta nesse zoom veio de uma busca por endereco e
+    // ja tem o nome da rua escrito no proprio marcador.
+    //
+    // Nao ha substituto melhor a mao: o CARTO (only_labels, feito para
+    // sobreposicao) passou a exigir chave de API, e desenhar rotulo proprio
+    // exigiria uma base de eixo de via que o municipio nao publica.
+    rotulos: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
+    rotulosOpcoes: {
+      attribution: 'Nomes de via: Esri, HERE, Garmin',
     },
   },
   ortofoto: {
@@ -130,7 +158,12 @@ const ESCALAS = {
 const estado = {
   escala: 'setor',
   indicador: 'ivt',
-  fundo: 'proprio',
+  // Satelite de saida, e nao o mapa vetorial proprio. Quem abre o painel para
+  // resolver um endereco precisa reconhecer o lugar, e telhado, quadra e rio
+  // fazem isso melhor do que poligono chapado; quem abre para ler o indice
+  // troca num clique. O coropletico recua sobre imagem (ver RECUO_SOBRE_IMAGEM)
+  // justamente para a imagem continuar legivel por baixo.
+  fundo: 'satelite',
   calor: 'nenhum',
   divisoria: 'todos',
   selecionado: null,
@@ -144,10 +177,16 @@ let camadaDados;
 let camadaUnidades;
 let camadaContexto;
 let camadaFundo;
+let camadaRotulosFundo;
 let camadaCalor;
 let camadaDivisorias;
 let camadaRotulos;
 let quadroPendente = null;
+/* O Leaflet DESCARTA um setView emitido enquanto uma animação de zoom está em
+   curso: o _tryAnimatedZoom devolve "já estou me movendo" e o pedido some sem
+   erro nenhum. Quem precisa enquadrar logo depois de outra troca de quadro tem
+   que esperar a anterior terminar -- ver `aoParar`. */
+let mapaEmMovimento = false;
 
 const nf = new Intl.NumberFormat('pt-BR');
 const nf1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -306,6 +345,33 @@ const ALFA_COM_DADO = 0.90;
 const ALFA_SEM_DADO = 0.75;
 const RECUO_SOBRE_IMAGEM = 0.78;  // ver o comentario de trocarFundo
 
+/* Sobre imagem, o coroplético abre caminho conforme o zoom entra.
+
+   As duas leituras não convivem na mesma escala. De longe a pergunta é "qual
+   território é mais vulnerável", e aí a mancha de cor É a resposta: tem que
+   estar cheia. De perto a pergunta virou outra -- "é esta casa mesmo?" --, e
+   aí a mesma mancha é só um filtro amarelo por cima do telhado que a pessoa
+   precisa reconhecer. O índice não muda dentro de um setor, então manter a
+   cor cheia no zoom de quarteirão não acrescenta informação nenhuma e custa a
+   imagem inteira.
+
+   Entre os dois zooms a opacidade cai linearmente, e não de um salto: salto
+   faria a cor "piscar" ao cruzar o limiar, e quem está procurando um endereço
+   leria isso como falha. Abaixo de ZOOM_CHEIO nada muda; acima de ZOOM_LIMPO
+   resta só o fio de cor que diz de que território é o lote. */
+const ZOOM_CHEIO = 14;
+const ZOOM_LIMPO = 18;
+const RECUO_NO_ZOOM_LIMPO = 0.14;
+
+function recuoDoZoom() {
+  if (!mapa || !FUNDOS[estado.fundo].imagem) return 1;
+  const z = mapa.getZoom();
+  if (z <= ZOOM_CHEIO) return 1;
+  if (z >= ZOOM_LIMPO) return RECUO_NO_ZOOM_LIMPO;
+  const andado = (z - ZOOM_CHEIO) / (ZOOM_LIMPO - ZOOM_CHEIO);
+  return 1 - andado * (1 - RECUO_NO_ZOOM_LIMPO);
+}
+
 /* Hachura do setor sem valor publicavel.
 
    O painel promete hachura em dois lugares do texto e o mapa nunca desenhou
@@ -379,7 +445,7 @@ function estiloFeicao(feicao) {
   const base = semDado ? ALFA_SEM_DADO : (cinema.ligado ? 1 : ALFA_COM_DADO);
   // Com calor ligado o coroplético recua para contexto: duas superfícies
   // contínuas disputando a mesma leitura não somam, se anulam.
-  const recuoImagem = cinema.ligado ? 0.88 : RECUO_SOBRE_IMAGEM;
+  const recuoImagem = cinema.ligado ? 0.88 : RECUO_SOBRE_IMAGEM * recuoDoZoom();
   const recuo = (sobreImagem ? recuoImagem : 1) * (estado.calor !== 'nenhum' ? 0.45 : 1);
   return {
     // fill e stroke REPOSTOS, e não herdados. setStyle do Leaflet faz merge, não
@@ -505,6 +571,14 @@ function montarMapa() {
   mapa.getPane('divisorias').style.zIndex = 460;
   mapa.getPane('divisorias').style.pointerEvents = 'none';
 
+  // Nome de via do fundo híbrido: acima do coroplético, senão a cor o cobre e
+  // ele some justo no zoom em que foi ligado; abaixo da divisória (460), que é
+  // a linha que separa um território do outro e não pode ser cortada por
+  // texto. Sem eventos: é fundo, não alvo de clique.
+  mapa.createPane('rotulosFundo');
+  mapa.getPane('rotulosFundo').style.zIndex = 455;
+  mapa.getPane('rotulosFundo').style.pointerEvents = 'none';
+
   // Rótulo de território acima de tudo, inclusive do marcador de unidade: ele
   // é texto, e texto coberto por um ponto de 8px fica ilegível sem que ninguém
   // perceba a causa.
@@ -517,11 +591,24 @@ function montarMapa() {
   // temporizador: o voo tem duração própria e qualquer palpite erraria para
   // mais ou para menos.
   const marcarMovimento = (movendo) => {
+    mapaEmMovimento = movendo;
     const camada = document.getElementById('cinema');
     if (camada) camada.classList.toggle('movendo', movendo);
   };
   mapa.on('movestart zoomstart', () => marcarMovimento(true));
   mapa.on('moveend zoomend', () => marcarMovimento(false));
+
+  // Sobre imagem a opacidade do coroplético é função do zoom (ver
+  // recuoDoZoom), então ela precisa ser recalculada a cada zoom -- é um
+  // setStyle sobre a camada existente, sem reconstruir path nenhum.
+  mapa.on('zoomend', () => {
+    if (camadaDados && FUNDOS[estado.fundo].imagem) camadaDados.setStyle(estiloFeicao);
+    // O maxZoom do tileLayer para de PEDIR tile acima da faixa, mas o que ja
+    // foi desenhado continua na tela, ampliado e fora do lugar. Esconder o
+    // painel inteiro e o unico jeito de a camada realmente sair de cena.
+    const rotulos = mapa.getPane('rotulosFundo');
+    if (rotulos) rotulos.style.display = mapa.getZoom() > ZOOM_MAXIMO_DOS_ROTULOS ? 'none' : '';
+  });
 
   // O Leaflet so escuta resize da janela, e trocar display:none por block no
   // iframe do HUB nao gera resize nenhum. Quem ve o bloco mudar de tamanho e
@@ -563,8 +650,15 @@ function escuro() {
 function trocarFundo(nome) {
   estado.fundo = nome;
   if (camadaFundo) { camadaFundo.remove(); camadaFundo = null; }
+  if (camadaRotulosFundo) { camadaRotulosFundo.remove(); camadaRotulosFundo = null; }
 
   const fundo = FUNDOS[nome];
+  if (fundo.rotulos) {
+    camadaRotulosFundo = L.tileLayer(fundo.rotulos, {
+      minZoom: ZOOM_DOS_ROTULOS, maxZoom: ZOOM_MAXIMO_DOS_ROTULOS,
+      ...TILES_FLUIDOS, pane: 'rotulosFundo', ...(fundo.rotulosOpcoes || {}),
+    }).addTo(mapa);
+  }
   if (fundo.imagem) {
     // updateWhenIdle SÓ na apresentação. Medido: updateWhenZooming não alcança o
     // flyTo -- ele não é uma animação de zoom, é movimento contínuo, e o
@@ -1473,55 +1567,6 @@ function ligarPopulacao() {
   renderizarSeries();
 }
 
-/* ----------------------------------------------------- ficha de qualidade - */
-function renderizarConferencia() {
-  const conf = painel.municipais.conferencia;
-  document.getElementById('conferencia-ref').textContent =
-    `Observatório de ${conf.mes_referencia} · gerado em ${conf.gerado_em.split('-').reverse().join('/')}`;
-  document.getElementById('corpo-conferencia').innerHTML = conf.linhas.map((l) => {
-    const d = l.diferenca_pct;
-    // Até 1% de diferença é arredondamento ou corte de data entre as duas
-    // extrações; acima disso é discrepância de método e precisa de atenção.
-    const selo = d === null ? '<span class="badge neutro"><span class="dot"></span>sem par</span>'
-      : Math.abs(d) <= 1 ? `<span class="badge ok"><span class="dot"></span>${nf1.format(d)}%</span>`
-      : `<span class="badge warn"><span class="dot"></span>${nf1.format(d)}%</span>`;
-    return `<tr><td class="nome">${l.indicador}</td>
-      <td class="num">${l.painel === null ? '—' : nf.format(l.painel)}</td>
-      <td class="num">${l.observatorio === null ? '—' : nf.format(l.observatorio)}</td>
-      <td class="num">${selo}</td></tr>`;
-  }).join('')
-  + '<p class="nota" style="margin-top:var(--sp-3)">Quatro dos cinco indicadores batem exatamente. '
-  + 'A diferença na contagem de famílias monoparentais é de definição, não de dado: este painel conta filho de '
-  + 'qualquer idade, o Observatório aparenta restringir a filho menor. Fica declarada em vez de ajustada.</p>';
-}
-
-function renderizarQualidade() {
-  const q = painel.qualidade;
-  const cores = rampa();
-  const total = q.geocodificacao.familias;
-  document.getElementById('escada-geo').innerHTML = q.geocodificacao.niveis.map((n, i) => `
-    <div class="escada-item">
-      <span class="escada-rot">N${n.nivel} ${n.rotulo.replace('_', ' ')}</span>
-      <span class="escada-trilho"><span class="escada-fill"
-        style="width:${(n.familias / total) * 100}%;background:${cores[Math.max(cores.length - 1 - i, 0)]}"></span></span>
-      <span class="escada-val">${nf1.format(n.pct)}%</span>
-    </div>`).join('');
-
-  // Cobertura da ponte entre atendimentos e território, pelo mesmo princípio
-  // da escada de geocodificação: taxa publicada sem denominador declarado é
-  // número solto.
-  const a = q.atendimentos;
-  if (a) {
-    document.getElementById('nota-atendimentos').textContent =
-      `Atendimentos de ${a.periodo[0].split('-').reverse().join('/')} a `
-      + `${a.periodo[1].split('-').reverse().join('/')}: ${nf.format(a.total)} registros. `
-      + `${nf1.format((a.com_pessoa / a.total) * 100)}% cruzam com o cadastro de pessoas pelo `
-      + `identificador, e ${nf1.format(a.pct_com_bairro)}% chegam a um bairro — o resto tem a pessoa, `
-      + 'mas o cadastro dela não traz bairro aproveitável. A taxa por 100 habitantes é calculada sobre '
-      + 'o que chega ao território, nunca sobre o total.';
-  }
-}
-
 /* --------------------------------------------------------------- controles */
 /* Enquadramento recomendado por escala. No municipio inteiro, 83% dos pixeis
    vao para o territorio do CRAS Centro, que inclui toda a area rural -- os
@@ -1539,7 +1584,12 @@ function enquadrar(quadro) {
   document.getElementById('botao-municipio').setAttribute('aria-pressed', String(quadro !== 'urbano'));
 }
 
-function trocarEscala(escala) {
+/* `enquadrarTambem` sai como false quando quem chama já sabe para onde quer
+   levar o mapa -- a busca por endereço. Sem isso, esta função enquadra o
+   município, o Leaflet inicia a animação de zoom, e o enquadramento seguinte é
+   DESCARTADO em silêncio por chegar no meio dela. Suprimir o quadro aqui tira
+   a disputa em vez de tentar ganhar dela por tempo. */
+function trocarEscala(escala, enquadrarTambem = true) {
   estado.escala = escala;
   estado.selecionado = null;
   estado.indicador = indicadorValido(estado.indicador, escala);
@@ -1554,7 +1604,8 @@ function trocarEscala(escala) {
   // voltar para o municipio inteiro desfaria o recorte que o leitor acabou de
   // pedir, so porque ele trocou de setor para bairro.
   const alvo = estado.geo.cras.features.find((f) => f.properties.cras === estado.divisoria);
-  if (alvo) ajustarQuadro(L.geoJSON(alvo).getBounds(), { padding: [12, 12] });
+  if (!enquadrarTambem) { /* quem chamou enquadra */ }
+  else if (alvo) ajustarQuadro(L.geoJSON(alvo).getBounds(), { padding: [12, 12] });
   else enquadrar(QUADRO_POR_ESCALA[escala] || 'municipio');
   renderizarLegenda();
   renderizarDetalhe();
@@ -1632,7 +1683,6 @@ function aplicarTema(tema) {
     desenharDados();
     camadaDados.bringToFront();
     renderizarLegenda();
-    renderizarQualidade();
     renderizarQuadrante();
   }
 }
@@ -2442,6 +2492,519 @@ function ouvirTemaDoHub() {
   });
 }
 
+/* ------------------------------------------------------- diretório de CRAS - */
+/* A pergunta que esta seção responde não é analítica: é "moro na rua tal, qual
+   CRAS me atende". O índice vem pronto do Python (um registro por nome de
+   lugar, com o tipo e a unidade), então aqui não há regra de territorialização
+   nenhuma -- só pareamento de texto. Qualquer dúvida sobre A QUEM pertence um
+   lugar se resolve em scripts/diretorio_cras.py, não aqui.
+
+   Duas decisões que valem reler antes de mexer:
+
+   1. A lista das oito fichas já está no HTML, renderizada pelo Jinja. O JS
+      filtra e acende, nunca constrói a ficha. Painel aberto com o JS quebrado
+      continua entregando a lista inteira, que é o que o balcão precisa.
+   2. O limite de 8 sugestões não é estético. Com 196 termos, "jardim" casa com
+      mais de 80 -- uma lista de 80 linhas não é resposta, é a mesma busca de
+      novo. Quem digita pouco recebe o aviso de refinar; quem digita o nome
+      recebe a resposta. */
+const LIMITE_SUGESTOES = 8;
+
+/* Distância, em número predial, além da qual o endereço cadastrado mais
+   próximo deixa de ser evidência confortável. Não é um corte de validade: a
+   resposta continua saindo, mas acompanhada do aviso de conferir pela UBS. Em
+   quarteirão urbano de Araucária, 200 na numeração é da ordem de uma quadra e
+   meia -- perto o bastante para a fronteira não ter passado no meio, longe o
+   bastante para não se jurar. */
+const DISTANCIA_CONFORTAVEL = 200;
+
+let diretorio = { unidades: [], busca: [], fronteiras: [] };
+let ruas = { cras: [], disputas: [], tipos: [], ruas: [] };
+let sugestoes = [];
+let sugestaoAtiva = -1;
+// Termo que produziu o cartão de resposta na tela. Enquanto o texto digitado
+// for igual a ele, a resposta continua valendo; assim que diverge, o cartão
+// estaria respondendo a uma pergunta que não está mais escrita.
+let termoRespondido = null;
+
+/* Gêmeo em JS do sem_acento() do Python. As duas pontas precisam concordar: o
+   índice é construído lá com esta mesma normalização. */
+function normalizar(texto) {
+  return texto.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
+function unidadePor(nome) {
+  return diretorio.unidades.find((u) => u.unidade === nome);
+}
+
+/* O índice de ruas nomeia o território pelo polígono, e nem sempre o polígono
+   tem o nome da unidade: o do Centro se chama "CRAS Centro" e a unidade é
+   "CRAS Centro e Rural". Procurar a ficha pelo nome do polígono devolvia nada,
+   e o segundo candidato de uma rua em disputa sumia do cartão. */
+function unidadeDoTerritorio(chave) {
+  return diretorio.unidades.find((u) => u.chave_territorio === chave);
+}
+
+/* "Alberto Karas 1200" -> { texto: 'alberto karas', numero: 1200 }.
+
+   O número só é número quando está no fim: "Rua 2" e "Jardim Pequim 2" têm o
+   numeral no nome da via, e arrancá-lo deixaria a busca sem o que procurar.
+   Por isso a separação exige algo antes do numeral. */
+function partirConsulta(consulta) {
+  const casa = consulta.match(/^(.*?[^\s\d])[\s,ºnN°.-]+(\d{1,6})\s*$/);
+  const bruto = casa ? casa[1] : consulta;
+  const numero = casa ? Number(casa[2]) : null;
+  // "Rua", "Av.", "Estrada" e os demais tipos saem da frente, porque a chave
+  // da rua no índice também não os tem: o tipo varia de base para base para a
+  // mesma via e não ajuda a identificá-la. Só na frente -- "Rua das Praças"
+  // mantém "Praças".
+  const palavras = normalizar(bruto).replace(/\./g, ' ').split(/\s+/).filter(Boolean);
+  let tipado = false;
+  while (palavras.length > 1 && ruas.tipos.includes(palavras[0])) { palavras.shift(); tipado = true; }
+  return { texto: palavras.join(' '), numero, tipado };
+}
+
+/* Prefixo antes de miolo: quem digita "ara" quer "Jardim das Araucárias" antes
+   de "Campina da Barra", mesmo que as duas contenham "ara". Dentro de cada
+   grupo, a ordem alfabética que já vem do Python. */
+function ordenarPorCasamento(itens, chave) {
+  const prefixo = (t) => (t.posicao === 0 || t.chave[t.posicao - 1] === ' ' ? 0 : 1);
+  return itens
+    .map((t) => ({ ...t, posicao: t.chave.indexOf(chave) }))
+    .filter((t) => t.posicao >= 0)
+    .sort((a, b) => prefixo(a) - prefixo(b) || a.posicao - b.posicao);
+}
+
+/* Rua e lugar na mesma caixa, porque quem está no balcão tem um endereço na
+   mão e não sabe (nem precisa saber) se o que ele tem é nome de rua, de
+   loteamento ou de localidade rural. Com número digitado, rua primeiro -- um
+   número só faz sentido junto de uma via. */
+function buscar(consulta) {
+  const { texto, numero, tipado } = partirConsulta(consulta);
+  if (texto.length < 2) return [];
+
+  const vias = ordenarPorCasamento(
+    ruas.ruas.map((r) => ({ tipo: 'rua', termo: r.n, chave: r.k, rua: r, numero })),
+    texto
+  );
+  const lugares = ordenarPorCasamento(diretorio.busca, texto);
+  // Rua primeiro quando o texto já diz que é rua: um número no fim, ou o tipo
+  // do logradouro na frente. "Estrada Botiatuva" é a estrada, não a localidade
+  // Botiatuva, mesmo as duas existindo.
+  return numero !== null || tipado ? [...vias, ...lugares] : [...lugares, ...vias];
+}
+
+/* Resolve o código do território para uma rua, com o número quando houver.
+
+   Devolve { unidades, numeroUsado, distancia, disputa } -- `unidades` com um
+   nome quando a resposta é firme e com dois quando as fronteiras discordam. */
+/* Resolve o território de uma rua, com o número quando houver.
+
+   Devolve sempre UM território em `unidade` -- a resposta -- e, quando as duas
+   fronteiras discordam, a alternativa em `alternativa`. Quem responde é o
+   polígono do painel, e não é arbitrário: ele é versionado, deriva do
+   mapeamento de bairro do Protocolo, e é o único dos dois que cobre a área
+   rural. O desenho das equipes entra como a segunda possibilidade, com a UBS
+   para desempatar no balcão.
+
+   `ponto` é a coordenada do endereço cadastrado que respondeu, quando existe;
+   `moldura`, o retângulo da rua inteira, para quando não há número. */
+function territorioDaRua(rua, numero) {
+  const comum = { moldura: rua.b, ponto: null, numeroUsado: null, distancia: null };
+  const abrir = (cod) => (cod >= 0
+    ? { unidade: ruas.cras[cod], alternativa: null }
+    : { unidade: ruas.cras[ruas.disputas[-cod - 1][0]],
+        alternativa: ruas.cras[ruas.disputas[-cod - 1][1]] });
+
+  if (rua.c !== undefined) return { ...comum, ...abrir(rua.c) };
+  // Rua dividida de que não se conhece número: o primeiro candidato responde e
+  // o segundo fica como alternativa, mesmo tratamento da discordância.
+  if (rua.d) {
+    return { ...comum, unidade: ruas.cras[rua.d[0]],
+             alternativa: rua.d.length > 1 ? ruas.cras[rua.d[1]] : null };
+  }
+  if (numero === null) {
+    const todos = [...new Set(rua.a.flatMap(([, cod]) => {
+      const { unidade, alternativa } = abrir(cod);
+      return alternativa ? [unidade, alternativa] : [unidade];
+    }))];
+    return { ...comum, unidade: todos[0], alternativa: todos[1] || null, semNumero: todos.length > 1 };
+  }
+  const perto = rua.a.reduce((a, b) => (Math.abs(b[0] - numero) < Math.abs(a[0] - numero) ? b : a));
+  return { ...comum, ...abrir(perto[1]), numeroUsado: perto[0],
+           distancia: Math.abs(perto[0] - numero), ponto: [perto[3], perto[2]] };
+}
+
+function escaparHtml(texto) {
+  return texto.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+/* Marca o trecho casado no nome COM acento. A posição vem da chave sem acento,
+   e as duas têm o mesmo comprimento para o alfabeto português -- "á" decompõe
+   em "a" + combinante, e remover o combinante devolve um caractere. A guarda de
+   comprimento existe para o caso de entrar um nome que quebre essa premissa:
+   aí o nome sai sem marcação, que é melhor do que sair cortado errado. */
+function marcar(termo, chave, texto) {
+  const inicio = chave.indexOf(texto);
+  if (inicio < 0 || chave.length !== termo.length) return escaparHtml(termo);
+  const fim = inicio + texto.length;
+  return escaparHtml(termo.slice(0, inicio))
+    + `<mark>${escaparHtml(termo.slice(inicio, fim))}</mark>`
+    + escaparHtml(termo.slice(fim));
+}
+
+/* O que aparece à direita de cada sugestão: o CRAS, quando já dá para dizer,
+   ou a palavra que explica por que ainda não dá. */
+function resumoDaSugestao(sugestao) {
+  if (sugestao.tipo !== 'rua') return sugestao.unidade;
+  const { unidade: chave } = territorioDaRua(sugestao.rua, sugestao.numero);
+  const unidade = unidadeDoTerritorio(chave);
+  return unidade ? unidade.unidade : chave;
+}
+
+function renderizarSugestoes(consulta) {
+  const lista = document.getElementById('busca-lista');
+  const campo = document.getElementById('busca-lugar');
+  const { texto, numero } = partirConsulta(consulta);
+  sugestoes = buscar(consulta).slice(0, LIMITE_SUGESTOES);
+  sugestaoAtiva = -1;
+
+  if (!sugestoes.length) {
+    lista.hidden = true;
+    lista.innerHTML = '';
+    campo.setAttribute('aria-expanded', 'false');
+    return;
+  }
+  lista.innerHTML = sugestoes.map((t, i) => {
+    const sufixo = t.tipo === 'rua' && numero !== null ? `, ${numero}` : '';
+    return `
+    <li class="busca-item" role="option" id="sugestao-${i}" aria-selected="false" data-indice="${i}">
+      <span><b>${marcar(t.termo, t.chave, texto)}${escaparHtml(sufixo)}</b> <span class="tipo">${t.tipo}</span></span>
+      <span class="onde">${escaparHtml(resumoDaSugestao(t))}</span>
+    </li>`;
+  }).join('');
+  lista.hidden = false;
+  campo.setAttribute('aria-expanded', 'true');
+}
+
+function marcarSugestao(indice) {
+  const itens = [...document.querySelectorAll('.busca-item')];
+  if (!itens.length) return;
+  sugestaoAtiva = (indice + itens.length) % itens.length;
+  itens.forEach((item, i) => item.setAttribute('aria-selected', String(i === sugestaoAtiva)));
+  itens[sugestaoAtiva].scrollIntoView({ block: 'nearest' });
+  document.getElementById('busca-lugar')
+    .setAttribute('aria-activedescendant', `sugestao-${sugestaoAtiva}`);
+}
+
+/* O cartão de resposta não repete a ficha inteira: entrega o que resolve uma
+   ligação ou um deslocamento -- onde é, que horas abre, que telefone atende --
+   e manda para a ficha completa e para o mapa. */
+const ICONE_ALERTA = '<path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM120,104a8,8,0,0,1,16,0v32a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z"/>';
+
+function aviso(titulo, corpo) {
+  return `<div class="msg warn resposta-fronteira">
+    <svg class="icone" viewBox="0 0 256 256" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false">${ICONE_ALERTA}</svg>
+    <div><b>${titulo}</b>${corpo}</div>
+  </div>`;
+}
+
+/* `alvo` é o que o mapa deve enquadrar ao clicar: o ponto do endereço, ou a
+   moldura da rua quando não há número. Sem ele, o botão volta a enquadrar o
+   território inteiro, que é o que faz sentido para bairro e loteamento. */
+function fichaDaUnidade(unidade, alvo = {}) {
+  const zap = unidade.whatsapp.length
+    ? ` · WhatsApp <span class="mono">${escaparHtml(unidade.whatsapp.join(' e '))}</span>` : '';
+  const ponto = alvo.ponto ? ` data-ponto="${alvo.ponto.join(',')}"` : '';
+  const moldura = alvo.moldura ? ` data-moldura="${alvo.moldura.join(',')}"` : '';
+  const rotulo = alvo.rotulo ? ` data-rotulo="${escaparHtml(alvo.rotulo)}"` : '';
+  const verbo = alvo.ponto ? 'Ver o endereço no mapa'
+    : (alvo.moldura ? 'Ver a rua no mapa' : 'Ver o território no mapa');
+  return `
+    <p class="resposta-contato">
+      ${escaparHtml(unidade.endereco)} — ${escaparHtml(unidade.bairro_sede)}<br>
+      <span class="mono">${escaparHtml(unidade.telefone)}</span>${zap}<br>
+      ${escaparHtml(unidade.horario)}<br>
+      Em caso de dúvida no endereço, a referência é a ${escaparHtml(unidade.ubs.join(' e a '))}.
+    </p>
+    <div class="resposta-acoes">
+      <button class="btn" type="button" data-ir-ficha="${escaparHtml(unidade.unidade)}">Abrir a ficha completa</button>
+      <button class="btn" type="button" data-ir-mapa="${escaparHtml(unidade.chave_territorio)}"${ponto}${moldura}${rotulo}>${verbo}</button>
+    </div>`;
+}
+
+/* Resposta de rua: uma unidade sempre, e a segunda possibilidade embaixo
+   quando ela existe. A escolha da resposta é do polígono (ver
+   territorioDaRua); a alternativa fica visível com a UBS ao lado, que é o
+   desempate que o Protocolo manda usar no balcão. */
+function responderRua(sugestao) {
+  const { rua, numero } = sugestao;
+  const achado = territorioDaRua(rua, numero);
+  const { alternativa, numeroUsado, distancia, semNumero } = achado;
+  const unidade = unidadeDoTerritorio(achado.unidade);
+  if (!unidade) return '';
+
+  const comNumero = numero === null ? '' : `, ${numero}`;
+  const longe = distancia !== null && distancia > DISTANCIA_CONFORTAVEL;
+  const apoio = numeroUsado === null ? ''
+    : `<p class="resposta-apoio">Pelo endereço cadastrado mais próximo: <span class="mono">nº ${numeroUsado}</span>.</p>`;
+
+  const outra = unidadeDoTerritorio(alternativa);
+  const segunda = !outra ? '' : `
+    <div class="resposta-outra">
+      <p class="rotulo-mini">Outra possibilidade</p>
+      <p><b>${escaparHtml(outra.unidade)}</b> — <span class="mono">${escaparHtml(outra.telefone)}</span>.
+      ${semNumero
+        ? 'A rua atravessa os dois territórios; digite o número da casa no fim da busca para a resposta sair por endereço.'
+        : 'O mapa desenhado pelas equipes põe este endereço neste outro território.'}
+      Na dúvida, vale a UBS que atende o endereço: ${escaparHtml(unidade.ubs.join(' ou '))} para o
+      ${escaparHtml(unidade.unidade)}, ${escaparHtml(outra.ubs.join(' ou '))} para o ${escaparHtml(outra.unidade)}.</p>
+    </div>`;
+
+  return `<div class="resposta-cartao">
+    <p class="resposta-eb">${escaparHtml(rua.n)}${escaparHtml(comNumero)} — rua</p>
+    <h3>${escaparHtml(unidade.unidade)}</h3>${apoio}
+    ${longe ? aviso('O endereço cadastrado mais próximo está longe.',
+      `Entre o nº ${numero} e o nº ${numeroUsado} há ${distancia} na numeração, e a rua muda de território em algum ponto. Confirme pela ${escaparHtml(unidade.ubs.join(' ou pela '))}.`) : ''}
+    ${fichaDaUnidade(unidade, {
+      ponto: achado.ponto,
+      moldura: achado.ponto ? null : achado.moldura,
+      rotulo: `${rua.n}${comNumero}`,
+    })}
+    ${segunda}
+  </div>`;
+}
+
+function responder(sugestao) {
+  const alvo = document.getElementById('busca-resposta');
+  if (sugestao.tipo === 'rua') { alvo.innerHTML = responderRua(sugestao); return; }
+
+  const unidade = unidadePor(sugestao.unidade);
+  if (!unidade) { alvo.innerHTML = ''; return; }
+  const fronteira = diretorio.fronteiras
+    .find((f) => normalizar(sugestao.termo).includes(normalizar(f.termo)));
+
+  alvo.innerHTML = `
+    <div class="resposta-cartao">
+      <p class="resposta-eb">${escaparHtml(sugestao.termo)} — ${escaparHtml(sugestao.tipo)}</p>
+      <h3>${escaparHtml(unidade.unidade)}</h3>
+      ${fronteira ? aviso('Fronteira entre territórios', escaparHtml(fronteira.nota)) : ''}
+      ${fichaDaUnidade(unidade)}
+    </div>`;
+}
+
+function semResposta() {
+  document.getElementById('busca-resposta').innerHTML = `
+    <div class="busca-vazio">
+      <svg class="icone" viewBox="0 0 256 256" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/></svg>
+      <div><b>Nada com esse nome no cadastro de endereços nem na lista do Protocolo.</b>
+      Pode ser grafia diferente da do cadastro — tente só o sobrenome da rua, sem "Rua" e sem o número — ou um
+      nome de uso local que não consta como microrregião. Persistindo, o desempate é a UBS que atende o
+      endereço: ligue para o CRAS cuja UBS de referência cobre a região.</div>
+    </div>`;
+}
+
+/* Acender o território no mapa é trocar a escala, selecionar e rolar até lá.
+   Trocar a escala zera a seleção por dentro, então selecionar vem depois --
+   invertido, o clique não deixa nada aceso. */
+/* Zoom do endereço: 18, o último nível em que o nome da rua ainda é desenhado
+   corretamente sobre a imagem (ver ZOOM_MAXIMO_DOS_ROTULOS). Em 19 a imagem
+   ganha um pouco de detalhe e perde a referência que faz a conferência valer:
+   quem chega num endereço precisa ver a CASA e o NOME DA RUA juntos, e 18
+   entrega os dois. A roda do mouse continua chegando aos 21 para quem quiser
+   olhar o telhado de perto. */
+const ZOOM_DO_ENDERECO = 18;
+
+/* A rua inteira entra um pouco mais perto também: 17 é a escala em que as
+   duas pontas de uma rua residencial ainda cabem e o nome dela já aparece. */
+const ZOOM_MAXIMO_DA_RUA = 18;
+
+let marcaDoEndereco = null;
+
+/* Roda `acao` com o mapa parado. No primeiro clique da sessão o trocarEscala
+   logo acima acabou de iniciar a animação de ida para a escala de CRAS, e um
+   setView disparado no meio dela é engolido sem erro -- o mapa pousava no
+   município com o marcador do endereço perdido lá dentro. O `once` usa os
+   mesmos eventos que o painel já escuta, sem tocar em estado interno do
+   Leaflet; o rAF no caminho livre só garante que o relayout do scroll já
+   aconteceu antes de medir o container. */
+function aoParar(acao) {
+  if (mapaEmMovimento) mapa.once('moveend zoomend', () => requestAnimationFrame(acao));
+  else requestAnimationFrame(acao);
+}
+
+/* Acende o território no mapa e, quando a busca deu um endereço, vai até ele.
+   Enquadrar o território inteiro como resposta a "Rua tal, 1200" era pedir que
+   a pessoa procurasse a rua com o olho dentro de um polígono de 8 km² -- o
+   mesmo trabalho que ela já fazia no My Maps. */
+function irParaOMapa(chaveTerritorio, alvo = {}) {
+  const proprio = Boolean(alvo.ponto || alvo.moldura);
+  if (estado.escala !== 'cras') trocarEscala('cras', !proprio);
+  if (estado.selecionado !== chaveTerritorio) selecionar(chaveTerritorio);
+
+  if (marcaDoEndereco) { marcaDoEndereco.remove(); marcaDoEndereco = null; }
+  if (alvo.ponto || alvo.moldura) trocarFundo('satelite');
+  document.getElementById('mapa-secao').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // trocarEscala acabou de pedir o quadro do território, e esse pedido fica
+  // pendurado em quadroPendente. O scroll acima muda o tamanho medido do
+  // container, o ResizeObserver dispara e REAPLICA aquele quadro -- desfazendo
+  // o enquadramento do endereço um instante depois de ele acontecer. Zerar o
+  // pendente e posicionar no quadro seguinte resolve as duas metades: nada
+  // para reaplicar, e o posicionamento acontece depois do relayout.
+  quadroPendente = null;
+  aoParar(() => {
+    if (alvo.ponto) {
+      mapa.setView(alvo.ponto, ZOOM_DO_ENDERECO, { animate: false });
+      marcaDoEndereco = L.marker(alvo.ponto, {
+        icon: L.divIcon({ className: 'marca-endereco-caixa', html: '<i class="marca-endereco"></i>',
+                          iconSize: [18, 18], iconAnchor: [9, 9] }),
+        keyboard: false,
+      }).addTo(mapa);
+      if (alvo.rotulo) {
+        marcaDoEndereco.bindTooltip(alvo.rotulo, { className: 'tt-mapa', direction: 'top', offset: [0, -12] })
+          .openTooltip();
+      }
+    } else if (alvo.moldura) {
+      const [oeste, sul, leste, norte] = alvo.moldura;
+      ajustarQuadro(L.latLngBounds([sul, oeste], [norte, leste]),
+                    { padding: [40, 40], maxZoom: ZOOM_MAXIMO_DA_RUA });
+    } else {
+      const territorio = estado.geo.cras.features.find((f) => f.properties.cras === chaveTerritorio);
+      if (territorio) ajustarQuadro(L.geoJSON(territorio).getBounds(), { padding: [20, 20] });
+    }
+  });
+}
+
+function irParaAFicha(nome) {
+  const cartao = document.querySelector(`.unidade-card[data-unidade="${nome}"]`);
+  if (!cartao) return;
+  // Só desfaz o filtro se a ficha procurada estiver escondida por ele. Quem
+  // acabou de buscar já está com a grade filtrada nessa unidade, e limpar o
+  // filtro ali devolveria as outras sete sem ninguém ter pedido.
+  if (cartao.hidden) filtrarUnidades('');
+  cartao.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Acende e apaga: a borda é um "é esta" momentâneo, não um estado que o
+  // leitor precise desfazer depois.
+  cartao.classList.add('acesa');
+  setTimeout(() => cartao.classList.remove('acesa'), 2400);
+}
+
+function filtrarUnidades(nome) {
+  document.querySelectorAll('.unidade-card').forEach((cartao) => {
+    cartao.hidden = Boolean(nome) && cartao.dataset.unidade !== nome;
+  });
+  document.querySelectorAll('#filtro-unidades .chip').forEach((chip) => {
+    chip.setAttribute('aria-pressed', String(chip.dataset.unidade === nome));
+  });
+  document.getElementById('diretorio-grade').classList.toggle('uma-so', Boolean(nome));
+}
+
+function escolher(indice) {
+  const sugestao = sugestoes[indice];
+  if (!sugestao) return;
+  const campo = document.getElementById('busca-lugar');
+  // O número digitado volta para o campo junto do nome: ele faz parte da
+  // pergunta, e some-lo faria a resposta parecer valer para a rua inteira.
+  campo.value = sugestao.tipo === 'rua' && sugestao.numero !== null
+    ? `${sugestao.termo}, ${sugestao.numero}`
+    : sugestao.termo;
+  document.getElementById('busca-lista').hidden = true;
+  campo.setAttribute('aria-expanded', 'false');
+  campo.removeAttribute('aria-activedescendant');
+  responder(sugestao);
+  termoRespondido = campo.value;
+
+  // A grade só é filtrada quando há uma unidade só para filtrar por.
+  if (sugestao.tipo !== 'rua') { filtrarUnidades(sugestao.unidade); return; }
+  // Com alternativa na mesa, a grade fica inteira: filtrar para a unidade
+  // escolhida esconderia justamente a ficha da outra possibilidade.
+  const { unidade, alternativa } = territorioDaRua(sugestao.rua, sugestao.numero);
+  const ficha = alternativa ? null : unidadeDoTerritorio(unidade);
+  filtrarUnidades(ficha ? ficha.unidade : '');
+}
+
+function ligarDiretorio() {
+  diretorio = JSON.parse(document.getElementById('dados-diretorio').textContent);
+  ruas = JSON.parse(document.getElementById('dados-ruas').textContent);
+
+  const forma = document.getElementById('busca-forma');
+  const campo = document.getElementById('busca-lugar');
+  const lista = document.getElementById('busca-lista');
+  const limpar = document.getElementById('busca-limpar');
+
+  const resposta = document.getElementById('busca-resposta');
+  campo.addEventListener('input', () => {
+    limpar.hidden = !campo.value;
+    renderizarSugestoes(campo.value);
+    if (campo.value !== termoRespondido) {
+      termoRespondido = null;
+      resposta.innerHTML = '';
+      filtrarUnidades('');
+    }
+    if (normalizar(campo.value).length >= 2 && !sugestoes.length) semResposta();
+  });
+
+  // Enter com uma sugestão destacada escolhe aquela; sem destaque, escolhe a
+  // primeira -- que é o comportamento que quem digita e aperta Enter espera.
+  // O submit do <form> é cancelado porque não há para onde enviar.
+  forma.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    escolher(sugestaoAtiva >= 0 ? sugestaoAtiva : 0);
+  });
+
+  campo.addEventListener('keydown', (evento) => {
+    if (evento.key === 'ArrowDown') { evento.preventDefault(); marcarSugestao(sugestaoAtiva + 1); }
+    else if (evento.key === 'ArrowUp') { evento.preventDefault(); marcarSugestao(sugestaoAtiva - 1); }
+    else if (evento.key === 'Escape') { lista.hidden = true; campo.setAttribute('aria-expanded', 'false'); }
+  });
+
+  // mousedown, não click: o campo perde o foco antes do click disparar, e com
+  // o listener no click a lista já tinha sumido quando o evento chegava.
+  lista.addEventListener('mousedown', (evento) => {
+    const item = evento.target.closest('.busca-item');
+    if (item) { evento.preventDefault(); escolher(Number(item.dataset.indice)); }
+  });
+
+  forma.addEventListener('reset', () => {
+    limpar.hidden = true;
+    lista.hidden = true;
+    campo.setAttribute('aria-expanded', 'false');
+    termoRespondido = null;
+    resposta.innerHTML = '';
+    filtrarUnidades('');
+  });
+
+  document.getElementById('filtro-unidades').addEventListener('click', (evento) => {
+    const chip = evento.target.closest('.chip');
+    if (chip) filtrarUnidades(chip.dataset.unidade);
+  });
+
+  // Um ouvinte na seção em vez de um por botão: os de dentro do cartão de
+  // resposta nascem depois, a cada busca.
+  document.getElementById('diretorio').addEventListener('click', (evento) => {
+    const paraMapa = evento.target.closest('[data-ir-mapa], .ver-no-mapa');
+    if (paraMapa) {
+      const numeros = (atributo) => (paraMapa.dataset[atributo]
+        ? paraMapa.dataset[atributo].split(',').map(Number) : null);
+      irParaOMapa(paraMapa.dataset.irMapa || paraMapa.dataset.territorio, {
+        ponto: numeros('ponto'),
+        moldura: numeros('moldura'),
+        rotulo: paraMapa.dataset.rotulo,
+      });
+    }
+    const paraFicha = evento.target.closest('[data-ir-ficha]');
+    if (paraFicha) irParaAFicha(paraFicha.dataset.irFicha);
+  });
+
+  // O conteúdo de um <details> fechado é escondido por content-visibility, que
+  // nenhuma regra de @media print desfaz. Abrir na hora de imprimir é o único
+  // jeito de a folha sair com as microrregiões.
+  const microrregioes = () => document.querySelectorAll('.unidade-micro');
+  addEventListener('beforeprint', () => microrregioes().forEach((d) => { d.open = true; }));
+  addEventListener('afterprint', () => microrregioes().forEach((d) => { d.open = false; }));
+}
+
 /* ------------------------------------------------------------------ carga - */
 function carregar() {
   painel = JSON.parse(document.getElementById('dados-painel').textContent);
@@ -2479,10 +3042,9 @@ function carregar() {
   aplicarCalor();
   renderizarFaixas();
   renderizarQuadrante();
-  renderizarQualidade();
-  renderizarConferencia();
   renderizarRede();
   ligarPopulacao();
+  ligarDiretorio();
 }
 
 function iniciar() {

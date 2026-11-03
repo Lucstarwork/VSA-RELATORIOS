@@ -643,6 +643,208 @@ dl.defs dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nu
   border:var(--hair) solid var(--hairline);overflow-x:auto;
 }
 
+/* ---- 9b. DIRETÓRIO DE CRAS ------------------------------------------------ */
+/* A seção é a única do painel que não serve para analisar, e sim para resolver:
+   alguém com um endereço na mão precisa saber qual porta procurar. Por isso o
+   campo de busca é o elemento mais pesado da seção -- maior que qualquer
+   controle do mapa -- e a resposta aparece grande, com o nome da unidade em
+   serifada, do tamanho de um título. É o oposto da densidade que governa o
+   resto da página, e é de propósito. */
+.busca-bloco{padding:var(--sp-6);margin-bottom:var(--sp-4)}
+.busca-forma{display:flex;flex-direction:column;gap:var(--sp-2)}
+.busca-rotulo{
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.busca-campo{
+  display:flex;align-items:center;gap:var(--sp-3);
+  background:var(--surface-2);border:var(--hair) solid var(--hairline);
+  border-radius:var(--radius-md);padding:0 var(--sp-3);
+  transition:border-color var(--dur-fast),background var(--dur-fast);
+}
+.busca-campo:focus-within{border-color:var(--primary);background:var(--surface)}
+.busca-campo > .icone{width:20px;height:20px;color:var(--ink-3);flex:0 0 auto}
+.busca-campo:focus-within > .icone{color:var(--primary)}
+/* 17px e nao menos: campo abaixo de 16px faz o Safari do iOS dar zoom sozinho
+   ao focar. Vale mesmo num painel de alvo desktop -- o celular aparece. */
+#busca-lugar{
+  flex:1 1 auto;min-width:0;border:0;background:none;color:var(--ink);
+  font-family:var(--font-sans);font-size:var(--fs-body-lg);padding:14px 0;
+}
+#busca-lugar:focus{outline:none}
+#busca-lugar::placeholder{color:var(--ink-3)}
+/* O X nativo do type="search" duplicaria o botao de limpar, que e o que
+   governa a lista e o foco. */
+#busca-lugar::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+#busca-limpar{height:28px;width:28px;min-width:28px;border-radius:var(--radius-pill)}
+
+.busca-lista{
+  list-style:none;margin:var(--sp-3) 0 0;padding:0;max-height:264px;overflow-y:auto;
+  border:var(--hair) solid var(--hairline);border-radius:var(--radius-md);
+}
+.busca-item{
+  display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-4);
+  padding:9px var(--sp-4);font-size:var(--fs-caption);cursor:pointer;
+  border-bottom:var(--hair) solid var(--hairline);
+}
+.busca-item:last-child{border-bottom:0}
+.busca-item b{font-weight:500}
+.busca-item mark{background:var(--primary-soft);color:var(--primary-strong);border-radius:2px}
+.busca-item .onde{font-family:var(--font-mono);font-size:var(--fs-label);color:var(--ink-3);white-space:nowrap}
+.busca-item .tipo{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em}
+@media (hover:hover){.busca-item:hover{background:var(--surface-2)}}
+.busca-item[aria-selected="true"]{background:var(--primary-soft)}
+.busca-item[aria-selected="true"] .onde{color:var(--primary-strong)}
+
+.busca-resposta:empty{display:none}
+.busca-resposta{margin-top:var(--sp-4)}
+.resposta-cartao{
+  border:var(--hair) solid var(--primary-soft-border);background:var(--primary-soft);
+  border-radius:var(--radius-md);padding:var(--sp-5);
+}
+.resposta-eb{
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--primary-strong);margin:0 0 var(--sp-1);
+}
+.resposta-cartao h3{font-size:var(--fs-h3);margin:0;color:var(--ink)}
+.resposta-cartao .resposta-contato{
+  margin:var(--sp-3) 0 0;font-size:var(--fs-caption);color:var(--ink-2);line-height:1.6;
+}
+.resposta-cartao .resposta-contato .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.resposta-acoes{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-4)}
+.resposta-fronteira{margin-top:var(--sp-3)}
+.resposta-apoio{font-size:var(--fs-caption);color:var(--ink-2);margin:var(--sp-2) 0 0}
+/* Segunda possibilidade: separada por régua, em peso menor. Ela existe para ser
+   lida depois da resposta, não disputar com ela. */
+.resposta-outra{
+  margin-top:var(--sp-4);padding-top:var(--sp-4);
+  border-top:var(--hair) solid var(--primary-soft-border);
+}
+.resposta-outra p{font-size:var(--fs-caption);color:var(--ink-2);margin:0}
+.resposta-outra .rotulo-mini{margin-bottom:var(--sp-1)}
+.resposta-outra .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+/* Marca do endereço encontrado. Anel branco por fora porque ela pousa sobre
+   imagem de satélite, onde um ponto só de cor some no telhado. */
+.marca-endereco-caixa{background:none;border:0}
+.marca-endereco{
+  display:block;width:14px;height:14px;margin:2px;border-radius:var(--radius-pill);
+  background:var(--primary);box-shadow:0 0 0 3px #fff, 0 0 0 4px rgba(0,0,0,.35);
+}
+.resposta-apoio .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+/* Resposta de duas unidades: o cartao perde o verde de confirmacao e fica
+   neutro. Pintar de marca uma resposta que o sistema nao sustenta e o jeito
+   mais rapido de ensinar a equipe a confiar no que nao deve. */
+.resposta-dupla{background:var(--surface-2);border-color:var(--hairline)}
+.resposta-dupla .resposta-eb{color:var(--ink-3)}
+.resposta-dupla h3{font-size:var(--fs-h4)}
+.resposta-candidatos{
+  list-style:none;margin:var(--sp-3) 0 0;padding:0;
+  font-size:var(--fs-caption);color:var(--ink-2);
+}
+.resposta-candidatos li{padding:7px 0;border-bottom:var(--hair) solid var(--hairline)}
+.resposta-candidatos li:last-child{border-bottom:0}
+.resposta-candidatos .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+/* Faixa de confianca: tres leituras do mesmo total de enderecos. Numero em
+   mono, como todo dado do painel, e a cor so no marcador lateral -- a classe
+   .ok/.alerta nao pode ser a unica portadora do sentido. */
+.confianca-faixa{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-4);margin:var(--sp-4) 0 var(--sp-8)}
+.confianca-item{
+  border:var(--hair) solid var(--hairline);border-radius:var(--radius-md);
+  padding:var(--sp-4);background:var(--surface-2);
+}
+.confianca-item.ok{border-color:var(--primary-soft-border);background:var(--primary-soft)}
+.confianca-item.alerta{
+  border-color:color-mix(in srgb,var(--warning) 28%,transparent);background:var(--warning-bg);
+}
+.confianca-num{
+  display:block;font-family:var(--font-mono);font-size:var(--fs-h2);font-weight:600;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--ink);
+}
+.confianca-num .unidade{font-size:var(--fs-h4);color:var(--ink-3);margin-left:2px}
+.confianca-item p{font-size:var(--fs-caption);color:var(--ink-2);margin:var(--sp-2) 0 0}
+.busca-vazio{
+  display:flex;gap:var(--sp-3);font-size:var(--fs-caption);color:var(--ink-2);
+  border:var(--hair) dashed var(--hairline-strong);border-radius:var(--radius-md);
+  padding:var(--sp-4);
+}
+.busca-vazio .icone{width:20px;height:20px;color:var(--ink-3);flex:0 0 auto}
+
+.diretorio-barra{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);
+  flex-wrap:wrap;margin-bottom:var(--sp-4);
+}
+.diretorio-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-4)}
+/* Filtrada a uma unidade, a grade de duas colunas deixaria um cartão sozinho à
+   esquerda com metade da linha vazia -- o "vazio lateral" que o design system
+   trata como o tell nº 1 de tela feita por IA. Coluna única e centrada, na
+   mesma largura que o cartão tinha na grade: o branco restante lê como margem,
+   não como coluna que quebrou. */
+.diretorio-grade.uma-so{grid-template-columns:min(100%,780px);justify-content:center}
+.unidade-card{
+  padding:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-4);
+  transition:border-color var(--dur-surface),box-shadow var(--dur-surface);
+}
+.unidade-card[hidden]{display:none}
+.unidade-card.acesa{border-color:var(--primary);box-shadow:inset 3px 0 0 var(--primary)}
+.unidade-topo{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.unidade-topo h3{font-size:var(--fs-h4);margin:0}
+
+/* dl de duas colunas: rotulo mono curto a esquerda, valor corrido a direita.
+   Grade, e nao float, porque o valor quebra em duas linhas com frequencia
+   (endereco longo, lista de cargos) e o rotulo tem que continuar no topo. */
+.unidade-contato{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px var(--sp-4);margin:0}
+.unidade-contato dt{
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3);white-space:nowrap;padding-top:2px;
+}
+.unidade-contato dd{margin:0;font-size:var(--fs-caption);color:var(--ink-2);min-width:0;overflow-wrap:break-word}
+/* Piso de 24px de alvo sob cursor (DESIGN_GUIDE §2). O link de e-mail tem 17px
+   de altura de linha; o padding vertical o leva ao piso sem mexer no ritmo da
+   dl, que continua governado pelo gap da grade. Mesma solução já usada em
+   .dtable a. */
+.unidade-contato dd a{display:inline-block;min-height:24px;padding:3px 0}
+.unidade-contato dd .mono,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.unidade-contato dd .contador{margin-left:var(--sp-1)}
+
+.unidade-territorio{border-top:var(--hair) solid var(--hairline);padding-top:var(--sp-4)}
+.rotulo-mini{
+  font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 var(--sp-2);
+}
+.unidade-bairros{font-size:var(--fs-body);color:var(--ink);margin:0;font-weight:500}
+.unidade-micro{margin-top:var(--sp-3)}
+.unidade-micro summary{
+  font-family:var(--font-mono);font-size:var(--fs-label);color:var(--primary-strong);
+  cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;
+  border-radius:var(--radius-sm);min-height:24px;
+}
+.unidade-micro summary::-webkit-details-marker{display:none}
+.unidade-micro summary::before{
+  content:"";width:0;height:0;border-left:5px solid currentColor;
+  border-top:4px solid transparent;border-bottom:4px solid transparent;
+  transition:transform var(--dur-fast);
+}
+.unidade-micro[open] summary::before{transform:rotate(90deg)}
+.unidade-micro summary:focus-visible{outline:var(--focus-w) solid var(--focus);outline-offset:3px}
+.unidade-lista{font-size:var(--fs-caption);color:var(--ink-2);line-height:1.7;margin:var(--sp-3) 0 0}
+.unidade-micro .rotulo-mini{margin-top:var(--sp-4)}
+.ver-no-mapa{margin-top:auto;align-self:flex-start}
+.btn-sm{height:32px;padding:0 var(--sp-3);font-size:var(--fs-label)}
+
+.diretorio-notas{padding:var(--sp-6);margin-top:var(--sp-4)}
+.diretorio-notas h3{font-size:var(--fs-h4);margin:0 0 var(--sp-2)}
+.diretorio-notas h3 ~ h3{margin-top:var(--sp-8)}
+.diretorio-notas > p{font-size:var(--fs-caption);color:var(--ink-2);max-width:var(--measure);margin:0 0 var(--sp-4)}
+.fronteira-lista{margin:0 0 var(--sp-2)}
+.fronteira-lista dt{
+  font-size:var(--fs-body);font-weight:500;color:var(--ink);
+  padding-top:var(--sp-3);border-top:var(--hair) solid var(--hairline);
+}
+.fronteira-lista dt:first-child{border-top:0;padding-top:0}
+.fronteira-lista dd{font-size:var(--fs-caption);color:var(--ink-2);margin:4px 0 var(--sp-3);max-width:var(--measure)}
+
 /* ---- 10. RESPONSIVO (rede de segurança; o alvo é desktop) ----------------- */
 @media (max-width:1180px){
   .kpi-row{grid-template-columns:repeat(3,1fr)}
@@ -652,10 +854,15 @@ dl.defs dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nu
      as duas estarem na medida de leitura. Abaixo disso o texto empilha. */
   .secao-head{grid-template-columns:minmax(0,1fr)}
   .grade-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .diretorio-grade{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:760px){
   .shell{padding:0 var(--sp-4) var(--sp-12)}
   .kpi-row,.grade-2,.grade-3{grid-template-columns:minmax(0,1fr)}
+  /* Rótulo mono em cima do valor: com 110px de rótulo à esquerda o endereço
+     fica em coluna de quatro palavras. */
+  .unidade-contato{grid-template-columns:minmax(0,1fr);gap:2px}
+  .unidade-contato dd{margin-bottom:var(--sp-2)}
   .faixa-linha,.faixa-eixo{grid-template-columns:110px 1fr 48px}
   .escada-item{grid-template-columns:96px 1fr 64px}
 }
@@ -905,6 +1112,16 @@ dl.defs dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nu
      explicaria um botao que nao esta na folha. */
   .appbar-right,.mapa-barra .seg,.mapa-barra .rotulo,#orto-indisponivel,
   .cinema,.leaflet-control-zoom,.btn{display:none!important}
+  /* A busca e o filtro são controles; o diretório em si vai inteiro para o
+     papel, com as microrregiões abertas -- é a folha que fica no balcão. */
+  .busca-bloco,.diretorio-barra{display:none!important}
+  .diretorio-grade{grid-template-columns:minmax(0,1fr)}
+  .unidade-card{break-inside:avoid}
+  .unidade-card[hidden]{display:flex!important}
+  /* O <details> é aberto por JS no beforeprint, que é o único jeito confiável:
+     o navegador esconde o conteúdo fechado por content-visibility, que nenhuma
+     regra de display desfaz. Aqui só some o triângulo de abrir. */
+  .unidade-micro summary{display:none}
   .shell{max-width:none;padding:0}
   .secao{break-inside:avoid;margin-top:var(--sp-8)}
   .card{break-inside:avoid;border-color:#bbb}
@@ -921,3 +1138,5 @@ dl.defs dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nu
    do MapLibre, em outro zoom e com inclinação. Régua errada sobre mapa é pior
    que régua nenhuma. */
 .mapa-palco:has(.cena3d.visivel) .leaflet-control-container{opacity:0;transition:opacity .3s}
+
+
